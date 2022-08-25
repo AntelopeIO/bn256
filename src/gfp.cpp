@@ -4,8 +4,8 @@
 
 namespace bn256 {
 
-    void gfp_carry(gfP &a, const uint64_t head){
-        gfP b{};
+    void gfp_carry(gfp &a, uint64_t head){
+        gfp b{};
         uint64_t carry = 0;
         for (const auto& pi : p2) {
             const auto i = &pi - &p2[0];
@@ -17,8 +17,8 @@ namespace bn256 {
         }
         carry = carry & ~head;
 
-        // If b is negative, then return a.
-        // Else return b.
+        // if b is negative, then return a.
+        // else return b.
         carry = -carry;
         const auto ncarry = ~carry;
         for (auto i = 0; i < 4; i++) {
@@ -26,7 +26,7 @@ namespace bn256 {
         }
     }
 
-    void gfp_neg(gfP& c, const gfP& a){
+    void gfp_neg(gfp& c, const gfp& a){
         uint64_t carry = 0;
         for (const auto& pi : p2) {
             const auto i = &pi - &p2[0];
@@ -38,7 +38,7 @@ namespace bn256 {
         gfp_carry(c, 0);
     }
 
-    void gfp_add(gfP& c, const gfP& a, const gfP& b){
+    void gfp_add(gfp& c, const gfp& a, const gfp& b){
         uint64_t carry = 0;
         for (const auto& ai : a) {
             const auto i = &ai - &a[0];
@@ -50,9 +50,9 @@ namespace bn256 {
         gfp_carry(c, carry);
     }
 
-    void gfp_sub(gfP& c, const gfP& a, const gfP& b){
+    void gfp_sub(gfp& c, const gfp& a, const gfp& b){
         uint64_t carry = 0;
-        gfP t{};
+        gfp t{};
         for (const auto& pi : p2) {
             const auto i = &pi - &p2[0];
             const auto bi = b[i];
@@ -71,7 +71,7 @@ namespace bn256 {
         gfp_carry(c, carry);
     }
 
-    uint64_array_8_t& mul(const gfP& a, const gfP& b, uint64_array_8_t& rc){
+    uint64_array_8_t& mul(const gfp& a, const gfp& b, uint64_array_8_t& rc){
         constexpr uint64_t mask16 = 0x0000ffff;
         constexpr uint64_t mask32 = 0xffffffff;
         uint64_array_32_t array32{};
@@ -121,7 +121,7 @@ namespace bn256 {
         return rc;
     }
 
-    uint64_array_4_t& halfMul(const uint64_array_4_t& a, const uint64_array_4_t& b, uint64_array_4_t& rc) {
+    uint64_array_4_t& half_mul(const uint64_array_4_t& a, const uint64_array_4_t& b, uint64_array_4_t& rc) {
         constexpr uint64_t mask16 = 0x0000ffff;
         constexpr uint64_t mask32 = 0xffffffff;
         uint64_array_18_t array18{};
@@ -169,25 +169,25 @@ namespace bn256 {
         return rc;
     }
 
-    void gfp_mul(gfP& c, const gfP& a, const gfP& b) {
-        uint64_array_8_t array8_T{};
-        auto T = mul(a, b, array8_T);
+    void gfp_mul(gfp& c, const gfp& a, const gfp& b) {
+        uint64_array_8_t array8_t1{};
+        auto t1 = mul(a, b, array8_t1);
         uint64_array_4_t array4_m{};
-        const uint64_array_4_t array4_1 = {T[0], T[1], T[2], T[3]};
-        const auto m = halfMul(array4_1, np, array4_m);
+        const uint64_array_4_t array4_1 = {t1[0], t1[1], t1[2], t1[3]};
+        const auto m = half_mul(array4_1, np, array4_m);
         uint64_array_8_t array8_t{};
         const uint64_array_4_t array4_2 = {m[0], m[1], m[2], m[3]};
-        const auto t = mul(array4_2, p2, array8_t);
+        const auto t2 = mul(array4_2, p2, array8_t);
         uint64_t carry = 0;
-        for (const auto& Ti : T) {
-            const auto i = &Ti - &T[0];
-            const auto ti = t[i];
-            const auto zi = Ti + ti + carry;
-            T[i] = zi;
-            carry = (Ti & ti | (Ti | ti) & ~zi) >> 63ull;
+        for (const auto& t1_i : t1) {
+            const auto i = &t1_i - &t1[0];
+            const auto t2_i = t2[i];
+            const auto zi = t1_i + t2_i + carry;
+            t1[i] = zi;
+            carry = (t1_i & t2_i | (t1_i | t2_i) & ~zi) >> 63ull;
         }
-        c = {T[4], T[5], T[6], T[7]};
-        std::cout << "c:" << T[4] << "," << T[5] << "," << T[6] << "," << T[7] << std::endl;
+        c = {t1[4], t1[5], t1[6], t1[7]};
+        std::cout << "c:" << t1[4] << "," << t1[5] << "," << t1[6] << "," << t1[7] << std::endl;
         gfp_carry(c, carry);
         std::cout << "c:" << c[0] << "," << c[1] << "," << c[2] << "," << c[3] << std::endl;
     }
