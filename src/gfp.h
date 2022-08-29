@@ -25,15 +25,15 @@ namespace bn256 {
     struct gfp2 {
         gfp x;
         gfp y;
-        auto set(gfp2 &a) {
+        const gfp2& set(gfp2 &a) {
             gfp_set(x, a.x);
             gfp_set(y, a.y);
-            return this;
+            return *this;
         }
-        auto set_zero() {
+        const gfp2& set_zero() {
             gfp_setzero(x);
             gfp_setzero(y);
-            return this;
+            return *this;
         }
     };
 
@@ -49,29 +49,29 @@ namespace bn256 {
             y.set(a.y);
             y.set(a.z);
         }
-        auto set_zero() {
+        const gfp6& set_zero() {
             x.set_zero();
             y.set_zero();
             z.set_zero();
-            return this;
+            return *this;
         }
     } ;
 
     // gfp12 implements the field of size p¹² as a quadratic extension of gfp6
     // where ω²=τ.
-    struct gfp12{
+    struct gfp12 {
         // value is xω + y
         gfp6 x;
         gfp6 y;
-        auto set(gfp12 &a) {
+        const gfp12& set(gfp12 &a) {
             x.set(a.x);
             y.set(a.y);
-            return this;
+            return *this;
         }
-        auto set_zero(gfp12 &e) {
+        const gfp12& set_zero(gfp12 &e) {
             x.set_zero();
             y.set_zero();
-            return this;
+            return *this;
         }
     };
 
