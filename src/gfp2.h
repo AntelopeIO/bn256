@@ -8,10 +8,10 @@ namespace bn256 {
     // gfp2 implements a field of size p² as a quadratic extension of the base field
     // where i²=-1.
     struct gfp2 {
-        gfp x;
-        gfp y;
+        gfp x{};
+        gfp y{};
         
-        const gfp2& set(gfp2 &a) {
+        const gfp2& set(gfp2& a) {
             gfp_set(x, a.x);
             gfp_set(y, a.y);
             return *this;

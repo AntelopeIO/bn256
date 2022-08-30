@@ -12,12 +12,12 @@ namespace bn256 {
         gfp6 x;
         gfp6 y;
 
-        const gfp12& set(gfp12 &a) {
+        const gfp12& set(gfp12& a) {
             x.set(a.x);
             y.set(a.y);
             return *this;
         }
-        const gfp12& set_zero(gfp12 &e) {
+        const gfp12& set_zero() {
             x.set_zero();
             y.set_zero();
             return *this;

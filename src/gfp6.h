@@ -13,10 +13,10 @@ namespace bn256 {
         gfp2 y;
         gfp2 z;
         
-        void set(gfp6 &a) {
+        void set(gfp6& a) {
             x.set(a.x);
             y.set(a.y);
-            y.set(a.z);
+            z.set(a.z);
         }
         const gfp6& set_zero() {
             x.set_zero();

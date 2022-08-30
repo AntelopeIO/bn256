@@ -9,7 +9,7 @@ namespace bn256 {
     typedef std::array<uint64_t, 18> uint64_array_18_t;
     typedef std::array<uint64_t, 32> uint64_array_32_t;
 
-    static void gfp_carry(gfp &a, uint64_t head){
+    static void gfp_carry(gfp& a, uint64_t head){
         gfp b{};
         uint64_t carry = 0;
         for (const auto& pi : p2) {
