@@ -1,5 +1,6 @@
 #include <constants.h>
 #include <gfp.h>
+#include <gfp_generic.h>
 #include <iostream>
 #include <iosfwd>
 

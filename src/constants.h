@@ -1,7 +1,9 @@
 #ifndef BN256_CONSTANTS_H
 #define BN256_CONSTANTS_H
 
-#include "gfp.h"
+#include <gfp.h>
+#include <gfp2.h>
+#include <gfp6.h>
 #include <boost/multiprecision/cpp_int.hpp>
 
 namespace bn256 {

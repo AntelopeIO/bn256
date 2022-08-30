@@ -1,9 +1,15 @@
-#include <gfp.h>
+
+#include <gfp_generic.h>
 #include <constants.h>
+#include <gfp.h>
 
 namespace bn256 {
 
-    void gfp_carry(gfp &a, uint64_t head){
+    typedef std::array<uint64_t, 8> uint64_array_8_t;
+    typedef std::array<uint64_t, 18> uint64_array_18_t;
+    typedef std::array<uint64_t, 32> uint64_array_32_t;
+
+    static void gfp_carry(gfp &a, uint64_t head){
         gfp b{};
         uint64_t carry = 0;
         for (const auto& pi : p2) {
@@ -69,7 +75,7 @@ namespace bn256 {
         gfp_carry(c, carry);
     }
 
-    void mul(const gfp& a, const gfp& b, uint64_array_8_t& rc){
+    static void mul(const gfp& a, const gfp& b, uint64_array_8_t& rc){
         constexpr uint64_t mask16 = 0x0000ffff;
         constexpr uint64_t mask32 = 0xffffffff;
         uint64_array_32_t array32{};
@@ -118,7 +124,7 @@ namespace bn256 {
         };
     }
 
-    void half_mul(const uint64_array_4_t& a, const uint64_array_4_t& b, uint64_array_4_t& rc) {
+    static void half_mul(const uint64_array_4_t& a, const uint64_array_4_t& b, uint64_array_4_t& rc) {
         constexpr uint64_t mask16 = 0x0000ffff;
         constexpr uint64_t mask32 = 0xffffffff;
         uint64_array_18_t array18{};
