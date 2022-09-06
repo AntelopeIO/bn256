@@ -12,8 +12,8 @@ namespace bn256 {
     static void gfp_carry(gfp& a, uint64_t head){
         gfp b{};
         uint64_t carry = 0;
-        for (const auto& pi : p2) {
-            const auto i = &pi - &p2[0];
+        for (const auto& pi : constants::p2) {
+            const auto i = &pi - &constants::p2[0];
             const auto ai = a[i];
             const auto bi = ai - pi - carry;
             b[i] = bi;
@@ -32,8 +32,8 @@ namespace bn256 {
 
     void gfp_neg(gfp& c, const gfp& a){
         uint64_t carry = 0;
-        for (const auto& pi : p2) {
-            const auto i = &pi - &p2[0];
+        for (const auto& pi : constants::p2) {
+            const auto i = &pi - &constants::p2[0];
             const auto ai = a[i];
             const auto ci = pi - ai - carry;
             c[i] = ci;
@@ -57,8 +57,8 @@ namespace bn256 {
     void gfp_sub(gfp& c, const gfp& a, const gfp& b){
         uint64_t carry = 0;
         gfp t{};
-        for (const auto& pi : p2) {
-            const auto i = &pi - &p2[0];
+        for (const auto& pi : constants::p2) {
+            const auto i = &pi - &constants::p2[0];
             const auto bi = b[i];
             const auto ti = pi - bi - carry;
             t[i] = ti;
@@ -177,10 +177,10 @@ namespace bn256 {
 
         uint64_array_4_t array4_m{};
         const uint64_array_4_t array4_1 = {array8_t1[0], array8_t1[1], array8_t1[2], array8_t1[3]};
-        half_mul(array4_1, np, array4_m);
+        half_mul(array4_1, constants::np, array4_m);
 
         uint64_array_8_t array8_t2{};
-        mul(array4_m, p2, array8_t2);
+        mul(array4_m, constants::p2, array8_t2);
 
         uint64_t carry = 0;
         uint64_array_8_t array8_zi{};

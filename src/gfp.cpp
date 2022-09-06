@@ -16,7 +16,7 @@ namespace bn256 {
         return out;
     }
 
-    void invert(gfp& e, gfp& f) {
+    void gfp_invert(gfp& e, const gfp& f) {
 
         constexpr uint64_array_4_t bits = {
             0x3c208c16d87cfd45,
@@ -26,17 +26,19 @@ namespace bn256 {
         };
 
         gfp sum{}, power{};
+        gfp_set(sum, constants::rn1);
+        gfp_set(power, f);
 
         for (auto word = 0; word < bits.size(); word++) {
             for (auto bit = 0; bit < 64; bit++) {
-                if ((bits[word] >> bit) & 1 == 1) {
+                if (((bits[word] >> bit) & 1) == 1) {
                     gfp_mul(sum, sum, power);
                 }
                 gfp_mul(power, power, power);
             }
         }
 
-        gfp_mul(sum, sum, r3);
+        gfp_mul(sum, sum, constants::r3);
         gfp_set(e,sum);
     }
 
@@ -62,21 +64,21 @@ namespace bn256 {
         const std::string error_string("bn256: coordinate exceeds modulus");
 
         for (auto i = 3; i >= 0; i--) {
-            if (e[i] < p2[i]) {
+            if (e[i] < constants::p2[i]) {
                 return std::nullopt;
             }
-            if (e[i] > p2[i]) {
+            if (e[i] > constants::p2[i]) {
                 return error_string;
             }
         }
         return error_string;
     }
 
-    void mont_encode(gfp& c, gfp& a){
-        gfp_mul(c, a, r2);
+    void mont_encode(gfp& c, const gfp& a){
+        gfp_mul(c, a, constants::r2);
     }
 
-    void mont_decode(gfp& c, gfp& a){
+    void mont_decode(gfp& c, const gfp& a){
         constexpr gfp decode_b {1};
         gfp_mul(c, a, decode_b);
     }

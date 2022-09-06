@@ -22,13 +22,13 @@ namespace bn256 {
 
     gfp new_gfp(int64_t x);
 
-    static void invert(gfp& e, gfp& f);
+    void gfp_invert(gfp& e, const gfp& f);
 
     void marshal(gfp& e, std::vector<uint8_t>& out);
     std::optional<std::string> unmarshal(gfp& e, std::vector<uint8_t>& in);
 
-    static void mont_encode(gfp& c, gfp& a);
-    static void mont_decode(gfp& c, gfp& a);
+    void mont_encode(gfp& c, const gfp& a);
+    void mont_decode(gfp& c, const gfp& a);
 
 }
 
