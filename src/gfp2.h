@@ -1,6 +1,4 @@
-#ifndef BN256_GFP2_H
-#define BN256_GFP2_H
-
+#pragma once
 #include <gfp.h>
 #include <gfp_generic.h>
 
@@ -48,5 +46,3 @@ namespace bn256 {
     };
 
 }
-
-#endif //BN256_GFP2_H

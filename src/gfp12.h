@@ -1,6 +1,4 @@
-#ifndef BN256_GFP12_H
-#define BN256_GFP12_H
-
+#pragma once
 #include <gfp6.h>
 #include <boost/multiprecision/cpp_int.hpp>
 
@@ -52,5 +50,3 @@ namespace bn256 {
     };
 
 }
-
-#endif //BN256_GFP12_H

@@ -1,6 +1,4 @@
-#ifndef BN256_GFP_H
-#define BN256_GFP_H
-
+#pragma once
 #include <cstdint>
 #include <array>
 #include <vector>
@@ -31,5 +29,3 @@ namespace bn256 {
     void mont_decode(gfp& c, const gfp& a);
 
 }
-
-#endif //BN256_GFP_H

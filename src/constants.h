@@ -1,6 +1,4 @@
-#ifndef BN256_CONSTANTS_H
-#define BN256_CONSTANTS_H
-
+#pragma once
 #include <gfp.h>
 #include <gfp2.h>
 #include <gfp6.h>
@@ -93,5 +91,3 @@ namespace bn256::constants {
             {0x7361d77f843abe92, 0xa5bb2bd3273411fb, 0x9c941f314b3e2399, 0x15df9cddbb9fd3ec}
         };
     }
-
-#endif //BN256_CONSTANTS_H
