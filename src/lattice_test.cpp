@@ -5,7 +5,7 @@
 #include <iosfwd>
 #include <constants.h>
 
-using boost::multiprecision::uint128_t;
+using boost::multiprecision::int128_t;
 
 void test_lattice_reduce_curve() {
     constexpr std::size_t max_bitlen = 130;
@@ -15,11 +15,26 @@ void test_lattice_reduce_curve() {
     bool not_positive = false;
     for (std::size_t i = 0; i < 2; i++) {
         auto bit_len = bn256::bitlen(ks[i]);
+        std::cout << __FILE__ << ":"
+                  << __LINE__ << ","
+                  << i << ","
+                  << bit_len << ","
+                  << ks[i] << std::endl;
         if(bit_len > max_bitlen) {
             too_large = true;
+            std::cout << "Large::[" << __FILE__ << ":"
+                      << __LINE__ << ","
+                      << i << ","
+                      << bit_len << ","
+                      << ks[i] << "]" << std::endl;
         }
         if(ks[i].sign() << 0 ) {
             not_positive = true;
+            std::cout << "Negative::[" << __FILE__ << ":"
+                      << __LINE__ << ","
+                      << i << ","
+                      << bit_len << ","
+                      << ks[i] << "]" << std::endl;
         }
     }
     if (too_large) {
@@ -37,11 +52,27 @@ void test_lattice_reduce_target() {
     bool too_large = false;
     bool not_positive = false;
     for (std::size_t i = 0; i < 4; i++) {
-        if(bn256::bitlen(ks[i]) > max_bitlen) {
+        auto bit_len = bn256::bitlen(ks[i]);
+        std::cout << __FILE__ << ":"
+                  << __LINE__ << ","
+                  << i << ","
+                  << bit_len << ","
+                  << ks[i] << std::endl;
+        if(bit_len > max_bitlen) {
             too_large = true;
+            std::cout << "Large::[" << __FILE__ << ":"
+                      << __LINE__ << ","
+                      << i << ","
+                      << bit_len << ","
+                      << ks[i] << "]" << std::endl;
         }
         if(ks[i].sign() << 0 ) {
             not_positive = true;
+            std::cout << "Negative::[" << __FILE__ << ":"
+                      << __LINE__ << ","
+                      << i << ","
+                      << bit_len << ","
+                      << ks[i] << "]" << std::endl;
         }
     }
     if (too_large) {

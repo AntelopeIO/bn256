@@ -3,6 +3,7 @@
 #include <constants.h>
 #include <lattice.h>
 
+using boost::multiprecision::int128_t;
 namespace bn256 {
 
     static constexpr gfp curve_b {3};
@@ -161,13 +162,13 @@ namespace bn256 {
         gfp_sub(y_, t2, t);
     }
 
-    void curve_point::mul(const curve_point& a, const int256_t& scalar) {
+    void curve_point::mul(const curve_point& a, const int128_t& scalar) {
         typedef std::array<curve_point, 4> curve_point_array_4_t;
         curve_point_array_4_t precomp{};
 
         precomp[1].set(a);
         precomp[2].set(a);
-        gfp_mul(precomp[2].x_, precomp[2].x_, xi_to_2p_squared_minus_2_over_3);
+        gfp_mul(precomp[2].x_, precomp[2].x_, constants::xi_to_2p_squared_minus_2_over_3);
         precomp[3].add(precomp[1], precomp[2]);
 
         const auto multi_scalar = curve_lattice.multi(scalar);
@@ -176,7 +177,7 @@ namespace bn256 {
         sum.set_infinity();
         curve_point t{};
 
-        for (auto i = multi_scalar.size() - 1; i >= 0; i--) {
+        for (int i = multi_scalar.size() - 1; i >= 0; i--) {
             t.double_(sum);
             if (multi_scalar[i] == 0) {
                 sum.set(t);
