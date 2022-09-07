@@ -19,7 +19,7 @@ namespace bn256::constants {
         static const auto P = boost::multiprecision::int128_t("21888242871839275222246405745257275088696311157297823662689037894645226208583");
 
         // p2 is p, represented as little-endian 64-bit words.
-        inline constexpr uint64_array_4_t p2 = {
+        inline constexpr gfp p2 = {
             0x3c208c16d87cfd47,
             0x97816a916871ca8d,
             0xb85045b68181585d,

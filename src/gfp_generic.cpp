@@ -174,7 +174,7 @@ namespace bn256 {
         uint64_array_8_t array8_t1{};
         mul(a, b, array8_t1);
 
-        uint64_array_4_t array4_m{};
+        gfp array4_m{};
         const uint64_array_4_t array4_1 = {array8_t1[0], array8_t1[1], array8_t1[2], array8_t1[3]};
         half_mul(array4_1, constants::np, array4_m);
 

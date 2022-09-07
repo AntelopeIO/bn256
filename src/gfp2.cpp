@@ -4,25 +4,25 @@ namespace bn256 {
 
     gfp2 gfp2::gfp2_decode(const gfp2& in) {
         gfp2 out{};
-        mont_decode(out.x_, in.x_);
-        mont_decode(out.y_, in.y_);
+        out.x_.mont_decode(in.x_);
+        out.y_.mont_decode(in.y_);
         return out;
     }
 
     const gfp2& gfp2::set(const gfp2& a) {
-        gfp_set(x_, a.x_);
-        gfp_set(y_, a.y_);
+        x_.set(a.x_);
+        y_.set(a.y_);
         return *this;
     }
 
     const gfp2& gfp2::set_zero() {
-        gfp_setzero(x_);
-        gfp_setzero(y_);
+        x_.set_zero();
+        y_.set_zero();
         return *this;
     }
 
     const gfp2& gfp2::set_one() {
-        gfp_setzero(x_);
+        x_.set_zero();
         y_ = {1};
         return *this;
     }
@@ -39,7 +39,7 @@ namespace bn256 {
     }
 
     const gfp2& gfp2::conjugate(const gfp2& a) {
-        gfp_set(y_, a.y_);
+        y_.set(a.y_);
         gfp_neg(x_, a.x_);
         return *this;
     }
@@ -75,8 +75,8 @@ namespace bn256 {
         gfp_mul(t, a.x_, b.x_);
         gfp_sub(ty, ty, t);
 
-        gfp_set(x_, tx);
-        gfp_set(y_, ty);
+        x_.set(tx);
+        y_.set(ty);
 
         return *this;
     }
@@ -104,8 +104,8 @@ namespace bn256 {
 
         gfp_add(ty, ty, a.x_);
 
-        gfp_set(x_,tx);
-        gfp_set(y_,ty);
+        x_.set(tx);
+        y_.set(ty);
 
         return *this;
     }
@@ -121,8 +121,8 @@ namespace bn256 {
         gfp_mul(tx, a.x_, a.y_);
         gfp_add(tx, tx, tx);
 
-        gfp_set(x_,tx);
-        gfp_set(y_,ty);
+        x_.set(tx);
+        y_.set(ty);
 
         return *this;
     }
@@ -136,7 +136,7 @@ namespace bn256 {
         gfp_mul(t2, a.y_, a.y_);
         gfp_add(t1, t1, t2);
 
-        gfp_invert(inv,t1);
+        inv.invert(t1);
 
         gfp_neg(t1, a.x_);
 
