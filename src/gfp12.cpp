@@ -1,6 +1,6 @@
 #include <gfp12.h>
 #include <constants.h>
-#include <lattice.h>
+#include <bitlen.h>
 #include <boost/multiprecision/cpp_int.hpp>
 
 namespace bn256 {
