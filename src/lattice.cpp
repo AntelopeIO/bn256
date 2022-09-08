@@ -1,5 +1,5 @@
 #include <lattice.h>
-
+#include <bitlen.h>
 using boost::multiprecision::int256_t;
 
 namespace bn256 {
@@ -35,16 +35,6 @@ namespace bn256 {
         boost::multiprecision::add(out[0], out[0], k);
 
         return out;
-    }
-
-    std::size_t bitlen(const int256_t& value) {
-        std::size_t len = 0;
-        auto x = abs(value);
-        while(x) {
-            len++;
-            x >>= 1;
-        }
-        return len;
     }
 
     std::vector<uint8_t> lattice::multi(const int256_t& scalar) const  {

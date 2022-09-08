@@ -9,10 +9,10 @@ namespace bn256 {
     static constexpr gfp curve_b {3};
 
     void curve_point::set(const curve_point& a) {
-        gfp_set(x_, a.x_);
-        gfp_set(y_, a.y_);
-        gfp_set(z_, a.z_);
-        gfp_set(t_, a.t_);
+        x_.set(a.x_);
+        y_.set(a.y_);
+        z_.set(a.z_);
+        t_.set(a.t_);
     }
 
     bool curve_point::is_on_curve() {
@@ -201,9 +201,9 @@ namespace bn256 {
     }
 
     void curve_point::neg(const curve_point& a) {
-        gfp_set(x_, a.x_);
+        x_.set(a.x_);
         gfp_neg(y_, a.y_);
-        gfp_set(z_, a.z_);
-        gfp_set(t_, a.t_);
+        z_.set(a.z_);
+        t_.set(a.t_);
     }
 }
