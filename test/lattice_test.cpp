@@ -1,9 +1,8 @@
 #include <lattice.h>
-#include <cstdlib>
 #include <random>
 #include <iostream>
 #include <iosfwd>
-#include <constants.h>
+#include <bitlen.h>
 
 using boost::multiprecision::int256_t;
 
@@ -28,7 +27,7 @@ void test_lattice_reduce_curve() {
                       << bit_len << ","
                       << ks[i] << "]" << std::endl;
         }
-        if(ks[i].sign() << 0 ) {
+        if(ks[i].sign() < 0 ) {
             not_positive = true;
             std::cout << "Negative::[" << __FILE__ << ":"
                       << __LINE__ << ","
@@ -66,7 +65,7 @@ void test_lattice_reduce_target() {
                       << bit_len << ","
                       << ks[i] << "]" << std::endl;
         }
-        if(ks[i].sign() << 0 ) {
+        if(ks[i].sign() < 0 ) {
             not_positive = true;
             std::cout << "Negative::[" << __FILE__ << ":"
                       << __LINE__ << ","

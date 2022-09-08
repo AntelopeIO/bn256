@@ -6,12 +6,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(../src ${Boost_INCLUDE_DIRS})
 
 add_executable (gfp_test gfp_test.cpp)
+add_executable (lattice_test lattice_test.cpp)
 
 target_link_libraries (gfp_test LINK_PUBLIC bn256)
+target_link_libraries (lattice_test LINK_PUBLIC bn256)
 
 enable_testing()
 
 add_test(
         NAME gfp_test
         COMMAND $<TARGET_FILE:gfp_test>
+)
+
+add_test(
+        NAME lattice_test
+        COMMAND $<TARGET_FILE:lattice_test>
 )
