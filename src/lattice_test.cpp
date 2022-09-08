@@ -5,7 +5,7 @@
 #include <iosfwd>
 #include <constants.h>
 
-using boost::multiprecision::int128_t;
+using boost::multiprecision::int256_t;
 
 void test_lattice_reduce_curve() {
     constexpr std::size_t max_bitlen = 130;

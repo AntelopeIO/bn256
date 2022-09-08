@@ -102,7 +102,7 @@ namespace bn256 {
         return *this;
     }
 
-    const gfp12& gfp12::exp(const gfp12& a, const int128_t& power) {
+    const gfp12& gfp12::exp(const gfp12& a, const int256_t& power) {
         gfp12 sum{}, t{};
         sum.set_one();
 

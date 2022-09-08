@@ -1,14 +1,14 @@
 #include <lattice.h>
 
-using boost::multiprecision::int128_t;
+using boost::multiprecision::int256_t;
 
 namespace bn256 {
 
     // decompose takes a scalar mod order as input and finds a short,
     // positive decomposition of it wrt to the lattice basis.
-    std::vector<int128_t> lattice::decompose(const int128_t& k) const {
+    std::vector<int256_t> lattice::decompose(const int256_t& k) const {
         auto n = inverse_.size();
-        std::vector<int128_t> c(n);
+        std::vector<int256_t> c(n);
 
         for (std::size_t i = 0; i < n; i++) {
             c[i] = k * inverse_[i];
@@ -16,8 +16,8 @@ namespace bn256 {
         }
 
         // Transform vectors according to c and subtract <k,0,0,...>.
-        std::vector<int128_t> out(n);
-        int128_t temp;
+        std::vector<int256_t> out(n);
+        int256_t temp;
 
         for (std::size_t i = 0; i < n; i++) {
 
@@ -37,7 +37,7 @@ namespace bn256 {
         return out;
     }
 
-    std::size_t bitlen(const int128_t& value) {
+    std::size_t bitlen(const int256_t& value) {
         std::size_t len = 0;
         auto x = abs(value);
         while(x) {
@@ -47,8 +47,8 @@ namespace bn256 {
         return len;
     }
 
-    std::vector<uint8_t> lattice::multi(const int128_t& scalar) const  {
-        std::vector<int128_t> decomp = decompose(scalar);
+    std::vector<uint8_t> lattice::multi(const int256_t& scalar) const  {
+        std::vector<int256_t> decomp = decompose(scalar);
 
         std::size_t maxlen = 0;
         for (const auto& x : decomp) {
@@ -73,10 +73,10 @@ namespace bn256 {
     }
 
     // round sets num to num/denom rounded to the nearest integer.
-    void lattice::round(int128_t& num, const int128_t& denom) {
+    void lattice::round(int256_t& num, const int256_t& denom) {
         if (denom != 0) {
-            const int128_t half = constants::order >> 1;
-            int128_t q, r;
+            const int256_t half = constants::order >> 1;
+            int256_t q, r;
             divide_qr(num, denom, q, r);
             auto compare_result = r.compare(half);
             if (compare_result > 0) {

@@ -3,7 +3,7 @@
 #include <constants.h>
 #include <lattice.h>
 
-using boost::multiprecision::int128_t;
+using boost::multiprecision::int256_t;
 namespace bn256 {
 
     static constexpr gfp curve_b {3};
@@ -162,7 +162,7 @@ namespace bn256 {
         gfp_sub(y_, t2, t);
     }
 
-    void curve_point::mul(const curve_point& a, const int128_t& scalar) {
+    void curve_point::mul(const curve_point& a, const int256_t& scalar) {
         typedef std::array<curve_point, 4> curve_point_array_4_t;
         curve_point_array_4_t precomp{};
 

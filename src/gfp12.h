@@ -2,7 +2,7 @@
 #include <gfp6.h>
 #include <boost/multiprecision/cpp_int.hpp>
 
-using boost::multiprecision::int128_t;
+using boost::multiprecision::int256_t;
 
 namespace bn256 {
 
@@ -41,7 +41,7 @@ namespace bn256 {
 
         const gfp12& mul_scalar(const gfp12& a, const gfp6& b);
 
-        const gfp12& exp(const gfp12& a, const int128_t& power);
+        const gfp12& exp(const gfp12& a, const int256_t& power);
 
         const gfp12& square(const gfp12& a);
 
