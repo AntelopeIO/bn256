@@ -1,6 +1,4 @@
-#ifndef BN256_LATTICE_H
-#define BN256_LATTICE_H
-
+#pragma once
 #include <boost/multiprecision/cpp_int.hpp>
 #include <constants.h>
 
@@ -71,6 +69,3 @@ namespace bn256 {
     };
 
 }
-
-
-#endif //BN256_LATTICE_H

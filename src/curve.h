@@ -1,9 +1,9 @@
-#ifndef BN256_CURVE_H
-#define BN256_CURVE_H
-
+#pragma once
 #include <gfp.h>
 #include <boost/multiprecision/cpp_int.hpp>
+
 using boost::multiprecision::int256_t;
+
 namespace bn256 {
 
     struct curve_point {
@@ -24,6 +24,3 @@ namespace bn256 {
         void neg(const curve_point& a);
     };
 }
-
-
-#endif //BN256_CURVE_H

@@ -1,6 +1,4 @@
-#ifndef BN256_TWIST_H
-#define BN256_TWIST_H
-
+#pragma once
 #include <gfp2.h>
 #include <boost/multiprecision/cpp_int.hpp>
 
@@ -34,6 +32,3 @@ namespace bn256 {
     };
 
 }
-
-
-#endif //BN256_TWIST_H

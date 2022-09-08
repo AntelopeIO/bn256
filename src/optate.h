@@ -1,6 +1,4 @@
-#ifndef BN256_OPTATE_H
-#define BN256_OPTATE_H
-
+#pragma once
 #include <twist.h>
 #include <curve.h>
 #include <gfp2.h>
@@ -27,5 +25,3 @@ namespace bn256 {
 
     gfp12 optimal_ate(twist_point& q, curve_point& p);
 }
-
-#endif //BN256_OPTATE_H
