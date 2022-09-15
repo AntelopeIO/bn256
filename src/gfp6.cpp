@@ -230,4 +230,14 @@ namespace bn256 {
         return *this;
     }
 
+    bool gfp6::operator==(const gfp6& rhs) const {
+        return x_ == rhs.x_ &&
+               y_ == rhs.y_ &&
+               z_ == rhs.z_;
+    }
+
+    bool gfp6::operator!=(const gfp6& rhs) const {
+        return !(rhs == *this);
+    }
+
 }

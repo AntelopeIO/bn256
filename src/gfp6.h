@@ -45,6 +45,10 @@ namespace bn256 {
 
         const gfp6& invert(const gfp6& a);
 
+        bool operator==(const gfp6& rhs) const;
+
+        bool operator!=(const gfp6& rhs) const;
+
     };
 
 }

@@ -157,4 +157,13 @@ namespace bn256 {
         return *this;
     }
 
+    bool gfp12::operator==(const gfp12& rhs) const {
+        return x_ == rhs.x_ &&
+               y_ == rhs.y_;
+    }
+
+    bool gfp12::operator!=(const gfp12& rhs) const {
+        return !(rhs == *this);
+    }
+
 }
