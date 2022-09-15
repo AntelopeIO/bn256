@@ -69,7 +69,7 @@ namespace bn256 {
         return rc;
     }
 
-    line_function_result_t line_function_double(twist_point& r, curve_point& q) {
+    line_function_result_t line_function_double(const twist_point& r, const curve_point& q) {
 
         line_function_result_t rc{};
 
@@ -133,8 +133,27 @@ namespace bn256 {
         return rc;
     }
 
-    void mul_line(gfp12& ret, gfp2& a, gfp2& b, gfp2& c) {
+    void mul_line(gfp12& ret, const gfp2& a, const gfp2& b, const gfp2& c) {
+        gfp6 a2{}, t2{}, t3{};
+        gfp2 t{};
 
+        a2.y_.set(a);
+        a2.z_.set(b);
+        a2.mul(a2, ret.x_);
+        t3.mul_scalar(ret.y_, c);
+
+        t.add(b, c);
+        t2.y_.set(a);
+        t2.z_.set(t);
+        ret.x_.add(ret.x_, ret.y_);
+
+        ret.y_.set(t3);
+
+        ret.x_.mul(ret.x_, t2);
+        ret.x_.sub(ret.x_, a2);
+        ret.x_.sub(ret.x_, ret.y_);
+        a2.mul_tau(a2);
+        ret.y_.add(ret.y_, a2);
     }
 
     // sixuPlus2NAF is 6u+2 in non-adjacent form.
@@ -148,7 +167,7 @@ namespace bn256 {
 
     // miller implements the Miller loop for calculating the Optimal Ate pairing.
     // See algorithm 1 from http://cryptojedi.org/papers/dclxvi-20100714.pdf
-    gfp12 miller(twist_point& q, curve_point& p) {
+    gfp12 miller(const twist_point& q, const curve_point& p) {
         gfp12 ret{};
         ret.set_one();
 
@@ -243,7 +262,7 @@ namespace bn256 {
     // finalExponentiation computes the (p¹²-1)/Order-th power of an element of
     // GF(p¹²) to obtain an element of GT (steps 13-15 of algorithm 1 from
     // http://cryptojedi.org/papers/dclxvi-20100714.pdf)
-    gfp12 final_exponentiation(gfp12& in) {
+    gfp12 final_exponentiation(const gfp12& in) {
         gfp12 t1{}, inv{}, t2{}, fp{}, fp2{}, fp3{},
               fu{}, fu2{}, fu3{}, y3{}, fu2p{}, fu3p{},
               y2{}, y0{}, y1{}, y4{}, y5{}, y6{}, t0{};
@@ -300,7 +319,7 @@ namespace bn256 {
         return t0;
     }
 
-    gfp12 optimal_ate(twist_point& a, curve_point& b) {
+    gfp12 optimal_ate(const twist_point& a, const curve_point& b) {
         auto e = miller(a, b);
         auto ret = final_exponentiation(e);
 
