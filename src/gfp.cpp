@@ -37,7 +37,7 @@ namespace bn256 {
         this->set(sum);
     }
 
-    void gfp::marshal(std::vector<uint8_t>& out) {
+    void gfp::marshal(uint8_array_32_t& out) {
         for (auto w = 0; w < 4; w++) {
             for (auto b = 0; b < 8; b++) {
                 uint8_t t = ((*this)[3-w] >> (56 - 8*b));
@@ -46,7 +46,7 @@ namespace bn256 {
         }
     }
 
-    std::optional<std::string> gfp::unmarshal(std::vector<uint8_t>& in) {
+    unmarshal_status gfp::unmarshal(uint8_array_32_t& in) {
         // Unmarshal the bytes into little endian form
         for (auto w = 0; w < 4; w++) {
             (*this)[3-w] = 0;
@@ -56,17 +56,15 @@ namespace bn256 {
         }
 
         // Ensure the point respects the curve modulus
-        const std::string error_string("bn256: coordinate exceeds modulus");
-
         for (auto i = 3; i >= 0; i--) {
             if ((*this)[i] < constants::p2[i]) {
-                return std::nullopt;
+                return unmarshal_success;
             }
             if ((*this)[i] > constants::p2[i]) {
-                return error_string;
+                return unmarshal_coordinate_exceeds_modulus;
             }
         }
-        return error_string;
+        return unmarshal_coordinate_exceeds_modulus;
     }
 
     void gfp::mont_encode(const gfp& a) {
