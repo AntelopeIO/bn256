@@ -9,7 +9,7 @@ namespace bn256 {
             {0x3bf938e377b802a8, 0x020b1b273633535d, 0x26b7edf049755260, 0x2514c6324384a86d},
     };
 
-    void twist_point::set(twist_point& a) {
+    void twist_point::set(const twist_point& a) {
         x_.set(a.x_);
         y_.set(a.y_);
         z_.set(a.z_);
@@ -48,7 +48,7 @@ namespace bn256 {
         return z_.is_zero();
     }
 
-    void twist_point::add(twist_point& a, twist_point& b) {
+    void twist_point::add(const twist_point& a, const twist_point& b) {
         if (a.is_infinity()) {
             set(b);
             return;
@@ -107,7 +107,7 @@ namespace bn256 {
 
     }
 
-    void twist_point::double_(twist_point& a) {
+    void twist_point::double_(const twist_point& a) {
         // See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/doubling/dbl-2009-l.op3
         gfp2 a2{}, b{}, c{}, t{}, t2{}, d{}, e{}, f{};
         a2.square(a.x_);
@@ -138,7 +138,7 @@ namespace bn256 {
 
     }
 
-    void twist_point::mul(twist_point& a, const int256_t& scalar) {
+    void twist_point::mul(const twist_point& a, const int256_t& scalar) {
         twist_point sum{}, t{};
 
         for (int i = bitlen(scalar); i >= 0; i--) {
@@ -175,7 +175,7 @@ namespace bn256 {
 
     }
 
-    void twist_point::neg(twist_point& a) {
+    void twist_point::neg(const twist_point& a) {
         x_.set(a.x_);
         y_.neg(a.y_);
         z_.set(a.z_);

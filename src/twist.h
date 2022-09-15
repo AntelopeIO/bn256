@@ -11,7 +11,7 @@ namespace bn256 {
         gfp2 z_;
         gfp2 t_;
 
-        void set(twist_point& a);
+        void set(const twist_point& a);
 
         bool is_on_curve();
 
@@ -19,15 +19,15 @@ namespace bn256 {
 
         [[nodiscard]] bool is_infinity() const;
 
-        void add(twist_point& a, twist_point& b);
+        void add(const twist_point& a, const twist_point& b);
 
-        void double_(twist_point& a);
+        void double_(const twist_point& a);
 
-        void mul(twist_point& a, const int256_t& scalar);
+        void mul(const twist_point& a, const int256_t& scalar);
 
         void make_affine();
 
-        void neg(twist_point& a);
+        void neg(const twist_point& a);
 
     };
 
