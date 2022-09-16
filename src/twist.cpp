@@ -138,7 +138,7 @@ namespace bn256 {
 
     }
 
-    void twist_point::mul(const twist_point& a, const int256_t& scalar) {
+    void twist_point::mul(const twist_point& a, const int512_t& scalar) {
         twist_point sum{}, t{};
 
         for (int i = bitlen(scalar); i >= 0; i--) {

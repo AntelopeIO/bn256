@@ -2,7 +2,7 @@
 #include <gfp2.h>
 #include <boost/multiprecision/cpp_int.hpp>
 
-using boost::multiprecision::int256_t;
+using boost::multiprecision::int512_t;
 
 namespace bn256 {
     struct twist_point {
@@ -23,7 +23,7 @@ namespace bn256 {
 
         void double_(const twist_point& a);
 
-        void mul(const twist_point& a, const int256_t& scalar);
+        void mul(const twist_point& a, const int512_t& scalar);
 
         void make_affine();
 

@@ -2,7 +2,7 @@
 #include <gfp.h>
 #include <boost/multiprecision/cpp_int.hpp>
 
-using boost::multiprecision::int256_t;
+using boost::multiprecision::int512_t;
 
 namespace bn256 {
 
@@ -19,7 +19,7 @@ namespace bn256 {
         [[nodiscard]] bool is_infinity() const;
         void add(const curve_point& a, const curve_point& b);
         void double_(const curve_point& point);
-        void mul(const curve_point& a, const int256_t& scalar);
+        void mul(const curve_point& a, const int512_t& scalar);
         void make_affine();
         void neg(const curve_point& a);
     };

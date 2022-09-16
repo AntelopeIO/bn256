@@ -2,7 +2,7 @@
 #include <curve.h>
 #include <optate.h>
 #include <boost/multiprecision/cpp_int.hpp>
-#include <random_int256.h>
+#include <random_256.h>
 #include <constants.h>
 
 namespace bn256 {
@@ -11,13 +11,13 @@ namespace bn256 {
 
     // scalar_base_mult sets g1 to g*k where g is the generator of the group and then
     // returns g1.
-    const g1& g1::scalar_base_mult(const int256_t& k) {
+    const g1& g1::scalar_base_mult(const int512_t& k) {
         p_.mul(curve_gen, k);
         return *this;
     }
 
     // scalar_mult sets g1 to a*k and then returns g1.
-    const g1& g1::scalar_mult(const g1& a, const int256_t& k) {
+    const g1& g1::scalar_mult(const g1& a, const int512_t& k) {
         p_.mul(a.p_, k);
         return *this;
     }
@@ -88,13 +88,13 @@ namespace bn256 {
 
     // scalar_base_mult sets g2 to g*k where g is the generator of the group and then
     // returns out.
-    const g2& g2::scalar_base_mult(const int256_t& k) {
+    const g2& g2::scalar_base_mult(const int512_t& k) {
         p_.mul(twist_gen, k);
         return *this;
     }
 
     // scalar_mult sets g2 to a*k and then returns g2.
-    const g2& g2::scalar_mult(const g2& a, const int256_t& k) {
+    const g2& g2::scalar_mult(const g2& a, const int512_t& k) {
         p_.mul(a.p_, k);
         return *this;
     }
@@ -187,7 +187,7 @@ namespace bn256 {
         return status;
     }
 
-    const gt& gt::scalar_mult(const gt& a, const int256_t& k) {
+    const gt& gt::scalar_mult(const gt& a, const int512_t& k) {
         p_.exp(a.p_, k);
         return *this;
     }
@@ -377,15 +377,15 @@ namespace bn256 {
         return ret;
     }
 
-    std::tuple<int256_t,g1> ramdom_g1() {
-        random_int256 rand;
+    std::tuple<int512_t,g1> ramdom_g1() {
+        random_256 rand;
         auto k = rand.sample();
         g1 ret{};
         return std::tuple(k, ret.scalar_base_mult(k));
     }
 
-    std::tuple<int256_t,g2> ramdom_g2() {
-        random_int256 rand;
+    std::tuple<int512_t,g2> ramdom_g2() {
+        random_256 rand;
         g2 ret{};
         auto k = rand.sample();
         return std::make_tuple(k, ret.scalar_base_mult(k));

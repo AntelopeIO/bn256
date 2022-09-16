@@ -2,7 +2,7 @@
 
 namespace bn256 {
 
-    std::size_t bitlen(const int256_t& value) {
+    std::size_t bitlen(const int512_t& value) {
         std::size_t len = 0;
         auto x = abs(value);
         while (x) {

@@ -24,7 +24,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <utility>
 
-using boost::multiprecision::int256_t;
+using boost::multiprecision::int512_t;
 
 namespace bn256 {
 
@@ -42,9 +42,9 @@ namespace bn256 {
     struct g1 {
         curve_point p_ {};
 
-        const g1& scalar_base_mult(const int256_t& k);
+        const g1& scalar_base_mult(const int512_t& k);
 
-        const g1& scalar_mult(const g1& a, const int256_t& k);
+        const g1& scalar_mult(const g1& a, const int512_t& k);
 
         const g1& add(const g1& a, const g1& b);
 
@@ -62,9 +62,9 @@ namespace bn256 {
     struct g2 {
         twist_point p_ {};
 
-        const g2& scalar_base_mult(const int256_t& k);
+        const g2& scalar_base_mult(const int512_t& k);
 
-        const g2& scalar_mult(const g2& a, const int256_t& k);
+        const g2& scalar_mult(const g2& a, const int512_t& k);
 
         const g2& add(const g2& a, const g2& b);
 
@@ -84,7 +84,7 @@ namespace bn256 {
         gfp12 p_ {};
 
         // scalar_mult sets gt to a*k and then returns gt.
-        const gt& scalar_mult(const gt& a, const int256_t& k);
+        const gt& scalar_mult(const gt& a, const int512_t& k);
 
         // add sets gt to a+b and then returns gt.
         const gt& add(const gt& a, const gt& b);
@@ -124,7 +124,7 @@ namespace bn256 {
     // to pair(g1,g2).
     gt miller(const g1& g1, const g2& g2);
 
-    std::tuple<int256_t,g1> ramdom_g1();
-    std::tuple<int256_t,g2> ramdom_g2();
+    std::tuple<int512_t,g1> ramdom_g1();
+    std::tuple<int512_t,g2> ramdom_g2();
 
 }
