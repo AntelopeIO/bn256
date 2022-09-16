@@ -10,14 +10,15 @@ namespace bn256 {
     using namespace boost::multiprecision;
     using namespace boost::random;
 
-    typedef boost::random::independent_bits_engine<mt19937_64 , std::numeric_limits<uint256_t>::digits, uint256_t> generator;
-    class random_int256 {
+    typedef independent_bits_engine<mt19937_64,std::numeric_limits<uint256_t>::digits, uint256_t> generator;
+
+    class random_256 {
     public:
-        random_int256();
+        random_256();
         uint256_t sample();
 
     private:
-        boost::random::uniform_int_distribution<uint256_t> ur_;
+        uniform_int_distribution<uint256_t> uniform_int_distribution_;
         generator gen_;
 
     };
