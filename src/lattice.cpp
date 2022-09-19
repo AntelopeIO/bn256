@@ -67,19 +67,12 @@ namespace bn256 {
     void lattice::round(int512_t& num, const int512_t& denom) {
         if (denom != 0) {
             const int512_t half = constants::order >> 1;
-            int512_t r;
-            int neg = num.sign();
-            divide_qr(num, denom, num, r);
-            if ( num.sign() != neg) {
-                num.backend().negate();
-            }
-            auto compare_result = r.compare(half);
+            num /= denom;
+            int512_t rem = num % denom;
+            auto compare_result = rem.compare(half);
             if (compare_result > 0) {
                 num++;
-            } else if( compare_result < 0) {
-                num--;
             }
         }
     }
-
 }
