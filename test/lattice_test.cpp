@@ -48,8 +48,7 @@ int test_lattice_reduce_target() {
     int rc = test_pass;
     constexpr std::size_t max_bitlen = 66;
     bn256::random_256 rand;
-//    auto k = rand.sample();
-    auto k = 0x3E7AA0B35C1123515E051CF20868560F8A19CE2B009E81BF4A5151A899D0599_cppi512;
+    auto k = rand.sample();
     std::cout << "test_lattice_reduce_target: " << k << std::endl;
     auto ks = bn256::target_lattice.decompose(k);
     bool too_large = false;
