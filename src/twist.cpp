@@ -1,6 +1,7 @@
 #include <twist.h>
 #include <constants.h>
 #include <bitlen.h>
+#include <sstream>
 
 namespace bn256 {
 
@@ -180,5 +181,14 @@ namespace bn256 {
         y_.neg(a.y_);
         z_.set(a.z_);
         t_.set_zero();
+    }
+
+    std::string twist_point::string() {
+        std::stringstream ss;
+        make_affine();
+        x_ = gfp2::gfp2_decode(x_);
+        y_ = gfp2::gfp2_decode(y_);
+        ss << "(" << x_.string() << ", " << y_.string() << ")";
+        return ss.str();
     }
 }

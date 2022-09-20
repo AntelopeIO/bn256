@@ -29,6 +29,8 @@ namespace bn256 {
 
         void neg(const twist_point& a);
 
+        std::string string();
+
     };
 
 }

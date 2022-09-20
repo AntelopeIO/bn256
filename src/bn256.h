@@ -55,6 +55,8 @@ namespace bn256 {
         [[nodiscard]] uint8_array_32_array_2_t marshal();
 
         unmarshal_status unmarshal(uint8_array_32_array_2_t& m);
+
+        std::string string();
     };
 
     // g2 is an abstract cyclic group. The zero value is suitable for use as the
@@ -76,6 +78,7 @@ namespace bn256 {
 
         unmarshal_status unmarshal(uint8_array_32_array_4_t& m);
 
+        std::string string();
     };
 
     // GT is an abstract cyclic group. The zero value is suitable for use as the
@@ -111,6 +114,7 @@ namespace bn256 {
 
         bool operator!=(const gt& rhs) const;
 
+        std::string string();
     };
 
     // pair calculates an Optimal Ate pairing.

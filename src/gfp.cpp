@@ -1,6 +1,7 @@
 #include <gfp.h>
 #include <gfp_generic.h>
 #include <constants.h>
+#include <iostream>
 
 namespace bn256 {
 
@@ -74,6 +75,12 @@ namespace bn256 {
     void gfp::mont_decode(const gfp& a) {
         constexpr gfp decode_b {1};
         gfp_mul(*this, a, decode_b);
+    }
+
+    std::string gfp::string() {
+        std::stringstream ss;
+        ss << std::hex << (*this)[3] << (*this)[2] << (*this)[1] << (*this)[0];
+        return ss.str();
     }
 
     gfp new_gfp(int64_t x) {

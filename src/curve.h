@@ -22,5 +22,6 @@ namespace bn256 {
         void mul(const curve_point& a, const int512_t& scalar);
         void make_affine();
         void neg(const curve_point& a);
+        std::string string();
     };
 }

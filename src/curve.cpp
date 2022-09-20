@@ -206,4 +206,16 @@ namespace bn256 {
         z_.set(a.z_);
         t_.set(a.t_);
     }
+
+    std::string curve_point::string() {
+        make_affine();
+
+        gfp x{}, y{};
+        x.mont_decode(x_);
+        y.mont_decode(y_);
+
+        std::stringstream ss;
+        ss << "(" << x.string() << ", " << y.string() << ")";
+        return ss.str();
+    }
 }

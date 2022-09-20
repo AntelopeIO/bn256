@@ -2,6 +2,7 @@
 #include <constants.h>
 #include <bitlen.h>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <sstream>
 
 namespace bn256 {
 
@@ -164,6 +165,12 @@ namespace bn256 {
 
     bool gfp12::operator!=(const gfp12& rhs) const {
         return !(rhs == *this);
+    }
+
+    std::string gfp12::string() {
+        std::stringstream ss;
+        ss << "(" << x_.string() << ", " << y_.string() << ")";
+        return ss.str();
     }
 
 }

@@ -30,6 +30,8 @@ namespace bn256 {
 
         void mont_decode(const gfp& a);
 
+        std::string string();
+
     };
 
     gfp new_gfp(int64_t x);

@@ -1,4 +1,5 @@
 #include <gfp2.h>
+#include <sstream>
 
 namespace bn256 {
 
@@ -153,6 +154,12 @@ namespace bn256 {
 
     bool gfp2::operator!=(const gfp2& rhs) const {
         return !(rhs == *this);
+    }
+
+    std::string gfp2::string() {
+        std::stringstream ss;
+        ss << "(" << x_.string() << ", " << y_.string() << ")";
+        return ss.str();
     }
 
 }

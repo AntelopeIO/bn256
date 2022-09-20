@@ -3,7 +3,7 @@
 #include <optate.h>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <random_256.h>
-#include <constants.h>
+#include <sstream>
 
 namespace bn256 {
     using namespace boost::multiprecision::literals;
@@ -84,6 +84,12 @@ namespace bn256 {
             }
         }
         return unmarshal_success;
+    }
+
+    std::string g1::string() {
+        std::stringstream ss;
+        ss << "bn256.g1" << p_.string();
+        return ss.str();
     }
 
     // scalar_base_mult sets g2 to g*k where g is the generator of the group and then
@@ -185,6 +191,12 @@ namespace bn256 {
         }
 
         return status;
+    }
+
+    std::string g2::string() {
+        std::stringstream ss;
+        ss << "bn256.g2" << p_.string();
+        return ss.str();
     }
 
     const gt& gt::scalar_mult(const gt& a, const int512_t& k) {
@@ -346,6 +358,12 @@ namespace bn256 {
 
     bool gt::operator!=(const gt& rhs) const {
         return !(rhs == *this);
+    }
+
+    std::string gt::string() {
+        std::stringstream ss;
+        ss << "bn256.gt" << p_.string();
+        return ss.str();
     }
 
     // pair calculates an Optimal Ate pairing.
