@@ -9,11 +9,13 @@ add_executable (gfp_test gfp_test.cpp)
 add_executable (lattice_test lattice_test.cpp)
 add_executable (bn256_test bn256_test.cpp)
 add_executable (main_test main_test.cpp)
+add_executable (example_test example_test.cpp)
 
 target_link_libraries (gfp_test LINK_PUBLIC bn256)
 target_link_libraries (lattice_test LINK_PUBLIC bn256)
 target_link_libraries (bn256_test LINK_PUBLIC bn256)
 target_link_libraries (main_test LINK_PUBLIC bn256)
+target_link_libraries (example_test LINK_PUBLIC bn256)
 
 enable_testing()
 
@@ -35,4 +37,9 @@ add_test(
 add_test(
         NAME main_test
         COMMAND $<TARGET_FILE:main_test>
+)
+
+add_test(
+        NAME example_test
+        COMMAND $<TARGET_FILE:example_test>
 )
