@@ -29,7 +29,12 @@ using boost::multiprecision::int512_t;
 namespace bn256 {
 
     // curveGen is the generator of G₁.
-    inline constexpr curve_point curve_gen = {1, 2, 1, 1};
+    const curve_point curve_gen = {
+            new_gfp(1),
+            new_gfp(2),
+            new_gfp(1),
+            new_gfp(1)
+    };
 
     static const twist_point twist_gen = {{{0xafb4737da84c6140, 0x6043dd5a5802d8c4, 0x09e950fc52a02f86, 0x14fef0833aea7b6b},{0x8e83b5d102bc2026, 0xdceb1935497b0172, 0xfbb8264797811adf, 0x19573841af96503b},},{{0x64095b56c71856ee, 0xdc57f922327d3cbb, 0x55f935be33351076, 0x0da4a0e693fd6482},{0x619dfa9d886be9f6, 0xfe7fd297f59e9b78, 0xff9e1a62231b7dfe, 0x28fd7eebae9e4206},},{new_gfp(0), new_gfp(1)},{new_gfp(0), new_gfp(1)}};
 
