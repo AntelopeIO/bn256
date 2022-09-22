@@ -112,7 +112,7 @@ static std::unique_ptr<bn256::uint8_array_32_array_12_t> test_marshal_pair(const
     auto pair = bn256::pair(a, b);
     pair.scalar_mult(pair, base);
     auto pair_bytes = pair.marshal();
-    auto ptr = std::unique_ptr<bn256::uint8_array_32_array_12_t>(new bn256::uint8_array_32_array_12_t);
+    auto ptr = std::make_unique<bn256::uint8_array_32_array_12_t>();
     *ptr = pair_bytes;
     return ptr;
 }
@@ -151,9 +151,10 @@ int test_tripartite_diffie_hellman() {
 int test_g2_self_addition() {
     std::cout << std::endl << "test_g2_self_addition:" << std::endl;
     constexpr int512_t s = 0xA2422041C5891A948F80F739C3F3B7A32FE306F28ED085741EE155DDFB789C17_cppi512;
-    std::unique_ptr<bn256::g1> p(new bn256::g1 {});
+    auto p = std::make_unique<bn256::g2>();
     p->scalar_base_mult(s);
     if (!p->p_.is_on_curve()) {
+        std::cout << p->string() << std::endl;
         std::cout << "p isn't on curve" << std::endl;
         return test_fail;
     }
