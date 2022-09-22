@@ -1,5 +1,6 @@
 #include <bn256.h>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <memory>
 
 using namespace boost::multiprecision::literals;
 using namespace boost::multiprecision;
