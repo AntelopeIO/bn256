@@ -7,6 +7,8 @@ using boost::multiprecision::int512_t;
 
 namespace bn256 {
 
+   // curvePoint implements the elliptic curve y²=x³+3. Points are kept in Jacobian
+   // form and t=z² when valid. G₁ is the set of points of this curve on GF(p).
    struct curve_point {
       // value is xτ² + yτ + z
       gfp x_;
@@ -14,8 +16,11 @@ namespace bn256 {
       gfp z_;
       gfp t_;
 
+      std::string string();
+
       void set(const curve_point& a);
 
+      // IsOnCurve returns true iff c is on the curve.
       bool is_on_curve();
 
       void set_infinity();
@@ -31,7 +36,5 @@ namespace bn256 {
       void make_affine();
 
       void neg(const curve_point& a);
-
-      std::string string();
    };
 }

@@ -8,6 +8,24 @@ namespace bn256 {
 
    static constexpr gfp curve_b{3};
 
+   std::string curve_point::string() {
+      make_affine();
+
+      gfp x{}, y{};
+      x.mont_decode(x_);
+      y.mont_decode(y_);
+
+      std::string ret;
+      ret.reserve(132);
+      ret.append("(");
+      ret.append(x.string());
+      ret.append(", ");
+      ret.append(y.string());
+      ret.append(")");
+
+      return ret;
+   }
+
    void curve_point::set(const curve_point& a) {
       x_.set(a.x_);
       y_.set(a.y_);
@@ -198,6 +216,19 @@ namespace bn256 {
          t_.fill(0);
          return;
       }
+
+      gfp z_inv{};
+      z_inv.invert(z_);
+
+      gfp t{}, z_inv2{};
+      gfp_mul(t, y_, z_inv);
+      gfp_mul(z_inv2, z_inv, z_inv);
+
+      gfp_mul(x_, x_, z_inv2);
+      gfp_mul(y_, t, z_inv2);
+
+      z_ = new_gfp(1ll);
+      t_ = new_gfp(1ll);
    }
 
    void curve_point::neg(const curve_point& a) {
@@ -205,17 +236,5 @@ namespace bn256 {
       gfp_neg(y_, a.y_);
       z_.set(a.z_);
       t_.set(a.t_);
-   }
-
-   std::string curve_point::string() {
-      make_affine();
-
-      gfp x{}, y{};
-      x.mont_decode(x_);
-      y.mont_decode(y_);
-
-      std::stringstream ss;
-      ss << "(" << x.string() << ", " << y.string() << ")";
-      return ss.str();
    }
 }
