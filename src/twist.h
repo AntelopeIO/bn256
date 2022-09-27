@@ -6,14 +6,21 @@
 using boost::multiprecision::int512_t;
 
 namespace bn256 {
+
+   // twistPoint implements the elliptic curve y²=x³+3/ξ over GF(p²). Points are
+   // kept in Jacobian form and t=z² when valid. The group G₂ is the set of
+   // n-torsion points of this curve over GF(p²) (where n = Order)
    struct twist_point {
       gfp2 x_;
       gfp2 y_;
       gfp2 z_;
       gfp2 t_;
 
+      std::string string();
+
       void set(const twist_point& a);
 
+      // IsOnCurve returns true iff c is on the curve.
       bool is_on_curve();
 
       void set_infinity();
@@ -29,9 +36,6 @@ namespace bn256 {
       void make_affine();
 
       void neg(const twist_point& a);
-
-      std::string string();
-
    };
 
 }

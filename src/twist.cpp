@@ -10,6 +10,21 @@ namespace bn256 {
       {0x3bf938e377b802a8, 0x020b1b273633535d, 0x26b7edf049755260, 0x2514c6324384a86d},
    };
 
+   std::string twist_point::string() {
+      make_affine();
+      x_ = gfp2::gfp2_decode(x_);
+      y_ = gfp2::gfp2_decode(y_);
+
+      std::string ret;
+      ret.reserve(265);
+      ret.append("(");
+      ret.append(x_.string());
+      ret.append(", ");
+      ret.append(y_.string());
+      ret.append(")");
+      return ret;
+   }
+
    void twist_point::set(const twist_point& a) {
       x_.set(a.x_);
       y_.set(a.y_);
@@ -60,23 +75,32 @@ namespace bn256 {
       }
 
       // See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/addition/add-2007-bl.op3
-      gfp2 z12{}, z22{}, u1{}, u2{}, t{}, s1{}, s2{}, h{}, i{}, j{}, r{}, v{}, t4{}, t6{};
+      gfp2 z12{};
       z12.square(a.z_);
+      gfp2 z22{};
       z22.square(a.z_);
+      gfp2 u1{};
       u1.mul(a.x_, z22);
+      gfp2 u2{};
       u2.mul(b.x_, z12);
 
+      gfp2 t{};
       t.mul(b.z_, z22);
+      gfp2 s1{};
       s1.mul(a.y_, t);
 
       t.mul(a.z_, z12);
+      gfp2 s2{};
       s2.mul(b.y_, t);
 
+      gfp2 h{};
       h.sub(u2, u1);
       bool x_equal = h.is_zero();
 
       t.add(h, h);
+      gfp2 i{};
       i.square(t);
+      gfp2 j{};
       j.mul(h, i);
 
       t.sub(s2, s1);
@@ -85,12 +109,16 @@ namespace bn256 {
          double_(a);
          return;
       }
+      gfp2 r{};
       r.add(t, t);
 
+      gfp2 v{};
       v.mul(u1, i);
 
+      gfp2 t4{};
       t4.square(r);
       t.add(v, v);
+      gfp2 t6{};
       t6.sub(t4, j);
       x_.sub(t6, t);
 
@@ -101,27 +129,33 @@ namespace bn256 {
       y_.sub(t4, t6);
 
       t.add(z_, b.z_); // t11
-      t4.square(t);      // t12
+      t4.square(t);    // t12
       t.sub(t4, z12);  // t13
       t4.sub(t, z22);  // t14
       z_.mul(t4, h);
-
    }
 
    void twist_point::double_(const twist_point& a) {
       // See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/doubling/dbl-2009-l.op3
-      gfp2 a2{}, b{}, c{}, t{}, t2{}, d{}, e{}, f{};
-      a2.square(a.x_);
+      gfp2 A{};
+      A.square(a.x_);
+      gfp2 b{};
       b.square(a.y_);
+      gfp2 c{};
       c.square(b);
 
+      gfp2 t{};
       t.add(a.x_, b);
+      gfp2 t2{};
       t2.square(t);
-      t.sub(t2, a2);
+      t.sub(t2, A);
       t2.sub(t, c);
+      gfp2 d{};
       d.add(t2, t2);
-      t.add(a2, a2);
-      e.add(t, a2);
+      t.add(A, A);
+      gfp2 e{};
+      e.add(t, A);
+      gfp2 f{};
       f.square(e);
 
       t.add(d, d);
@@ -136,7 +170,6 @@ namespace bn256 {
       y_.sub(d, x_);
       t2.mul(e, y_);
       y_.sub(t2, t);
-
    }
 
    void twist_point::mul(const twist_point& a, const int512_t& scalar) {
@@ -152,7 +185,6 @@ namespace bn256 {
       }
 
       set(sum);
-
    }
 
    void twist_point::make_affine() {
@@ -173,7 +205,6 @@ namespace bn256 {
       x_.set(t);
       z_.set_one();
       t_.set_one();
-
    }
 
    void twist_point::neg(const twist_point& a) {
@@ -181,14 +212,5 @@ namespace bn256 {
       y_.neg(a.y_);
       z_.set(a.z_);
       t_.set_zero();
-   }
-
-   std::string twist_point::string() {
-      std::stringstream ss;
-      make_affine();
-      x_ = gfp2::gfp2_decode(x_);
-      y_ = gfp2::gfp2_decode(y_);
-      ss << "(" << x_.string() << ", " << y_.string() << ")";
-      return ss.str();
    }
 }
