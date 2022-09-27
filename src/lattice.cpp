@@ -12,6 +12,7 @@ namespace bn256 {
       auto n = inverse_.size();
       std::vector<int512_t> c(n);
 
+      // Calculate closest vector in lattice to <k,0,0,...> with Babai's rounding.
       for (std::size_t i = 0; i < n; i++) {
          c[i] = k * inverse_[i];
          round(c[i], det_);
@@ -24,7 +25,7 @@ namespace bn256 {
          out[i] = 0;
          for (std::size_t j = 0; j < n; j++) {
             temp = c[j] * vectors_[j][i];
-            out[i] = out[i] + temp;
+            out[i] += temp;
          }
          out[i].backend().negate();
          out[i] += vectors_[0][i];
@@ -39,7 +40,6 @@ namespace bn256 {
 
       std::size_t maxlen = 0;
       for (const auto& x: decomp) {
-
          const auto len = bitlen(x);
          if (len > maxlen) {
             maxlen = len;
@@ -47,10 +47,9 @@ namespace bn256 {
       }
 
       std::vector<uint8_t> out(maxlen);
-      for (auto& x : decomp) {
-         const auto j = &x - &decomp[0];
-         for (std::size_t i = 0; i < maxlen; i++) {
-            if (boost::multiprecision::bit_test(x, i)) {
+      for (std::size_t j = 0; j < decomp.size(); ++j) {
+         for (std::size_t i = 0; i < maxlen; ++i) {
+            if (bit_test(decomp[j], i)) {
                out[i] += (1 << j);
             }
          }
