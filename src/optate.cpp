@@ -44,7 +44,7 @@ namespace bn256 {
 
       t.sub(v, rc.out_.x_);
       t.mul(t, l1);
-      t2.mul(rc.out_.y_, j);
+      t2.mul(r.y_, j);
       t2.add(t2, t2);
       rc.out_.y_.sub(t, t2);
 
@@ -329,4 +329,3 @@ namespace bn256 {
       return ret;
    }
 }
-
