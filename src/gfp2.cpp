@@ -156,10 +156,14 @@ namespace bn256 {
       return !(rhs == *this);
    }
 
-   std::string gfp2::string() {
+   std::string gfp2::string() const {
       std::stringstream ss;
       ss << "(" << x_.string() << ", " << y_.string() << ")";
       return ss.str();
    }
 
+   std::ostream& operator << (std::ostream& os, gfp2& v) {
+      os << "(" << v.x_.string() << ", " << v.y_.string() << ")";
+      return os;
+   }
 }

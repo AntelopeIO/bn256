@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <array>
 #include <string>
+#include <iosfwd>
 
 namespace bn256 {
 
@@ -22,7 +23,7 @@ namespace bn256 {
 
         void invert(const gfp& f);
 
-        void marshal(uint8_array_32_t& out);
+        void marshal(uint8_array_32_t& out) const;
 
         unmarshal_status unmarshal(uint8_array_32_t& in);
 
@@ -30,9 +31,9 @@ namespace bn256 {
 
         void mont_decode(const gfp& a);
 
-        std::string string();
-
+        std::string string() const ;
     };
 
     gfp new_gfp(int64_t x);
+    std::ostream& operator << (std::ostream& os, const gfp& v);
 }

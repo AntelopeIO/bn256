@@ -10,17 +10,18 @@ namespace bn256 {
       {0x3bf938e377b802a8, 0x020b1b273633535d, 0x26b7edf049755260, 0x2514c6324384a86d},
    };
 
-   std::string twist_point::string() {
-      make_affine();
-      x_ = gfp2::gfp2_decode(x_);
-      y_ = gfp2::gfp2_decode(y_);
+   std::string twist_point::string() const {
+      twist_point tmp{*this};
+      tmp.make_affine();
+      auto x = gfp2::gfp2_decode(tmp.x_);
+      auto y = gfp2::gfp2_decode(tmp.y_);
 
       std::string ret;
       ret.reserve(265);
       ret.append("(");
-      ret.append(x_.string());
+      ret.append(x.string());
       ret.append(", ");
-      ret.append(y_.string());
+      ret.append(y.string());
       ret.append(")");
       return ret;
    }
@@ -78,7 +79,7 @@ namespace bn256 {
       gfp2 z12{};
       z12.square(a.z_);
       gfp2 z22{};
-      z22.square(a.z_);
+      z22.square(b.z_);
       gfp2 u1{};
       u1.mul(a.x_, z22);
       gfp2 u2{};
@@ -128,7 +129,7 @@ namespace bn256 {
       t4.mul(r, t);   // t10
       y_.sub(t4, t6);
 
-      t.add(z_, b.z_); // t11
+      t.add(a.z_, b.z_); // t11
       t4.square(t);    // t12
       t.sub(t4, z12);  // t13
       t4.sub(t, z22);  // t14
@@ -212,5 +213,10 @@ namespace bn256 {
       y_.neg(a.y_);
       z_.set(a.z_);
       t_.set_zero();
+   }
+
+   std::ostream& operator << (std::ostream& os, const twist_point& v) {
+      os << v.string();
+      return os;
    }
 }

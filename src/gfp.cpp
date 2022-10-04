@@ -38,11 +38,11 @@ namespace bn256 {
       this->set(sum);
    }
 
-   void gfp::marshal(uint8_array_32_t& out) {
+   void gfp::marshal(uint8_array_32_t& out) const {
       for (auto w = 0; w < 4; w++) {
          for (auto b = 0; b < 8; b++) {
             uint8_t t = ((*this)[3-w] >> (56 - 8*b));
-            out[8*w*b] = t;
+            out[8*w+b] = t;
          }
       }
    }
@@ -77,10 +77,20 @@ namespace bn256 {
       gfp_mul(*this, a, decode_b);
    }
 
-   std::string gfp::string() {
-      std::stringstream ss;
-      ss << std::hex << (*this)[3] << (*this)[2] << (*this)[1] << (*this)[0];
-      return ss.str();
+   std::string gfp::string() const {
+      std::string result;
+      result.resize(64);
+
+      std::for_each(rbegin(), rend(), [buf = result.data()](uint64_t v) mutable{
+         const char hex_table[]= "0123456789abcdef";
+         unsigned char* p = reinterpret_cast<unsigned char*>(&v) + 8;
+         for (int i = 0; i < sizeof(uint64_t); ++i) {
+            unsigned x = *(--p);
+            *buf++ = hex_table[(x >> 4)];
+            *buf++ = hex_table[x & 0x0F];
+         }
+      });
+      return result;
    }
 
    gfp new_gfp(int64_t x) {
@@ -95,4 +105,8 @@ namespace bn256 {
       return out;
    }
 
+   std::ostream& operator << (std::ostream& os, const gfp& v) {
+      os << v.string();
+      return os;
+   }
 }
