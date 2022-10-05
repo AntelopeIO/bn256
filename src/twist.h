@@ -16,7 +16,7 @@ namespace bn256 {
       gfp2 z_;
       gfp2 t_;
 
-      std::string string();
+      std::string string() const;
 
       void set(const twist_point& a);
 
