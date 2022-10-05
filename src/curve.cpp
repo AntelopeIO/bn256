@@ -6,7 +6,7 @@
 using boost::multiprecision::int512_t;
 namespace bn256 {
 
-   static constexpr gfp curve_b{3};
+   static const auto curve_b = new_gfp(3ll);
 
    std::string curve_point::string() {
       make_affine();
@@ -42,7 +42,7 @@ namespace bn256 {
       gfp_mul(y2_, y_, y_);
       gfp_mul(x3_, x_, x_);
       gfp_mul(x3_, x3_, x_);
-      gfp_mul(x3_, x3_, curve_b);
+      gfp_add(x3_, x3_, curve_b);
 
       return y2_ == x3_;
    }
