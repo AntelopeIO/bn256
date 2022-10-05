@@ -6,14 +6,14 @@
 using boost::multiprecision::int512_t;
 namespace bn256 {
 
-   static constexpr gfp curve_b{3};
+   static const gfp curve_b  = new_gfp(3);
 
-   std::string curve_point::string() {
-      make_affine();
+   std::string curve_point::string() const {
+      auto tmp = make_affine();
 
       gfp x{}, y{};
-      x.mont_decode(x_);
-      y.mont_decode(y_);
+      x.mont_decode(tmp.x_);
+      y.mont_decode(tmp.y_);
 
       std::string ret;
       ret.reserve(132);
@@ -33,18 +33,17 @@ namespace bn256 {
       t_.set(a.t_);
    }
 
-   bool curve_point::is_on_curve() {
-      make_affine();
-      if (is_infinity()) {
+   bool curve_point::is_on_curve() const {
+      auto tmp = make_affine();
+      if (tmp.is_infinity()) {
          return true;
       }
-      gfp y2_{}, x3_{};
-      gfp_mul(y2_, y_, y_);
-      gfp_mul(x3_, x_, x_);
-      gfp_mul(x3_, x3_, x_);
-      gfp_mul(x3_, x3_, curve_b);
-
-      return y2_ == x3_;
+      gfp y2{}, x3{};
+      gfp_mul(y2, tmp.y_, tmp.y_);
+      gfp_mul(x3, tmp.x_, tmp.x_);
+      gfp_mul(x3, x3, tmp.x_);
+      gfp_add(x3, x3, curve_b);
+      return y2 == x3;
    }
 
    void curve_point::set_infinity() {
@@ -207,28 +206,25 @@ namespace bn256 {
       set(sum);
    }
 
-   void curve_point::make_affine() {
+   curve_point curve_point::make_affine() const {
+
       if (z_ == new_gfp(1ll)) {
-         return;
+         return *this;
       } else if (z_ == new_gfp(0ll)) {
-         x_.fill(0);
-         y_ = new_gfp(1ll);
-         t_.fill(0);
-         return;
+         return { {},  new_gfp(1ll), new_gfp(0ll), {} };
       }
 
+      curve_point result{x_, y_,  new_gfp(1ll) ,  new_gfp(1ll)};
       gfp z_inv{};
       z_inv.invert(z_);
 
       gfp t{}, z_inv2{};
       gfp_mul(t, y_, z_inv);
       gfp_mul(z_inv2, z_inv, z_inv);
+      gfp_mul(result.x_, x_, z_inv2);
+      gfp_mul(result.y_, t, z_inv2);
 
-      gfp_mul(x_, x_, z_inv2);
-      gfp_mul(y_, t, z_inv2);
-
-      z_ = new_gfp(1ll);
-      t_ = new_gfp(1ll);
+      return result;
    }
 
    void curve_point::neg(const curve_point& a) {

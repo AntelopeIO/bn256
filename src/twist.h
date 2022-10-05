@@ -33,10 +33,12 @@ namespace bn256 {
 
       void mul(const twist_point& a, const int512_t& scalar);
 
-      void make_affine();
+      twist_point make_affine() const;
 
       void neg(const twist_point& a);
    };
 
-   std::ostream& operator << (std::ostream& os, const twist_point& v);
+   inline std::ostream& operator << (std::ostream& os, const twist_point& v) {
+      return os << v.string();
+   }
 }

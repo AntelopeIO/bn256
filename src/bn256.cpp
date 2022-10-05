@@ -41,52 +41,54 @@ namespace bn256 {
    }
 
    // marshal converts g1 to a byte slice.
-   [[nodiscard]] uint8_array_32_array_2_t g1::marshal() {
-
-      uint8_array_32_array_2_t ret{};
-
-      p_.make_affine();
-      if (p_.is_infinity()) {
-         return ret;
+void g1::marshal(nonstd::span<uint8_t, 64> m) const {
+      constexpr auto num_bytes = 256 / 8;
+      auto affined = p_.make_affine();
+      if (affined.is_infinity()) {
+         return;
       }
 
       gfp temp{};
-      temp.mont_decode(p_.x_);
-      temp.marshal(ret[0]);
+      temp.mont_decode(affined.x_);
+      temp.marshal(m.subspan<0, num_bytes>());
 
-      temp.mont_decode(p_.y_);
-      temp.marshal(ret[1]);
+      temp.mont_decode(affined.y_);
+      temp.marshal(m.subspan<num_bytes, num_bytes>());
 
-      return ret;
+      return;
    }
 
    // unmarshal sets g1 to the result of converting the output of marshal back into
    // a group element and then returns unmarshal_status.
-   unmarshal_status g1::unmarshal(uint8_array_32_array_2_t& m) {
+   std::error_code g1::unmarshal(nonstd::span<const uint8_t, 64> m) {
+      constexpr auto num_bytes = 256 / 8;
+      g1& e = *this;
+      if (auto ec = e.p_.x_.unmarshal(m.subspan<0, num_bytes>()); ec)
+         return ec;
 
-      p_.x_.unmarshal(m[0]);
-      p_.x_.mont_encode(p_.x_);
 
-      p_.y_.unmarshal(m[1]);
-      p_.y_.mont_encode(p_.y_);
+      if (auto ec = e.p_.y_.unmarshal(m.subspan<num_bytes, num_bytes>()); ec)
+         return ec;
+      e.p_.x_.mont_encode(e.p_.x_);
+      e.p_.y_.mont_encode(e.p_.y_);
 
       constexpr gfp zero{};
-      if (p_.x_ == zero && p_.y_ == zero) {
+      if (e.p_.x_ == zero && e.p_.y_ == zero) {
          // This is the point at infinity.
-         p_.y_ = new_gfp(1);
-         p_.z_ = zero;
-         p_.t_ = zero;
+         e.p_.y_ = new_gfp(1);
+         e.p_.z_ = zero;
+         e.p_.t_ = zero;
       } else {
-         p_.z_ = new_gfp(1);
-         p_.t_ = new_gfp(1);
-         if (!p_.is_on_curve()) {
-            return unmarshal_malformed_point;
+         e.p_.z_ = new_gfp(1);
+         e.p_.t_ = new_gfp(1);
+         if (!e.p_.is_on_curve()) {
+            return unmarshal_error::MALFORMED_POINT;
          }
       }
-      return unmarshal_success;
+      return {};
    }
 
-   std::string g1::string() {
+   std::string g1::string() const {
       std::stringstream ss;
       ss << "bn256.g1" << p_.string();
       return ss.str();
@@ -124,53 +126,44 @@ namespace bn256 {
    }
 
    // marshal converts g2 to a byte slice.
-   uint8_array_32_array_4_t g2::marshal() {
-      uint8_array_32_array_4_t ret{};
-
-      p_.make_affine();
-      if (p_.is_infinity()) {
-         return ret;
+   void g2::marshal(nonstd::span<uint8_t, 128> view) const {
+      constexpr auto num_bytes = 256 / 8;
+      auto affined = p_.make_affine();
+      if (affined.is_infinity()) {
+         return;
       }
 
       gfp temp{};
 
-      temp.mont_decode(p_.x_.x_);
-      temp.marshal(ret[0]);
+      temp.mont_decode(affined.x_.x_);
+      temp.marshal(view.subspan<0, num_bytes>());
 
-      temp.mont_decode(p_.x_.y_);
-      temp.marshal(ret[1]);
+      temp.mont_decode(affined.x_.y_);
+      temp.marshal(view.subspan<num_bytes, num_bytes>());
 
-      temp.mont_decode(p_.y_.x_);
-      temp.marshal(ret[2]);
+      temp.mont_decode(affined.y_.x_);
+      temp.marshal(view.subspan<num_bytes*2, num_bytes>());
 
-      temp.mont_decode(p_.y_.y_);
-      temp.marshal(ret[3]);
-
-      return ret;
+      temp.mont_decode(affined.y_.y_);
+      temp.marshal(view.subspan<num_bytes*3, num_bytes>());
    }
 
    // unmarshal sets g2 to the result of converting the output of marshal back into
    // a group element and then returns unmarshal_status.
-   unmarshal_status g2::unmarshal(uint8_array_32_array_4_t& m) {
-      unmarshal_status status = p_.x_.x_.unmarshal(m[0]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+std::error_code g2::unmarshal(nonstd::span<const uint8_t, 128> m) {
+      constexpr auto num_bytes = 256 / 8;
 
-      status = p_.x_.y_.unmarshal(m[1]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.x_.x_.unmarshal(m.subspan<0, num_bytes>()); ec)
+         return ec;
 
-      status = p_.y_.x_.unmarshal(m[2]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.x_.y_.unmarshal(m.subspan<num_bytes, num_bytes>()); ec)
+         return ec;
 
-      status = p_.y_.y_.unmarshal(m[3]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.y_.x_.unmarshal(m.subspan<num_bytes*2, num_bytes>()); ec)
+         return ec;
+
+      if (auto ec = p_.y_.y_.unmarshal(m.subspan<num_bytes*3, num_bytes>()); ec)
+         return ec;
 
       p_.x_.x_.mont_encode(p_.x_.x_);
       p_.x_.y_.mont_encode(p_.x_.y_);
@@ -186,11 +179,11 @@ namespace bn256 {
          p_.z_.set_one();
          p_.t_.set_one();
          if (!p_.is_on_curve()) {
-            return unmarshal_malformed_point;
+            return unmarshal_error::MALFORMED_POINT;
          }
       }
 
-      return status;
+      return {};
    }
 
    std::string g2::string() {
@@ -231,110 +224,84 @@ namespace bn256 {
       return *this;
    }
 
-   uint8_array_32_array_12_t gt::marshal() const {
-      uint8_array_32_array_12_t ret{};
-
+void gt::marshal(nonstd::span<uint8_t, 384> m)  const {
+      constexpr auto num_bytes = 256 / 8;
       gfp temp{};
 
       temp.mont_decode(p_.x_.x_.x_);
-      temp.marshal(ret[0]);
+      temp.marshal(m.subspan<0, num_bytes>());
 
       temp.mont_decode(p_.x_.x_.y_);
-      temp.marshal(ret[1]);
+      temp.marshal(m.subspan<num_bytes, num_bytes>());
 
       temp.mont_decode(p_.x_.y_.x_);
-      temp.marshal(ret[2]);
+      temp.marshal(m.subspan<num_bytes*2, num_bytes>());
 
       temp.mont_decode(p_.x_.y_.y_);
-      temp.marshal(ret[3]);
+      temp.marshal(m.subspan<num_bytes*3, num_bytes>());
 
       temp.mont_decode(p_.x_.z_.x_);
-      temp.marshal(ret[4]);
+      temp.marshal(m.subspan<num_bytes*4, num_bytes>());
 
       temp.mont_decode(p_.x_.z_.y_);
-      temp.marshal(ret[5]);
+      temp.marshal(m.subspan<num_bytes*5, num_bytes>());
 
       temp.mont_decode(p_.y_.x_.x_);
-      temp.marshal(ret[6]);
+      temp.marshal(m.subspan<num_bytes*6, num_bytes>());
 
       temp.mont_decode(p_.y_.x_.y_);
-      temp.marshal(ret[7]);
+      temp.marshal(m.subspan<num_bytes*7, num_bytes>());
 
       temp.mont_decode(p_.y_.y_.x_);
-      temp.marshal(ret[8]);
+      temp.marshal(m.subspan<num_bytes*8, num_bytes>());
 
       temp.mont_decode(p_.y_.y_.y_);
-      temp.marshal(ret[9]);
+      temp.marshal(m.subspan<num_bytes*9, num_bytes>());
 
       temp.mont_decode(p_.y_.z_.x_);
-      temp.marshal(ret[10]);
+      temp.marshal(m.subspan<num_bytes*10, num_bytes>());
 
       temp.mont_decode(p_.y_.z_.y_);
-      temp.marshal(ret[11]);
-
-      return ret;
+      temp.marshal(m.subspan<num_bytes*11, num_bytes>());
    }
 
-   unmarshal_status gt::unmarshal(uint8_array_32_array_12_t& m) {
-      unmarshal_status status = p_.x_.x_.x_.unmarshal(m[0]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+    std::error_code gt::unmarshal(nonstd::span<const uint8_t, 384> m) {
+      constexpr auto num_bytes = 256 / 8;
+      if (auto ec = p_.x_.x_.x_.unmarshal(m.subspan<0, num_bytes>()); ec)
+         return ec;
 
-      status = p_.x_.x_.y_.unmarshal(m[1]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.x_.x_.y_.unmarshal(m.subspan<num_bytes, num_bytes>()); ec)
+         return ec;
 
-      status = p_.x_.y_.x_.unmarshal(m[2]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.x_.y_.x_.unmarshal(m.subspan<num_bytes*2, num_bytes>()); ec)
+        return ec;
 
-      status = p_.x_.y_.y_.unmarshal(m[3]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.x_.y_.y_.unmarshal(m.subspan<num_bytes*3, num_bytes>()); ec)
+        return ec;
 
-      status = p_.x_.z_.x_.unmarshal(m[4]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.x_.z_.x_.unmarshal(m.subspan<num_bytes*4, num_bytes>()); ec)
+        return ec;
 
-      status = p_.x_.z_.y_.unmarshal(m[5]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.x_.z_.y_.unmarshal(m.subspan<num_bytes*5, num_bytes>()); ec)
+        return ec;
 
-      status = p_.y_.x_.x_.unmarshal(m[6]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.y_.x_.x_.unmarshal(m.subspan<num_bytes*6, num_bytes>()); ec)
+        return ec;
 
-      status = p_.y_.x_.y_.unmarshal(m[7]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.y_.x_.y_.unmarshal(m.subspan<num_bytes*7, num_bytes>()); ec)
+        return ec;
 
-      status = p_.y_.y_.x_.unmarshal(m[8]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.y_.y_.x_.unmarshal(m.subspan<num_bytes*8, num_bytes>()); ec)
+        return ec;
 
-      status = p_.y_.y_.y_.unmarshal(m[9]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.y_.y_.y_.unmarshal(m.subspan<num_bytes*9, num_bytes>()); ec)
+        return ec;
 
-      status = p_.y_.z_.x_.unmarshal(m[10]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.y_.z_.x_.unmarshal(m.subspan<num_bytes*10, num_bytes>()); ec)
+        return ec;
 
-      status = p_.y_.z_.y_.unmarshal(m[11]);
-      if (status != unmarshal_success) {
-         return status;
-      }
+      if (auto ec = p_.y_.z_.y_.unmarshal(m.subspan<num_bytes*11, num_bytes>()); ec)
+        return ec;
 
       p_.x_.x_.x_.mont_encode(p_.x_.x_.x_);
       p_.x_.x_.y_.mont_encode(p_.x_.x_.y_);
@@ -349,7 +316,7 @@ namespace bn256 {
       p_.y_.z_.x_.mont_encode(p_.y_.z_.x_);
       p_.y_.z_.y_.mont_encode(p_.y_.z_.y_);
 
-      return status;
+      return {};
    }
 
    bool gt::operator==(const gt& rhs) const {
@@ -407,5 +374,9 @@ namespace bn256 {
       g2 ret{};
       auto k = rand.sample();
       return std::make_tuple(k, ret.scalar_base_mult(k));
+   }
+
+   std::ostream& operator << (std::ostream& os, const gt& v) {
+      return os << v.p_;
    }
 }

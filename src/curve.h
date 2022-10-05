@@ -16,12 +16,12 @@ namespace bn256 {
       gfp z_;
       gfp t_;
 
-      std::string string();
+      std::string string() const ;
 
       void set(const curve_point& a);
 
       // IsOnCurve returns true iff c is on the curve.
-      bool is_on_curve();
+      bool is_on_curve() const;
 
       void set_infinity();
 
@@ -33,8 +33,12 @@ namespace bn256 {
 
       void mul(const curve_point& a, const int512_t& scalar);
 
-      void make_affine();
+      [[ nodiscard ]] curve_point make_affine() const;
 
       void neg(const curve_point& a);
    };
+
+   inline std::ostream& operator << (std::ostream& os, const curve_point& v) {
+      return os << v.string();
+   }
 }

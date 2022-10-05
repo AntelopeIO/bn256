@@ -11,8 +11,7 @@ namespace bn256 {
    };
 
    std::string twist_point::string() const {
-      twist_point tmp{*this};
-      tmp.make_affine();
+      auto tmp = make_affine();
       auto x = gfp2::gfp2_decode(tmp.x_);
       auto y = gfp2::gfp2_decode(tmp.y_);
 
@@ -34,15 +33,15 @@ namespace bn256 {
    }
 
    bool twist_point::is_on_curve() {
-      make_affine();
-      if (is_infinity()) {
+      auto c = make_affine();
+      if (c.is_infinity()) {
          return true;
       }
 
       gfp2 y2{}, x3{};
-      y2.square(y_);
-      x3.square(x_);
-      x3.mul(x3, x_);
+      y2.square(c.y_);
+      x3.square(c.x_);
+      x3.mul(x3, c.x_);
       x3.add(x3, twist_b);
 
       if (y2 != x3) {
@@ -50,7 +49,7 @@ namespace bn256 {
       }
 
       twist_point cneg{};
-      cneg.mul(*this, constants::order);
+      cneg.mul(c, constants::order);
       return cneg.z_.is_zero();
    }
 
@@ -188,24 +187,24 @@ namespace bn256 {
       set(sum);
    }
 
-   void twist_point::make_affine() {
+   twist_point twist_point::make_affine() const {
       if (z_.is_one()) {
-         return;
+         return *this;
       } else if (z_.is_zero()) {
-         x_.set_zero();
-         y_.set_zero();
-         t_.set_zero();
-         return;
+         return {};
       }
       gfp2 z_inv{}, t{}, z_inv2{};
       z_inv.invert(z_);
       t.mul(y_, z_inv);
       z_inv2.square(z_inv);
-      y_.mul(t, z_inv2);
+
+      twist_point result;
+      result.y_.mul(t, z_inv2);
       t.mul(x_, z_inv2);
-      x_.set(t);
-      z_.set_one();
-      t_.set_one();
+      result.x_.set(t);
+      result.z_.set_one();
+      result.t_.set_one();
+      return result;
    }
 
    void twist_point::neg(const twist_point& a) {
@@ -213,10 +212,5 @@ namespace bn256 {
       y_.neg(a.y_);
       z_.set(a.z_);
       t_.set_zero();
-   }
-
-   std::ostream& operator << (std::ostream& os, const twist_point& v) {
-      os << v.string();
-      return os;
    }
 }

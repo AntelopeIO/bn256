@@ -38,7 +38,7 @@ namespace bn256 {
       this->set(sum);
    }
 
-   void gfp::marshal(uint8_array_32_t& out) const {
+   void gfp::marshal(nonstd::span<uint8_t, 32> out) const {
       for (auto w = 0; w < 4; w++) {
          for (auto b = 0; b < 8; b++) {
             uint8_t t = ((*this)[3-w] >> (56 - 8*b));
@@ -47,25 +47,26 @@ namespace bn256 {
       }
    }
 
-   unmarshal_status gfp::unmarshal(uint8_array_32_t& in) {
+   std::error_code gfp::unmarshal(nonstd::span<const uint8_t, 32> in) {
+      gfp& result = *this;
       // Unmarshal the bytes into little endian form
       for (auto w = 0; w < 4; w++) {
-         (*this)[3-w] = 0;
+         result[3-w] = 0;
          for (auto b = 0; b < 8; b++) {
-            (*this)[3-w] += uint64_t(in[8*w+b]) << (56 - 8*b);
+            result[3-w] += uint64_t(in[8*w+b]) << (56 - 8*b);
          }
       }
 
       // Ensure the point respects the curve modulus
       for (auto i = 3; i >= 0; i--) {
-         if ((*this)[i] < constants::p2[i]) {
-            return unmarshal_success;
+         if (result[i] < constants::p2[i]) {
+            return {};
          }
-         if ((*this)[i] > constants::p2[i]) {
-            return unmarshal_coordinate_exceeds_modulus;
+         if (result[i] > constants::p2[i]) {
+            return unmarshal_error::COORDINATE_EXCEEDS_MODULUS;
          }
       }
-      return unmarshal_coordinate_exceeds_modulus;
+      return unmarshal_error::MALFORMED_POINT;
    }
 
    void gfp::mont_encode(const gfp& a) {

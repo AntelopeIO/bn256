@@ -54,4 +54,5 @@ namespace bn256 {
 
    };
 
+   std::ostream& operator << (std::ostream& os, const gfp6& v);
 }

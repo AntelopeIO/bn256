@@ -247,4 +247,8 @@ namespace bn256 {
       return ss.str();
    }
 
+   std::ostream& operator << (std::ostream& os, const gfp6& v) {
+         return os << "(" << v.x_ << ", " << v.y_ << ", " << v.z_ << ")";
+    }
+
 }

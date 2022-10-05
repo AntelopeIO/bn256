@@ -14,7 +14,18 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
+FetchContent_Declare(
+  span
+  GIT_REPOSITORY "https://github.com/martinmoene/span-lite"
+  GIT_TAG        v0.10.3
+)
 
-find_package(Boost)
+FetchContent_GetProperties(span)
+if(NOT span_POPULATED)
+  FetchContent_Populate(span)
+endif()
+
+
+find_package(Boost 1.78 REQUIRED)
 add_subdirectory(src)
 add_subdirectory(test)

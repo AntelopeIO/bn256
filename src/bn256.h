@@ -67,12 +67,21 @@ namespace bn256 {
 
       const g1& set(const g1& a);
 
-      [[nodiscard]] uint8_array_32_array_2_t marshal();
+      void marshal(nonstd::span<uint8_t,64> out) const;
+      std::array<uint8_t, 64> marshal() const {
+         std::array<uint8_t, 64> result;
+         marshal(result);
+         return result;
+      }
 
-      unmarshal_status unmarshal(uint8_array_32_array_2_t& m);
+      [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t,64> in);
 
-      std::string string();
+      std::string string() const;
    };
+
+   inline std::ostream& operator << (std::ostream& os, const g1& v) {
+      return os << v.p_.string();
+   }
 
    // g2 is an abstract cyclic group. The zero value is suitable for use as the
    // output of an operation, but cannot be used as an input.
@@ -89,12 +98,21 @@ namespace bn256 {
 
       const g2& set(const g2& a);
 
-      [[nodiscard]] uint8_array_32_array_4_t marshal();
+      void marshal(nonstd::span<uint8_t,128> out) const;
+      std::array<uint8_t, 128> marshal() const {
+         std::array<uint8_t, 128> result;
+         marshal(result);
+         return result;
+      }
 
-      unmarshal_status unmarshal(uint8_array_32_array_4_t& m);
+      [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t,128> m);
 
       std::string string();
    };
+
+   inline std::ostream& operator << (std::ostream& os, const g2& v) {
+      return os << v.p_.string();
+   }
 
    // GT is an abstract cyclic group. The zero value is suitable for use as the
    // output of an operation, but cannot be used as an input.
@@ -119,11 +137,16 @@ namespace bn256 {
       const gt& finalize();
 
       // marshal converts g2 to a byte slice.
-      [[nodiscard]] uint8_array_32_array_12_t marshal() const;
+      void marshal(nonstd::span<uint8_t, 384> out) const;
+      std::array<uint8_t, 384> marshal() const {
+         std::array<uint8_t, 384> result;
+         marshal(result);
+         return result;
+      }
 
       // unmarshal sets gt to the result of converting the output of marshal back into
       // a group element and then returns unmarshal_status.
-      unmarshal_status unmarshal(uint8_array_32_array_12_t& m);
+      [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t, 384> m);
 
       bool operator==(const gt& rhs) const;
 
@@ -131,6 +154,8 @@ namespace bn256 {
 
       std::string string();
    };
+
+   std::ostream& operator << (std::ostream& os, const gt& v);
 
    // pair calculates an Optimal Ate pairing.
    gt pair(const g1& g1, const g2& g2);

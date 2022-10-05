@@ -171,13 +171,8 @@ namespace bn256 {
       gfp12 ret{};
       ret.set_one();
 
-      twist_point a_affine{};
-      a_affine.set(q);
-      a_affine.make_affine();
-
-      curve_point b_affine{};
-      b_affine.set(p);
-      b_affine.make_affine();
+      twist_point a_affine = q.make_affine();
+      curve_point b_affine = p.make_affine();
 
       twist_point minus_a{}, r{};
       minus_a.neg(a_affine);

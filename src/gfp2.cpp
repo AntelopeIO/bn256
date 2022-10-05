@@ -162,8 +162,7 @@ namespace bn256 {
       return ss.str();
    }
 
-   std::ostream& operator << (std::ostream& os, gfp2& v) {
-      os << "(" << v.x_.string() << ", " << v.y_.string() << ")";
-      return os;
-   }
+   std::ostream& operator << (std::ostream& os, const gfp2& v) {
+        return os << "(" << v.x_ << ", " << v.y_ << ")";
+    }
 }
