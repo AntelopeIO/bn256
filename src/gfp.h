@@ -22,7 +22,7 @@ namespace bn256 {
 
         void invert(const gfp& f);
 
-        void marshal(uint8_array_32_t& out);
+        void marshal(uint8_array_32_t& out) const;
 
         unmarshal_status unmarshal(uint8_array_32_t& in);
 

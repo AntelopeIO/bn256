@@ -38,11 +38,11 @@ namespace bn256 {
       this->set(sum);
    }
 
-   void gfp::marshal(uint8_array_32_t& out) {
+   void gfp::marshal(uint8_array_32_t& out) const {
       for (auto w = 0; w < 4; w++) {
          for (auto b = 0; b < 8; b++) {
             uint8_t t = ((*this)[3-w] >> (56 - 8*b));
-            out[8*w*b] = t;
+            out[8*w+b] = t;
          }
       }
    }
