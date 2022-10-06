@@ -21,7 +21,7 @@ namespace bn256 {
       void set(const twist_point& a);
 
       // IsOnCurve returns true iff c is on the curve.
-      bool is_on_curve();
+      bool is_on_curve() const;
 
       void set_infinity();
 

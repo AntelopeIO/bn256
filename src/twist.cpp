@@ -33,16 +33,17 @@ namespace bn256 {
       t_.set(a.t_);
    }
 
-   bool twist_point::is_on_curve() {
-      make_affine();
+   bool twist_point::is_on_curve() const {
+      twist_point tmp{*this};
+      tmp.make_affine();
       if (is_infinity()) {
          return true;
       }
 
       gfp2 y2{}, x3{};
-      y2.square(y_);
-      x3.square(x_);
-      x3.mul(x3, x_);
+      y2.square(tmp.y_);
+      x3.square(tmp.x_);
+      x3.mul(x3, tmp.x_);
       x3.add(x3, twist_b);
 
       if (y2 != x3) {
