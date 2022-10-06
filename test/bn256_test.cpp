@@ -2,9 +2,17 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <memory>
 #include <catch2/catch_test_macros.hpp>
+#include <boost/algorithm/hex.hpp>
 
 using namespace boost::multiprecision::literals;
 using namespace boost::multiprecision;
+
+std::vector<uint8_t> unhex(const std::string& hex)
+{
+    std::vector<uint8_t> bytes = {0};
+    boost::algorithm::unhex(hex, std::back_inserter(bytes));
+    return bytes;
+}
 
 
 TEST_CASE("test g1 marshall", "[g1_marshall]"){
