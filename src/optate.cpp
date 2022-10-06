@@ -4,14 +4,25 @@
 
 namespace bn256 {
 
+   struct line_function_result_t {
+      gfp2 a_{};
+      gfp2 b_{};
+      gfp2 c_{};
+      twist_point out_{};
+   };
+
+   std::ostream& operator << (std::ostream& os, const line_function_result_t& lfr) {
+      return os << "  a: " << lfr.a_ << ",\n  b:" << lfr.b_ << ",\n  c: " << lfr.c_ << ",\n  out: " << lfr.out_ << "\n";
+   }
+
    line_function_result_t
    line_function_add(const twist_point& r, const twist_point& p, const curve_point& q, const gfp2& r2) {
       line_function_result_t rc{};
-      gfp2 d{}, h{}, i{}, e{}, j{}, l1{}, v{}, t{}, t2{};
+      gfp2 b{}, d{}, h{}, i{}, e{}, j{}, l1{}, v{}, t{}, t2{};
 
       // See the mixed addition algorithm from "Faster Computation of the
       // Tate Pairing", http://arxiv.org/pdf/0904.0854v3.pdf
-      rc.b_.mul(p.x_, r.t_);
+      b.mul(p.x_, r.t_);
 
       d.add(p.y_, r.z_);
       d.square(d);
@@ -19,7 +30,7 @@ namespace bn256 {
       d.sub(d, r.t_);
       d.mul(d, r.t_);
 
-      h.sub(rc.b_, r.x_);
+      h.sub(b, r.x_);
       i.square(h);
 
       e.add(i, i);
@@ -37,7 +48,7 @@ namespace bn256 {
       rc.out_.x_.sub(rc.out_.x_, v);
       rc.out_.x_.sub(rc.out_.x_, v);
 
-      rc.out_.z_.add(rc.out_.z_, h);
+      rc.out_.z_.add(r.z_, h);
       rc.out_.z_.square(rc.out_.z_);
       rc.out_.z_.sub(rc.out_.z_, r.t_);
       rc.out_.z_.sub(rc.out_.z_, i);
@@ -118,8 +129,8 @@ namespace bn256 {
 
       rc.a_.add(r.x_, e);
       rc.a_.square(rc.a_);
-      rc.a_.sub(a, a);
-      rc.a_.sub(a, g);
+      rc.a_.sub(rc.a_, a);
+      rc.a_.sub(rc.a_, g);
 
       t.add(b, b);
       t.add(t, t);
@@ -244,7 +255,7 @@ namespace bn256 {
       r2.square(q1.y_);
       auto lf_result = line_function_add(r, q1, b_affine, r2);
       mul_line(ret, lf_result.a_, lf_result.b_, lf_result.c_);
-      r = lf_result.out_;
+      r = lf_result.out_.make_affine();
 
       r2.square(minus_q2.y_);
       lf_result = line_function_add(r, minus_q2, b_affine, r2);
