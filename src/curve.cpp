@@ -8,12 +8,13 @@ namespace bn256 {
 
    static const auto curve_b = new_gfp(3ll);
 
-   std::string curve_point::string() {
-      make_affine();
+   std::string curve_point::string() const {
+      curve_point tmp{*this};
+      tmp.make_affine();
 
       gfp x{}, y{};
-      x.mont_decode(x_);
-      y.mont_decode(y_);
+      x.mont_decode(tmp.x_);
+      y.mont_decode(tmp.y_);
 
       std::string ret;
       ret.reserve(132);

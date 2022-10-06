@@ -86,7 +86,7 @@ namespace bn256 {
       return unmarshal_success;
    }
 
-   std::string g1::string() {
+   std::string g1::string() const {
       std::stringstream ss;
       ss << "bn256.g1" << p_.string();
       return ss.str();
@@ -193,7 +193,7 @@ namespace bn256 {
       return status;
    }
 
-   std::string g2::string() {
+   std::string g2::string() const {
       std::stringstream ss;
       ss << "bn256.g2" << p_.string();
       return ss.str();
@@ -360,7 +360,7 @@ namespace bn256 {
       return !(rhs == *this);
    }
 
-   std::string gt::string() {
+   std::string gt::string() const {
       std::stringstream ss;
       ss << "bn256.gt" << p_.string();
       return ss.str();

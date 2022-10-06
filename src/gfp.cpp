@@ -77,7 +77,7 @@ namespace bn256 {
       gfp_mul(*this, a, decode_b);
    }
 
-   std::string gfp::string() {
+   std::string gfp::string() const {
       std::stringstream ss;
       ss << std::hex << (*this)[3] << (*this)[2] << (*this)[1] << (*this)[0];
       return ss.str();

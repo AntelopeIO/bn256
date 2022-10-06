@@ -44,7 +44,7 @@ namespace bn256 {
 
         bool operator!=(const gfp2& rhs) const;
 
-        std::string string();
+        std::string string() const;
 
     };
 

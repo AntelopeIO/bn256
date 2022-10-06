@@ -52,7 +52,7 @@ namespace bn256 {
 
       bool operator!=(const gfp12& rhs) const;
 
-      std::string string();
+      std::string string() const;
 
    };
 

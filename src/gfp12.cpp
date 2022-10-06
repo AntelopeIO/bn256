@@ -167,7 +167,7 @@ namespace bn256 {
       return !(rhs == *this);
    }
 
-   std::string gfp12::string() {
+   std::string gfp12::string() const {
       std::stringstream ss;
       ss << "(" << x_.string() << ", " << y_.string() << ")";
       return ss.str();

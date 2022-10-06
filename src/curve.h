@@ -16,7 +16,7 @@ namespace bn256 {
       gfp z_;
       gfp t_;
 
-      std::string string();
+      std::string string() const;
 
       void set(const curve_point& a);
 
