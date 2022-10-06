@@ -33,15 +33,16 @@ namespace bn256 {
       t_.set(a.t_);
    }
 
-   bool curve_point::is_on_curve() {
-      make_affine();
-      if (is_infinity()) {
+   bool curve_point::is_on_curve() const {
+      curve_point tmp{*this};
+      tmp.make_affine();
+      if (tmp.is_infinity()) {
          return true;
       }
       gfp y2_{}, x3_{};
-      gfp_mul(y2_, y_, y_);
-      gfp_mul(x3_, x_, x_);
-      gfp_mul(x3_, x3_, x_);
+      gfp_mul(y2_, tmp.y_, tmp.y_);
+      gfp_mul(x3_, tmp.x_, tmp.x_);
+      gfp_mul(x3_, x3_, tmp.x_);
       gfp_add(x3_, x3_, curve_b);
 
       return y2_ == x3_;
