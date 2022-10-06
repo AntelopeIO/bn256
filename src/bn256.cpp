@@ -41,20 +41,21 @@ namespace bn256 {
    }
 
    // marshal converts g1 to a byte slice.
-   [[nodiscard]] uint8_array_32_array_2_t g1::marshal() {
+   [[nodiscard]] uint8_array_32_array_2_t g1::marshal() const {
 
       uint8_array_32_array_2_t ret{};
 
-      p_.make_affine();
-      if (p_.is_infinity()) {
+      g1 tmp(*this);
+      tmp.p_.make_affine();
+      if (tmp.p_.is_infinity()) {
          return ret;
       }
 
       gfp temp{};
-      temp.mont_decode(p_.x_);
+      temp.mont_decode(tmp.p_.x_);
       temp.marshal(ret[0]);
 
-      temp.mont_decode(p_.y_);
+      temp.mont_decode(tmp.p_.y_);
       temp.marshal(ret[1]);
 
       return ret;
@@ -124,26 +125,27 @@ namespace bn256 {
    }
 
    // marshal converts g2 to a byte slice.
-   uint8_array_32_array_4_t g2::marshal() {
+   uint8_array_32_array_4_t g2::marshal() const {
       uint8_array_32_array_4_t ret{};
 
-      p_.make_affine();
-      if (p_.is_infinity()) {
+      g2 tmp(*this);
+      tmp.p_.make_affine();
+      if (tmp.p_.is_infinity()) {
          return ret;
       }
 
       gfp temp{};
 
-      temp.mont_decode(p_.x_.x_);
+      temp.mont_decode(tmp.p_.x_.x_);
       temp.marshal(ret[0]);
 
-      temp.mont_decode(p_.x_.y_);
+      temp.mont_decode(tmp.p_.x_.y_);
       temp.marshal(ret[1]);
 
-      temp.mont_decode(p_.y_.x_);
+      temp.mont_decode(tmp.p_.y_.x_);
       temp.marshal(ret[2]);
 
-      temp.mont_decode(p_.y_.y_);
+      temp.mont_decode(tmp.p_.y_.y_);
       temp.marshal(ret[3]);
 
       return ret;

@@ -67,7 +67,7 @@ namespace bn256 {
 
       const g1& set(const g1& a);
 
-      [[nodiscard]] uint8_array_32_array_2_t marshal();
+      [[nodiscard]] uint8_array_32_array_2_t marshal() const;
 
       unmarshal_status unmarshal(uint8_array_32_array_2_t& m);
 
@@ -89,7 +89,7 @@ namespace bn256 {
 
       const g2& set(const g2& a);
 
-      [[nodiscard]] uint8_array_32_array_4_t marshal();
+      [[nodiscard]] uint8_array_32_array_4_t marshal() const;
 
       unmarshal_status unmarshal(uint8_array_32_array_4_t& m);
 
