@@ -38,6 +38,8 @@ namespace bn256 {
 
    const gfp6& gfp6::neg(const gfp6& a) {
       x_.neg(a.x_);
+      y_.neg(a.y_);
+      z_.neg(a.z_);
       return *this;
    }
 
