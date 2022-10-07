@@ -24,7 +24,7 @@ namespace bn256 {
 
    const gfp2& gfp2::set_one() {
       x_.set_zero();
-      y_ = {1};
+      y_ = new_gfp(1ll);
       return *this;
    }
 
@@ -35,7 +35,7 @@ namespace bn256 {
 
    bool gfp2::is_one() const {
       constexpr gfp zero{};
-      constexpr gfp one{1};
+      const gfp one{new_gfp(1ll)};
       return zero == x_ && one == y_;
    }
 
