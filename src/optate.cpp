@@ -177,22 +177,18 @@ namespace bn256 {
    gfp12 miller(const twist_point& q, const curve_point& p) {
       gfp12 ret{};
       ret.set_one();
-      std::cout << "ret: " << ret.string() << std::endl;
 
       twist_point a_affine{};
       a_affine.set(q);
       a_affine.make_affine();
-      std::cout << "aAffine: " << a_affine.string() << std::endl;
 
       curve_point b_affine{};
       b_affine.set(p);
       b_affine.make_affine();
-      std::cout << "bAffine: " << b_affine.string() << std::endl;
 
       twist_point minus_a{}, r{};
       minus_a.neg(a_affine);
       r.set(a_affine);
-      std::cout << "r: " << r.string() << std::endl;
 
       gfp2 r2{};
       r2.square(a_affine.y_);
