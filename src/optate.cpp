@@ -4,14 +4,21 @@
 
 namespace bn256 {
 
+   struct line_function_result_t {
+      gfp2 a_{};
+      gfp2 b_{};
+      gfp2 c_{};
+      twist_point out_{};
+   };
+
    line_function_result_t
    line_function_add(const twist_point& r, const twist_point& p, const curve_point& q, const gfp2& r2) {
       line_function_result_t rc{};
-      gfp2 d{}, h{}, i{}, e{}, j{}, l1{}, v{}, t{}, t2{};
+      gfp2 b{}, d{}, h{}, i{}, e{}, j{}, l1{}, v{}, t{}, t2{};
 
       // See the mixed addition algorithm from "Faster Computation of the
       // Tate Pairing", http://arxiv.org/pdf/0904.0854v3.pdf
-      rc.b_.mul(p.x_, r.t_);
+      b.mul(p.x_, r.t_);
 
       d.add(p.y_, r.z_);
       d.square(d);
@@ -19,7 +26,7 @@ namespace bn256 {
       d.sub(d, r.t_);
       d.mul(d, r.t_);
 
-      h.sub(rc.b_, r.x_);
+      h.sub(b, r.x_);
       i.square(h);
 
       e.add(i, i);
@@ -37,7 +44,7 @@ namespace bn256 {
       rc.out_.x_.sub(rc.out_.x_, v);
       rc.out_.x_.sub(rc.out_.x_, v);
 
-      rc.out_.z_.add(rc.out_.z_, h);
+      rc.out_.z_.add(r.z_, h);
       rc.out_.z_.square(rc.out_.z_);
       rc.out_.z_.sub(rc.out_.z_, r.t_);
       rc.out_.z_.sub(rc.out_.z_, i);
@@ -118,8 +125,8 @@ namespace bn256 {
 
       rc.a_.add(r.x_, e);
       rc.a_.square(rc.a_);
-      rc.a_.sub(a, a);
-      rc.a_.sub(a, g);
+      rc.a_.sub(rc.a_, a);
+      rc.a_.sub(rc.a_, g);
 
       t.add(b, b);
       t.add(t, t);
@@ -170,18 +177,22 @@ namespace bn256 {
    gfp12 miller(const twist_point& q, const curve_point& p) {
       gfp12 ret{};
       ret.set_one();
+      std::cout << "ret: " << ret.string() << std::endl;
 
       twist_point a_affine{};
       a_affine.set(q);
       a_affine.make_affine();
+      std::cout << "aAffine: " << a_affine.string() << std::endl;
 
       curve_point b_affine{};
       b_affine.set(p);
       b_affine.make_affine();
+      std::cout << "bAffine: " << b_affine.string() << std::endl;
 
       twist_point minus_a{}, r{};
       minus_a.neg(a_affine);
       r.set(a_affine);
+      std::cout << "r: " << r.string() << std::endl;
 
       gfp2 r2{};
       r2.square(a_affine.y_);
