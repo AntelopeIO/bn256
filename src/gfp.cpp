@@ -24,13 +24,13 @@ namespace bn256 {
       for (auto word = 0; word < bits.size(); word++) {
          for (auto bit = 0; bit < 64; bit++) {
             if (((bits[word] >> bit) & 1) == 1) {
-               gfp_mul(sum, sum, power);
+               sum = sum.mul(power);
             }
-            gfp_mul(power, power, power);
+            power = power.mul(power);
          }
       }
 
-      gfp_mul(sum, sum, constants::r3);
+      sum = sum.mul(constants::r3);
       return sum;
    }
 
@@ -66,16 +66,12 @@ namespace bn256 {
    }
 
    gfp gfp::mont_encode() const noexcept {
-      gfp r;
-      gfp_mul(r, *this, constants::r2);
-      return r;
+      return this->mul(constants::r2);
    }
 
    gfp gfp::mont_decode() const noexcept {
       constexpr gfp decode_b{1};
-      gfp r;
-      gfp_mul(r, *this, decode_b);
-      return r;
+      return this->mul(decode_b);
    }
 
    std::string gfp::string() const noexcept {
@@ -100,10 +96,9 @@ namespace bn256 {
          out = {uint64_t(x)};
       } else {
          out = {uint64_t(-x)};
-         out = -out;
+         out = out.neg();
       }
-      out = out.mont_encode();
-      return out;
+      return out.mont_encode();
    }
 
    std::ostream& operator << (std::ostream& os, const gfp& v) {

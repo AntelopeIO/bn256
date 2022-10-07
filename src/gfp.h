@@ -51,41 +51,28 @@ namespace bn256 {
 
         gfp invert() const noexcept;
 
-        gfp operator-() const noexcept {
+        gfp neg() const noexcept {
             gfp r;
             gfp_neg(r, *this);
             return r;
         }
 
-        gfp& operator+=(const gfp& other) noexcept {
-            gfp_add(*this, *this, other);
-            return *this;
+        gfp add(const gfp& other) const noexcept {
+            gfp r;
+            gfp_add(r, *this, other);
+            return r;
         }
 
-        gfp operator+(const gfp& rhs) const noexcept {
-            gfp r = *this;
-            return r += rhs;
+        gfp sub(const gfp& other) const noexcept {
+            gfp r;
+            gfp_sub(r, *this, other);
+            return r;
         }
 
-        gfp& operator-=(const gfp& other) noexcept {
-            gfp_sub(*this, *this, other);
-            return *this;
-        }
-
-        gfp operator-(const gfp& rhs) const noexcept {
-            gfp r = *this;
-            return r -= rhs;
-        }
-
-
-        gfp& operator*=(const gfp& other) noexcept {
-            gfp_mul(*this, *this, other);
-            return *this;
-        }
-
-        gfp operator*(const gfp& rhs) const noexcept {
-            gfp r = *this;
-            return r *= rhs;
+        gfp mul(const gfp& other) const noexcept {
+            gfp r;
+            gfp_mul(r, *this, other);
+            return r;
         }
 
         void marshal(nonstd::span<uint8_t, 32> out) const noexcept;

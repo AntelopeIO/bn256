@@ -73,9 +73,9 @@ static auto test_marshal_pair(const bn256::g1& a, const bn256::g2& b, const int5
 
 TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
 
-    constexpr int512_t a = 0xA2422041C5891A948F80F739C3F3B7A32FE306F28ED085741EE155DDFB789C17_cppi512;
-    constexpr int512_t b = a;
-    constexpr int512_t c = a;
+    int a = rand();
+    int b = rand();
+    int c = rand();
 
     bn256::g1 pa, pb, pc;
     bn256::g2 qa, qb, qc;
@@ -86,8 +86,8 @@ TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
     pb = test_marshal_g1(b);
     qb = test_marshal_g2(b);
 
-    pc = test_marshal_g1(b);
-    qc = test_marshal_g2(b);
+    pc = test_marshal_g1(c);
+    qc = test_marshal_g2(c);
 
     auto k1_bytes = test_marshal_pair(pb, qc, a);
     auto k2_bytes = test_marshal_pair(pc, qa, b);
@@ -97,7 +97,7 @@ TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
 }
 
 TEST_CASE("test g2_self_addition", "[bn256]"){
-    constexpr int512_t s = 0xA2422041C5891A948F80F739C3F3B7A32FE306F28ED085741EE155DDFB789C17_cppi512;
+    int s = rand();
     bn256::g2 p;
     p.scalar_base_mult(s);
     REQUIRE(p.p_.is_on_curve());
