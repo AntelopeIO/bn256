@@ -152,7 +152,10 @@ int test_tripartite_diffie_hellman() {
 
 int test_g2_self_addition() {
     std::cout << std::endl << "test_g2_self_addition:" << std::endl;
-    constexpr int512_t s = 0xA2422041C5891A948F80F739C3F3B7A32FE306F28ED085741EE155DDFB789C17_cppi512;
+
+    bn256::random_256 rand;
+    auto s = rand.sample();
+
     auto p = std::make_unique<bn256::g2>();
     p->scalar_base_mult(s);
     if (!p->p_.is_on_curve()) {
