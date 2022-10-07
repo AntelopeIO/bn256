@@ -1,6 +1,7 @@
 #include <bn256.h>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <memory>
+#include <random_256.h>
 
 using namespace boost::multiprecision::literals;
 using namespace boost::multiprecision;
@@ -120,9 +121,10 @@ static std::unique_ptr<bn256::uint8_array_32_array_12_t> test_marshal_pair(const
 int test_tripartite_diffie_hellman() {
     std::cout << std::endl << "test_tripartite_diffie_hellman:" << std::endl;
 
-    constexpr int512_t a = 0xA2422041C5891A948F80F739C3F3B7A32FE306F28ED085741EE155DDFB789C17_cppi512;
-    constexpr int512_t b = a;
-    constexpr int512_t c = a;
+    bn256::random_256 rand;
+    auto a = rand.sample();
+    auto b = rand.sample();
+    auto c = rand.sample();
 
     bn256::g1 pa, pb, pc;
     bn256::g2 qa, qb, qc;
@@ -133,8 +135,8 @@ int test_tripartite_diffie_hellman() {
     pb = test_marshal_g1(b);
     qb = test_marshal_g2(b);
 
-    pc = test_marshal_g1(b);
-    qc = test_marshal_g2(b);
+    pc = test_marshal_g1(c);
+    qc = test_marshal_g2(c);
 
     auto k1_bytes = test_marshal_pair(pb, qc, a);
     auto k2_bytes = test_marshal_pair(pc, qa, b);
@@ -173,7 +175,7 @@ int main() {
     rc += test_g1_marshall();
     rc += test_g2_marshall();
     rc += test_bilinearity();
-    // rc += test_tripartite_diffie_hellman();
+    rc += test_tripartite_diffie_hellman();
     rc += test_g2_self_addition();
     return rc;
 }
