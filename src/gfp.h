@@ -92,9 +92,9 @@ namespace bn256 {
 
         [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t, 32> input) noexcept;
 
-        void mont_encode(const gfp& a) noexcept;
+        gfp mont_encode() const noexcept;
 
-        void mont_decode(const gfp& a) noexcept;
+        gfp mont_decode() const noexcept;
 
         std::string string() const noexcept;
     };

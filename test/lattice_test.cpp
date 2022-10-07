@@ -11,7 +11,7 @@ using namespace boost::multiprecision;
 constexpr int test_fail = 1;
 constexpr int test_pass = 0;
 
-TEST_CASE("test lattice reduce curve", "[test_lattice_reduce_curve]"){
+TEST_CASE("test lattice reduce curve", "[lattice]"){
     constexpr std::size_t max_bitlen = 130;
     bn256::random_256 rand;
     auto k = rand.sample();
@@ -23,7 +23,7 @@ TEST_CASE("test lattice reduce curve", "[test_lattice_reduce_curve]"){
     }
 }
 
-TEST_CASE("test lattice reduce target", "[lattice_reduce_target]"){
+TEST_CASE("test lattice reduce target", "[lattice]"){
 
     constexpr std::size_t max_bitlen = 66;
     bn256::random_256 rand;

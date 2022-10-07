@@ -8,7 +8,7 @@
 
 // Tests that negation works the same way on both assembly-optimized and C++
 // implementation.
-TEST_CASE("test_gfp_neg", "[test_gfp_neg]"){
+TEST_CASE("test_gfp_neg", "[gfp]"){
 
    constexpr bn256::gfp n = {0x0123456789abcdef, 0xfedcba9876543210, 0xdeadbeefdeadbeef, 0xfeebdaedfeebdaed};
    constexpr bn256::gfp w = {0xfedcba9876543211, 0x0123456789abcdef, 0x2152411021524110, 0x0114251201142512};
@@ -19,7 +19,7 @@ TEST_CASE("test_gfp_neg", "[test_gfp_neg]"){
 
 // Tests that addition works the same way on both assembly-optimized and C++
 // implementation.
-TEST_CASE("test_gfp_add", "[test_gfp_add]"){
+TEST_CASE("test_gfp_add", "[gfp]"){
 
    constexpr bn256::gfp a = {0x0123456789abcdef, 0xfedcba9876543210, 0xdeadbeefdeadbeef, 0xfeebdaedfeebdaed};
    constexpr bn256::gfp b = {0xfedcba9876543210, 0x0123456789abcdef, 0xfeebdaedfeebdaed, 0xdeadbeefdeadbeef};
@@ -32,7 +32,7 @@ TEST_CASE("test_gfp_add", "[test_gfp_add]"){
 
 // Tests that subtraction works the same way on both assembly-optimized and C++
 // implementation.
-TEST_CASE("test_gfp_sub", "[test_gfp_sub]"){
+TEST_CASE("test_gfp_sub", "[gfp]"){
    constexpr bn256::gfp a = {0x0123456789abcdef, 0xfedcba9876543210, 0xdeadbeefdeadbeef, 0xfeebdaedfeebdaed};
    constexpr bn256::gfp b = {0xfedcba9876543210, 0x0123456789abcdef, 0xfeebdaedfeebdaed, 0xdeadbeefdeadbeef};
    constexpr bn256::gfp w = {0x02468acf13579bdf, 0xfdb97530eca86420, 0xdfc1e401dfc1e402, 0x203e1bfe203e1bfd};
@@ -43,16 +43,11 @@ TEST_CASE("test_gfp_sub", "[test_gfp_sub]"){
 
 // Tests that multiplication works the same way on both assembly-optimized and C++
 // implementation.
-TEST_CASE("test_gfp_mul", "[test_gfp_mul]"){
+TEST_CASE("test_gfp_mul", "[gfp]"){
    constexpr bn256::gfp a = {0x0123456789abcdef, 0xfedcba9876543210, 0xdeadbeefdeadbeef, 0xfeebdaedfeebdaed};
    constexpr bn256::gfp b = {0xfedcba9876543210, 0x0123456789abcdef, 0xfeebdaedfeebdaed, 0xdeadbeefdeadbeef};
    constexpr bn256::gfp w = {0xcbcbd377f7ad22d3, 0x3b89ba5d849379bf, 0x87b61627bd38b6d2, 0xc44052a2a0e654b2};
    bn256::gfp h{};
    bn256::gfp_mul(h, a, b);
    CHECK(h == w);
-}
-
-TEST_CASE("test gfp_marshall", "[gfp_marshall]") {
-    constexpr bn256::gfp n = {0x0123456789abcdef, 0xfedcba9876543210, 0xdeadbeefdeadbeef, 0xfeebdaedfeebdaed};
-
 }

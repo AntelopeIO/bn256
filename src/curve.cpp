@@ -12,8 +12,8 @@ namespace bn256 {
       auto tmp = make_affine();
 
       gfp x{}, y{};
-      x.mont_decode(tmp.x_);
-      y.mont_decode(tmp.y_);
+      x = tmp.x_.mont_decode();
+      y = tmp.y_.mont_decode();
 
       std::string ret;
       ret.reserve(132);

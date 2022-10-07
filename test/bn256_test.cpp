@@ -6,7 +6,7 @@
 using namespace boost::multiprecision::literals;
 using namespace boost::multiprecision;
 
-TEST_CASE("test g1 marshall", "[g1_marshall]"){
+TEST_CASE("test g1 marshall", "[bn256]"){
     auto [_, ga] = bn256::ramdom_g1();
     std::array<uint8_t, 64> ma, mb;
     ga.marshal(ma);
@@ -19,7 +19,7 @@ TEST_CASE("test g1 marshall", "[g1_marshall]"){
     CHECK(ma == mb);
 }
 
-TEST_CASE("test g2 marshall", "[g2_marshall]"){
+TEST_CASE("test g2 marshall", "[bn256]"){
     auto [_, ga] = bn256::ramdom_g2();
     std::array<uint8_t, 128> ma, mb;
     ga.marshal(ma);
@@ -30,7 +30,7 @@ TEST_CASE("test g2 marshall", "[g2_marshall]"){
     CHECK(ma == mb);
 }
 
-TEST_CASE("test bilinearity", "[bilinearity][!mayfail]"){
+TEST_CASE("test bilinearity", "[bn256]"){
     bn256::g1 c1{bn256::curve_gen};
     bn256::g2 c2{bn256::twist_gen};
 
@@ -71,7 +71,7 @@ static auto test_marshal_pair(const bn256::g1& a, const bn256::g2& b, const int5
     return pair;
 }
 
-TEST_CASE("test tripartite_diffie_hellman", "[tripartite_diffie_hellman]"){
+TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
 
     constexpr int512_t a = 0xA2422041C5891A948F80F739C3F3B7A32FE306F28ED085741EE155DDFB789C17_cppi512;
     constexpr int512_t b = a;
@@ -96,7 +96,7 @@ TEST_CASE("test tripartite_diffie_hellman", "[tripartite_diffie_hellman]"){
     CHECK(k2_bytes == k3_bytes);
 }
 
-TEST_CASE("test g2_self_addition", "[g2_self_addition]"){
+TEST_CASE("test g2_self_addition", "[bn256]"){
     constexpr int512_t s = 0xA2422041C5891A948F80F739C3F3B7A32FE306F28ED085741EE155DDFB789C17_cppi512;
     bn256::g2 p;
     p.scalar_base_mult(s);
@@ -108,7 +108,7 @@ TEST_CASE("test g2_self_addition", "[g2_self_addition]"){
 }
 
 
-TEST_CASE("test twist point mul", "[twist_point_mul]"){
+TEST_CASE("test twist point mul", "[bn256]"){
 	const int512_t k("73391516005847081647776723068736393251206848701235344996976057911204818492439");
 	bn256::twist_point tp_gen(bn256::twist_gen);
 	bn256::g2 p;

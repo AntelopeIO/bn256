@@ -4,9 +4,9 @@
 namespace bn256 {
 
    gfp2 gfp2::gfp2_decode(const gfp2& in) {
-      gfp2 out{};
-      out.x_.mont_decode(in.x_);
-      out.y_.mont_decode(in.y_);
+      gfp2 out;
+      out.x_ = in.x_.mont_decode();
+      out.y_ = in.y_.mont_decode();
       return out;
    }
 

@@ -65,13 +65,17 @@ namespace bn256 {
       return unmarshal_error::MALFORMED_POINT;
    }
 
-   void gfp::mont_encode(const gfp& a) noexcept {
-      gfp_mul(*this, a, constants::r2);
+   gfp gfp::mont_encode() const noexcept {
+      gfp r;
+      gfp_mul(r, *this, constants::r2);
+      return r;
    }
 
-   void gfp::mont_decode(const gfp& a) noexcept {
+   gfp gfp::mont_decode() const noexcept {
       constexpr gfp decode_b{1};
-      gfp_mul(*this, a, decode_b);
+      gfp r;
+      gfp_mul(r, *this, decode_b);
+      return r;
    }
 
    std::string gfp::string() const noexcept {
@@ -98,7 +102,7 @@ namespace bn256 {
          out = {uint64_t(-x)};
          out = -out;
       }
-      out.mont_encode(out);
+      out = out.mont_encode();
       return out;
    }
 

@@ -35,20 +35,15 @@ namespace bn256 {
    }
 
    // marshal converts g1 to a byte slice.
-void g1::marshal(nonstd::span<uint8_t, 64> m) const {
+  void g1::marshal(nonstd::span<uint8_t, 64> m) const {
       constexpr auto num_bytes = 256 / 8;
       auto affined = p_.make_affine();
       if (affined.is_infinity()) {
          return;
       }
 
-      gfp temp{};
-      temp.mont_decode(affined.x_);
-      temp.marshal(m.subspan<0, num_bytes>());
-
-      temp.mont_decode(affined.y_);
-      temp.marshal(m.subspan<num_bytes, num_bytes>());
-
+      affined.x_.mont_decode().marshal(m.subspan<0, num_bytes>());
+      affined.y_.mont_decode().marshal(m.subspan<num_bytes, num_bytes>());
       return;
    }
 
@@ -63,8 +58,8 @@ void g1::marshal(nonstd::span<uint8_t, 64> m) const {
 
       if (auto ec = e.p_.y_.unmarshal(m.subspan<num_bytes, num_bytes>()); ec)
          return ec;
-      e.p_.x_.mont_encode(e.p_.x_);
-      e.p_.y_.mont_encode(e.p_.y_);
+      e.p_.x_ = e.p_.x_.mont_encode();
+      e.p_.y_ = e.p_.y_.mont_encode();
 
       constexpr gfp zero{};
       if (e.p_.x_ == zero && e.p_.y_ == zero) {
@@ -121,19 +116,10 @@ void g1::marshal(nonstd::span<uint8_t, 64> m) const {
          return;
       }
 
-      gfp temp{};
-
-      temp.mont_decode(affined.x_.x_);
-      temp.marshal(view.subspan<0, num_bytes>());
-
-      temp.mont_decode(affined.x_.y_);
-      temp.marshal(view.subspan<num_bytes, num_bytes>());
-
-      temp.mont_decode(affined.y_.x_);
-      temp.marshal(view.subspan<num_bytes*2, num_bytes>());
-
-      temp.mont_decode(affined.y_.y_);
-      temp.marshal(view.subspan<num_bytes*3, num_bytes>());
+      affined.x_.x_.mont_decode().marshal(view.subspan<0, num_bytes>());
+      affined.x_.y_.mont_decode().marshal(view.subspan<num_bytes, num_bytes>());
+      affined.y_.x_.mont_decode().marshal(view.subspan<num_bytes*2, num_bytes>());
+      affined.y_.y_.mont_decode().marshal(view.subspan<num_bytes*3, num_bytes>());
    }
 
    // unmarshal sets g2 to the result of converting the output of marshal back into
@@ -153,10 +139,10 @@ std::error_code g2::unmarshal(nonstd::span<const uint8_t, 128> m) {
       if (auto ec = p_.y_.y_.unmarshal(m.subspan<num_bytes*3, num_bytes>()); ec)
          return ec;
 
-      p_.x_.x_.mont_encode(p_.x_.x_);
-      p_.x_.y_.mont_encode(p_.x_.y_);
-      p_.y_.x_.mont_encode(p_.y_.x_);
-      p_.y_.y_.mont_encode(p_.y_.y_);
+      p_.x_.x_ = p_.x_.x_.mont_encode();
+      p_.x_.y_ = p_.x_.y_.mont_encode();
+      p_.y_.x_ = p_.y_.x_.mont_encode();
+      p_.y_.y_ = p_.y_.y_.mont_encode();
 
       if (p_.x_.is_zero() && p_.y_.is_zero()) {
          // This is the point at infinity.
@@ -203,43 +189,19 @@ std::error_code g2::unmarshal(nonstd::span<const uint8_t, 128> m) {
 
 void gt::marshal(nonstd::span<uint8_t, 384> m)  const {
       constexpr auto num_bytes = 256 / 8;
-      gfp temp{};
 
-      temp.mont_decode(p_.x_.x_.x_);
-      temp.marshal(m.subspan<0, num_bytes>());
-
-      temp.mont_decode(p_.x_.x_.y_);
-      temp.marshal(m.subspan<num_bytes, num_bytes>());
-
-      temp.mont_decode(p_.x_.y_.x_);
-      temp.marshal(m.subspan<num_bytes*2, num_bytes>());
-
-      temp.mont_decode(p_.x_.y_.y_);
-      temp.marshal(m.subspan<num_bytes*3, num_bytes>());
-
-      temp.mont_decode(p_.x_.z_.x_);
-      temp.marshal(m.subspan<num_bytes*4, num_bytes>());
-
-      temp.mont_decode(p_.x_.z_.y_);
-      temp.marshal(m.subspan<num_bytes*5, num_bytes>());
-
-      temp.mont_decode(p_.y_.x_.x_);
-      temp.marshal(m.subspan<num_bytes*6, num_bytes>());
-
-      temp.mont_decode(p_.y_.x_.y_);
-      temp.marshal(m.subspan<num_bytes*7, num_bytes>());
-
-      temp.mont_decode(p_.y_.y_.x_);
-      temp.marshal(m.subspan<num_bytes*8, num_bytes>());
-
-      temp.mont_decode(p_.y_.y_.y_);
-      temp.marshal(m.subspan<num_bytes*9, num_bytes>());
-
-      temp.mont_decode(p_.y_.z_.x_);
-      temp.marshal(m.subspan<num_bytes*10, num_bytes>());
-
-      temp.mont_decode(p_.y_.z_.y_);
-      temp.marshal(m.subspan<num_bytes*11, num_bytes>());
+      p_.x_.x_.x_.mont_decode().marshal(m.subspan<0, num_bytes>());
+      p_.x_.x_.y_.mont_decode().marshal(m.subspan<num_bytes, num_bytes>());
+      p_.x_.y_.x_.mont_decode().marshal(m.subspan<num_bytes*2, num_bytes>());
+      p_.x_.y_.y_.mont_decode().marshal(m.subspan<num_bytes*3, num_bytes>());
+      p_.x_.z_.x_.mont_decode().marshal(m.subspan<num_bytes*4, num_bytes>());
+      p_.x_.z_.y_.mont_decode().marshal(m.subspan<num_bytes*5, num_bytes>());
+      p_.y_.x_.x_.mont_decode().marshal(m.subspan<num_bytes*6, num_bytes>());
+      p_.y_.x_.y_.mont_decode().marshal(m.subspan<num_bytes*7, num_bytes>());
+      p_.y_.y_.x_.mont_decode().marshal(m.subspan<num_bytes*8, num_bytes>());
+      p_.y_.y_.y_.mont_decode().marshal(m.subspan<num_bytes*9, num_bytes>());
+      p_.y_.z_.x_.mont_decode().marshal(m.subspan<num_bytes*10, num_bytes>());
+      p_.y_.z_.y_.mont_decode().marshal(m.subspan<num_bytes*11, num_bytes>());
    }
 
     std::error_code gt::unmarshal(nonstd::span<const uint8_t, 384> m) {
@@ -280,18 +242,18 @@ void gt::marshal(nonstd::span<uint8_t, 384> m)  const {
       if (auto ec = p_.y_.z_.y_.unmarshal(m.subspan<num_bytes*11, num_bytes>()); ec)
         return ec;
 
-      p_.x_.x_.x_.mont_encode(p_.x_.x_.x_);
-      p_.x_.x_.y_.mont_encode(p_.x_.x_.y_);
-      p_.x_.y_.x_.mont_encode(p_.x_.y_.x_);
-      p_.x_.y_.y_.mont_encode(p_.x_.y_.y_);
-      p_.x_.z_.x_.mont_encode(p_.x_.z_.x_);
-      p_.x_.z_.y_.mont_encode(p_.x_.z_.y_);
-      p_.y_.x_.x_.mont_encode(p_.y_.x_.x_);
-      p_.y_.x_.y_.mont_encode(p_.y_.x_.y_);
-      p_.y_.y_.x_.mont_encode(p_.y_.y_.x_);
-      p_.y_.y_.y_.mont_encode(p_.y_.y_.y_);
-      p_.y_.z_.x_.mont_encode(p_.y_.z_.x_);
-      p_.y_.z_.y_.mont_encode(p_.y_.z_.y_);
+      p_.x_.x_.x_ = p_.x_.x_.x_.mont_encode();
+      p_.x_.x_.y_ = p_.x_.x_.y_.mont_encode();
+      p_.x_.y_.x_ = p_.x_.y_.x_.mont_encode();
+      p_.x_.y_.y_ = p_.x_.y_.y_.mont_encode();
+      p_.x_.z_.x_ = p_.x_.z_.x_.mont_encode();
+      p_.x_.z_.y_ = p_.x_.z_.y_.mont_encode();
+      p_.y_.x_.x_ = p_.y_.x_.x_.mont_encode();
+      p_.y_.x_.y_ = p_.y_.x_.y_.mont_encode();
+      p_.y_.y_.x_ = p_.y_.y_.x_.mont_encode();
+      p_.y_.y_.y_ = p_.y_.y_.y_.mont_encode();
+      p_.y_.z_.x_ = p_.y_.z_.x_.mont_encode();
+      p_.y_.z_.y_ = p_.y_.z_.y_.mont_encode();
 
       return {};
    }
