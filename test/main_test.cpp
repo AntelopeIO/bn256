@@ -49,11 +49,6 @@ int test_pairings() {
    auto pn1 = bn256::pair(a1, bn1);
    auto np1 = bn256::pair(an1, b1);
 
-   std::cout << an1.string() << std::endl;
-   std::cout << bn1.string() << std::endl;
-   std::cout << pn1.string() << std::endl;
-   std::cout << np1.string() << std::endl;
-
    if (pn1.string() != np1.string()) {
       rc = test_fail;
       std::cout << "Pairing mismatch" << std::endl;
