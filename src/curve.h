@@ -17,9 +17,6 @@ namespace bn256 {
       gfp t_;
 
       std::string string() const ;
-
-      void set(const curve_point& a);
-
       // IsOnCurve returns true iff c is on the curve.
       bool is_on_curve() const;
 

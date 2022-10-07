@@ -148,17 +148,17 @@ namespace bn256 {
       gfp6 a2{}, t2{}, t3{};
       gfp2 t{};
 
-      a2.y_.set(a);
-      a2.z_.set(b);
+      a2.y_ = a;
+      a2.z_ = b;
       a2.mul(a2, ret.x_);
       t3.mul_scalar(ret.y_, c);
 
       t.add(b, c);
-      t2.y_.set(a);
-      t2.z_.set(t);
+      t2.y_ = a;
+      t2.z_ = t;
       ret.x_.add(ret.x_, ret.y_);
 
-      ret.y_.set(t3);
+      ret.y_ = t3;
 
       ret.x_.mul(ret.x_, t2);
       ret.x_.sub(ret.x_, a2);
@@ -187,7 +187,7 @@ namespace bn256 {
 
       twist_point minus_a{}, r{};
       minus_a.neg(a_affine);
-      r.set(a_affine);
+      r = a_affine;
 
       gfp2 r2{};
       r2.square(a_affine.y_);
@@ -248,14 +248,14 @@ namespace bn256 {
 
       twist_point minus_q2;
       minus_q2.x_.mul_scalar(a_affine.x_, constants::xi_to_p_squared_minus_1_over_3);
-      minus_q2.y_.set(a_affine.y_);
+      minus_q2.y_ = a_affine.y_;
       minus_q2.z_.set_one();
       minus_q2.t_.set_one();
 
       r2.square(q1.y_);
       auto lf_result = line_function_add(r, q1, b_affine, r2);
       mul_line(ret, lf_result.a_, lf_result.b_, lf_result.c_);
-      r = lf_result.out_.make_affine();
+      r = lf_result.out_;
 
       r2.square(minus_q2.y_);
       lf_result = line_function_add(r, minus_q2, b_affine, r2);
@@ -275,7 +275,7 @@ namespace bn256 {
 
       // This is the p^6-Frobenius
       t1.x_.neg(in.x_);
-      t1.y_.set(in.y_);
+      t1.y_ = in.y_;
 
       inv.invert(in);
       t1.mul(t1, inv);

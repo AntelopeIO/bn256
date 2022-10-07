@@ -5,15 +5,11 @@
 
 namespace bn256 {
 
-   void gfp::set(const gfp& f) {
-      (*this) = f;
-   }
-
-   void gfp::set_zero() {
+   void gfp::set_zero() noexcept {
       this->fill(0);
    }
 
-   void gfp::invert(const gfp& f) {
+   gfp gfp::invert() const noexcept {
       constexpr uint64_array_4_t bits = {
          0x3c208c16d87cfd45,
          0x97816a916871ca8d,
@@ -22,8 +18,8 @@ namespace bn256 {
       };
 
       gfp sum{}, power{};
-      sum.set(constants::rn1);
-      power.set(f);
+      sum = constants::rn1;
+      power = *this;
 
       for (auto word = 0; word < bits.size(); word++) {
          for (auto bit = 0; bit < 64; bit++) {
@@ -35,10 +31,10 @@ namespace bn256 {
       }
 
       gfp_mul(sum, sum, constants::r3);
-      this->set(sum);
+      return sum;
    }
 
-   void gfp::marshal(nonstd::span<uint8_t, 32> out) const {
+   void gfp::marshal(nonstd::span<uint8_t, 32> out) const noexcept {
       for (auto w = 0; w < 4; w++) {
          for (auto b = 0; b < 8; b++) {
             uint8_t t = ((*this)[3-w] >> (56 - 8*b));
@@ -47,7 +43,7 @@ namespace bn256 {
       }
    }
 
-   std::error_code gfp::unmarshal(nonstd::span<const uint8_t, 32> in) {
+   std::error_code gfp::unmarshal(nonstd::span<const uint8_t, 32> in) noexcept {
       gfp& result = *this;
       // Unmarshal the bytes into little endian form
       for (auto w = 0; w < 4; w++) {
@@ -69,16 +65,16 @@ namespace bn256 {
       return unmarshal_error::MALFORMED_POINT;
    }
 
-   void gfp::mont_encode(const gfp& a) {
+   void gfp::mont_encode(const gfp& a) noexcept {
       gfp_mul(*this, a, constants::r2);
    }
 
-   void gfp::mont_decode(const gfp& a) {
+   void gfp::mont_decode(const gfp& a) noexcept {
       constexpr gfp decode_b{1};
       gfp_mul(*this, a, decode_b);
    }
 
-   std::string gfp::string() const {
+   std::string gfp::string() const noexcept {
       std::string result;
       result.resize(64);
 
@@ -94,13 +90,13 @@ namespace bn256 {
       return result;
    }
 
-   gfp new_gfp(int64_t x) {
+   gfp new_gfp(int64_t x) noexcept {
       gfp out{};
       if (x >= 0) {
          out = {uint64_t(x)};
       } else {
          out = {uint64_t(-x)};
-         gfp_neg(out, out);
+         out = -out;
       }
       out.mont_encode(out);
       return out;

@@ -12,8 +12,6 @@ namespace bn256 {
 
         static gfp2 gfp2_decode(const gfp2& in);
 
-        const gfp2& set(const gfp2& a);
-
         const gfp2& set_zero();
 
         const gfp2& set_one();

@@ -4,12 +4,6 @@
 
 namespace bn256 {
 
-   void gfp6::set(const gfp6& a) {
-      x_.set(a.x_);
-      y_.set(a.y_);
-      z_.set(a.z_);
-   }
-
    const gfp6& gfp6::set_zero() {
       x_.set_zero();
       y_.set_zero();
@@ -59,14 +53,14 @@ namespace bn256 {
       x_.mul_scalar(a.x_, constants::xi_to_2p_squared_minus_2_over_3);
       // τ^(p²) = ττ^(p²-1) = τξ^((p²-1)/3)
       y_.mul_scalar(a.y_, constants::xi_to_p_squared_minus_1_over_3);
-      z_.set(a.z_);
+      z_ = a.z_;
       return *this;
    }
 
    const gfp6& gfp6::frobenius_p4(const gfp6& a) {
       x_.mul_scalar(a.x_, constants::xi_to_p_squared_minus_1_over_3);
       y_.mul_scalar(a.y_, constants::xi_to_2p_squared_minus_2_over_3);
-      z_.set(a.z_);
+      z_ = a.z_;
       return *this;
    }
 
@@ -117,9 +111,9 @@ namespace bn256 {
       tx.add(tx, v1);
       tx.sub(tx, v2);
 
-      x_.set(tx);
-      y_.set(ty);
-      z_.set(tz);
+      x_ = tx;
+      y_ = ty;
+      z_ = tz;
 
       return *this;
    }
@@ -142,11 +136,11 @@ namespace bn256 {
       gfp2 tz{}, ty{};
 
       tz.mul_xi(a.x_);
-      ty.set(a.y_);
+      ty = a.y_;
 
-      y_.set(a.z_);
-      x_.set(ty);
-      z_.set(tz);
+      y_ = a.z_;
+      x_ = ty;
+      z_ = tz;
       return *this;
    }
 
@@ -178,9 +172,9 @@ namespace bn256 {
       c2.add(c2, v1);
       c2.sub(c2, v2);
 
-      x_.set(c2);
-      y_.set(c1);
-      z_.set(c0);
+      x_ = c2;
+      y_ = c1;
+      z_ = c0;
       return *this;
    }
 

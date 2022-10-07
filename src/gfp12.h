@@ -14,8 +14,6 @@ namespace bn256 {
       gfp6 x_;
       gfp6 y_;
 
-      const gfp12& set(const gfp12& a);
-
       const gfp12& set_zero();
 
       const gfp12& set_one();

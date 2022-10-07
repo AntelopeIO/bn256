@@ -65,8 +65,6 @@ namespace bn256 {
 
       const g1& neg(const g1& a);
 
-      const g1& set(const g1& a);
-
       void marshal(nonstd::span<uint8_t,64> out) const;
       std::array<uint8_t, 64> marshal() const {
          std::array<uint8_t, 64> result;
@@ -95,8 +93,6 @@ namespace bn256 {
       const g2& add(const g2& a, const g2& b);
 
       const g2& neg(const g2& a);
-
-      const g2& set(const g2& a);
 
       void marshal(nonstd::span<uint8_t,128> out) const;
       std::array<uint8_t, 128> marshal() const {
@@ -127,11 +123,6 @@ namespace bn256 {
 
       // neg sets g2 to -a and then returns g2.
       const gt& neg(const gt& a);
-
-      // set sets gt to a and then returns gt.
-      const gt& set(const gt& a);
-
-      const gt& set(const gfp12& a);
 
       // finalize is a linear function from F_p^12 to gt.
       const gt& finalize();

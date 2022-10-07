@@ -6,12 +6,6 @@
 
 namespace bn256 {
 
-   const gfp12& gfp12::set(const gfp12& a) {
-      x_.set(a.x_);
-      y_.set(a.y_);
-      return *this;
-   }
-
    const gfp12& gfp12::set_zero() {
       x_.set_zero();
       y_.set_zero();
@@ -36,7 +30,7 @@ namespace bn256 {
 
    const gfp12& gfp12::conjugate(const gfp12& a) {
       x_.neg(a.x_);
-      y_.set(a.y_);
+      y_ = a.y_;
       return *this;
    }
 
@@ -92,7 +86,7 @@ namespace bn256 {
       t.mul(a.x_, b.x_);
       t.mul_tau(t);
 
-      x_.set(tx);
+      x_ = tx;
       y_.add(ty, t);
       return *this;
    }
@@ -112,11 +106,11 @@ namespace bn256 {
          if (bit_test(power, i) != 0) {
             sum.mul(t, a);
          } else {
-            sum.set(t);
+            sum = t;
          }
       }
 
-      set(sum);
+      *this = sum;
       return *this;
    }
 
@@ -136,7 +130,7 @@ namespace bn256 {
       ty.sub(ty, t);
 
       x_.add(v0, v0);
-      y_.set(ty);
+      y_ = ty;
       return *this;
    }
 
@@ -153,7 +147,7 @@ namespace bn256 {
       t2.invert(t1);
 
       x_.neg(a.x_);
-      y_.set(a.y_);
+      y_ = a.y_;
       mul_scalar(*this, t2);
       return *this;
    }

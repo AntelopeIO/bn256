@@ -34,12 +34,6 @@ namespace bn256 {
       return *this;
    }
 
-   // set sets g1 to a and then returns g1.
-   const g1& g1::set(const g1& a) {
-      p_.set(a.p_);
-      return *this;
-   }
-
    // marshal converts g1 to a byte slice.
 void g1::marshal(nonstd::span<uint8_t, 64> m) const {
       constexpr auto num_bytes = 256 / 8;
@@ -116,12 +110,6 @@ void g1::marshal(nonstd::span<uint8_t, 64> m) const {
    // neg sets g2 to -a and then returns g2.
    const g2& g2::neg(const g2& a) {
       p_.neg(a.p_);
-      return *this;
-   }
-
-   // set sets g2 to a and then returns g2.
-   const g2& g2::set(const g2& a) {
-      p_.set(a.p_);
       return *this;
    }
 
@@ -207,20 +195,9 @@ std::error_code g2::unmarshal(nonstd::span<const uint8_t, 128> m) {
       return *this;
    }
 
-   const gt& gt::set(const gt& a) {
-      p_.set(a.p_);
-      return *this;
-   }
-
-   const gt& gt::set(const gfp12& a) {
-      p_.set(a);
-      return *this;
-   }
-
-
    const gt& gt::finalize() {
       auto ret = final_exponentiation(p_);
-      p_.set(ret);
+      p_ = ret;
       return *this;
    }
 
@@ -335,8 +312,7 @@ void gt::marshal(nonstd::span<uint8_t, 384> m)  const {
 
    // pair calculates an Optimal Ate pairing.
    gt pair(const g1& g1, const g2& g2) {
-      gt ret{};
-      ret.set(optimal_ate(g2.p_, g1.p_));
+      gt ret = {optimal_ate(g2.p_, g1.p_)};
       return ret;
    }
 
@@ -357,8 +333,7 @@ void gt::marshal(nonstd::span<uint8_t, 384> m)  const {
    // the source groups to F_p^12. miller(g1, g2).finalize() is equivalent
    // to pair(g1,g2).
    gt miller(const g1& g1, const g2& g2) {
-      gt ret{};
-      ret.set(miller(g2.p_, g1.p_));
+      gt ret = {miller(g2.p_, g1.p_)};
       return ret;
    }
 

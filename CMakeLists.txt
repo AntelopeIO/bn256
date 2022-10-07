@@ -28,4 +28,5 @@ endif()
 
 find_package(Boost 1.78 REQUIRED)
 add_subdirectory(src)
+enable_testing()
 add_subdirectory(test)

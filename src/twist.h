@@ -18,8 +18,6 @@ namespace bn256 {
 
       std::string string() const ;
 
-      void set(const twist_point& a);
-
       // IsOnCurve returns true iff c is on the curve.
       bool is_on_curve();
 

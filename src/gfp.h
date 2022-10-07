@@ -5,6 +5,7 @@
 #include <iosfwd>
 #include <nonstd/span.hpp>
 #include <system_error>
+#include "gfp_generic.h"
 
 namespace bn256 {
 
@@ -37,7 +38,7 @@ namespace bn256 {
         };
     }
 
-    inline std::error_code make_error_code(unmarshal_error e)
+    inline std::error_code make_error_code(unmarshal_error e) noexcept
     {
         static const unmarshal_error_category category;
         return {static_cast<int>(e), category};
@@ -46,24 +47,59 @@ namespace bn256 {
 
     struct gfp : std::array<uint64_t, 4> {
 
-        void set(const gfp& f);
+        void set_zero() noexcept;
 
-        void set_zero();
+        gfp invert() const noexcept;
 
-        void invert(const gfp& f);
+        gfp operator-() const noexcept {
+            gfp r;
+            gfp_neg(r, *this);
+            return r;
+        }
 
-        void marshal(nonstd::span<uint8_t, 32> out) const;
+        gfp& operator+=(const gfp& other) noexcept {
+            gfp_add(*this, *this, other);
+            return *this;
+        }
 
-        [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t, 32> input);
+        gfp operator+(const gfp& rhs) const noexcept {
+            gfp r = *this;
+            return r += rhs;
+        }
 
-        void mont_encode(const gfp& a);
+        gfp& operator-=(const gfp& other) noexcept {
+            gfp_sub(*this, *this, other);
+            return *this;
+        }
 
-        void mont_decode(const gfp& a);
+        gfp operator-(const gfp& rhs) const noexcept {
+            gfp r = *this;
+            return r -= rhs;
+        }
 
-        std::string string() const ;
+
+        gfp& operator*=(const gfp& other) noexcept {
+            gfp_mul(*this, *this, other);
+            return *this;
+        }
+
+        gfp operator*(const gfp& rhs) const noexcept {
+            gfp r = *this;
+            return r *= rhs;
+        }
+
+        void marshal(nonstd::span<uint8_t, 32> out) const noexcept;
+
+        [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t, 32> input) noexcept;
+
+        void mont_encode(const gfp& a) noexcept;
+
+        void mont_decode(const gfp& a) noexcept;
+
+        std::string string() const noexcept;
     };
 
-    gfp new_gfp(int64_t x);
+    gfp new_gfp(int64_t x) noexcept;
     std::ostream& operator << (std::ostream& os, const gfp& v);
 }
 

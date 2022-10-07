@@ -8,7 +8,7 @@ namespace bn256 {
    typedef std::array<uint64_t, 18> uint64_array_18_t;
    typedef std::array<uint64_t, 32> uint64_array_32_t;
 
-   static void gfp_carry(gfp& a, uint64_t head) {
+   static void gfp_carry(gfp& a, uint64_t head) noexcept {
       gfp b{};
       uint64_t carry = 0;
       for (auto i = 0; i < constants::p2.size(); ++i) {
@@ -29,7 +29,7 @@ namespace bn256 {
       }
    }
 
-   void gfp_neg(gfp& c, const gfp& a) {
+   void gfp_neg(gfp& c, const gfp& a) noexcept {
       uint64_t carry = 0;
       for (auto i = 0; i < constants::p2.size(); ++i) {
          const auto pi = constants::p2[i];
@@ -41,7 +41,7 @@ namespace bn256 {
       gfp_carry(c, 0);
    }
 
-   void gfp_add(gfp& c, const gfp& a, const gfp& b) {
+   void gfp_add(gfp& c, const gfp& a, const gfp& b) noexcept {
       uint64_t carry = 0;
       for (auto i = 0; i < a.size(); ++i) {
          const auto ai = a[i];
@@ -53,7 +53,7 @@ namespace bn256 {
       gfp_carry(c, carry);
    }
 
-   void gfp_sub(gfp& c, const gfp& a, const gfp& b) {
+   void gfp_sub(gfp& c, const gfp& a, const gfp& b) noexcept {
       uint64_t carry = 0;
       gfp t{};
       for (auto i = 0; i < constants::p2.size(); ++i) {
@@ -74,7 +74,7 @@ namespace bn256 {
       gfp_carry(c, carry);
    }
 
-   static void mul(const gfp& a, const gfp& b, uint64_array_8_t& rc) {
+   static void mul(const gfp& a, const gfp& b, uint64_array_8_t& rc) noexcept {
       constexpr uint64_t mask16 = 0x0000ffff;
       constexpr uint64_t mask32 = 0xffffffff;
       uint64_array_32_t array32{};
@@ -123,7 +123,7 @@ namespace bn256 {
       };
    }
 
-   static void half_mul(const uint64_array_4_t& a, const uint64_array_4_t& b, uint64_array_4_t& rc) {
+   static void half_mul(const uint64_array_4_t& a, const uint64_array_4_t& b, uint64_array_4_t& rc) noexcept {
       constexpr uint64_t mask16 = 0x0000ffff;
       constexpr uint64_t mask32 = 0xffffffff;
       uint64_array_18_t array18{};
@@ -170,7 +170,7 @@ namespace bn256 {
       };
    }
 
-   void gfp_mul(gfp& c, const gfp& a, const gfp& b) {
+   void gfp_mul(gfp& c, const gfp& a, const gfp& b) noexcept {
       uint64_array_8_t array8_t1{};
       mul(a, b, array8_t1);
 

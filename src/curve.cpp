@@ -26,13 +26,6 @@ namespace bn256 {
       return ret;
    }
 
-   void curve_point::set(const curve_point& a) {
-      x_.set(a.x_);
-      y_.set(a.y_);
-      z_.set(a.z_);
-      t_.set(a.t_);
-   }
-
    bool curve_point::is_on_curve() const {
       auto tmp = make_affine();
       if (tmp.is_infinity()) {
@@ -60,11 +53,11 @@ namespace bn256 {
 
    void curve_point::add(const curve_point& a, const curve_point& b) {
       if (a.is_infinity()) {
-         set(b);
+         *this = b;
          return;
       }
       if (b.is_infinity()) {
-         set(a);
+         *this = a;
          return;
       }
       // See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/addition/add-2007-bl.op3
@@ -183,8 +176,8 @@ namespace bn256 {
       typedef std::array<curve_point, 4> curve_point_array_4_t;
       curve_point_array_4_t precomp{};
 
-      precomp[1].set(a);
-      precomp[2].set(a);
+      precomp[1] = a;
+      precomp[2] = a;
       gfp_mul(precomp[2].x_, precomp[2].x_, constants::xi_to_2p_squared_minus_2_over_3);
       precomp[3].add(precomp[1], precomp[2]);
 
@@ -197,13 +190,13 @@ namespace bn256 {
       for (int i = multi_scalar.size() - 1; i >= 0; i--) {
          t.double_(sum);
          if (multi_scalar[i] == 0) {
-            sum.set(t);
+            sum = t;
          } else {
             sum.add(t, precomp[multi_scalar[i]]);
          }
       }
 
-      set(sum);
+      *this = sum;
    }
 
    curve_point curve_point::make_affine() const {
@@ -216,7 +209,7 @@ namespace bn256 {
 
       curve_point result{x_, y_,  new_gfp(1ll) ,  new_gfp(1ll)};
       gfp z_inv{};
-      z_inv.invert(z_);
+      z_inv = z_.invert();
 
       gfp t{}, z_inv2{};
       gfp_mul(t, y_, z_inv);
@@ -228,9 +221,9 @@ namespace bn256 {
    }
 
    void curve_point::neg(const curve_point& a) {
-      x_.set(a.x_);
+      x_ = a.x_;
       gfp_neg(y_, a.y_);
-      z_.set(a.z_);
-      t_.set(a.t_);
+      z_ = a.z_;
+      t_ = a.t_;
    }
 }

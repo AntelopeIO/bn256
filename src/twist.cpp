@@ -25,13 +25,6 @@ namespace bn256 {
       return ret;
    }
 
-   void twist_point::set(const twist_point& a) {
-      x_.set(a.x_);
-      y_.set(a.y_);
-      z_.set(a.z_);
-      t_.set(a.t_);
-   }
-
    bool twist_point::is_on_curve() {
       auto c = make_affine();
       if (c.is_infinity()) {
@@ -66,11 +59,11 @@ namespace bn256 {
 
    void twist_point::add(const twist_point& a, const twist_point& b) {
       if (a.is_infinity()) {
-         set(b);
+         *this = b;
          return;
       }
       if (b.is_infinity()) {
-         set(a);
+         *this = a;
          return;
       }
 
@@ -180,11 +173,11 @@ namespace bn256 {
          if (bit_test(scalar, i)) {
             sum.add(t, a);
          } else {
-            sum.set(t);
+            sum = t;
          }
       }
 
-      set(sum);
+      *this = sum;
    }
 
    twist_point twist_point::make_affine() const {
@@ -201,16 +194,16 @@ namespace bn256 {
       twist_point result;
       result.y_.mul(t, z_inv2);
       t.mul(x_, z_inv2);
-      result.x_.set(t);
+      result.x_= t;
       result.z_.set_one();
       result.t_.set_one();
       return result;
    }
 
    void twist_point::neg(const twist_point& a) {
-      x_.set(a.x_);
+      x_ = a.x_;
       y_.neg(a.y_);
-      z_.set(a.z_);
+      z_ = a.z_;
       t_.set_zero();
    }
 }
