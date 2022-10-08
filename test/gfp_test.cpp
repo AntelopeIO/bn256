@@ -50,4 +50,8 @@ TEST_CASE("test_gfp_mul", "[gfp]"){
    bn256::gfp h{};
    bn256::gfp_mul(h, a, b);
    CHECK(h == w);
+
+   auto gfp1 = bn256::new_gfp(1);
+   std::cout << std::hex << gfp1[0] << "\n" << gfp1[1] << "\n" << gfp1[2] << "\n" << gfp1[3] << "\n";
+
 }

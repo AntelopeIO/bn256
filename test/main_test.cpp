@@ -7,24 +7,19 @@ using namespace boost::multiprecision;
 
 
 static bn256::g1 make_scaled_g1(const std::string& scale_string) {
-   bn256::g1 ret;
    int512_t scale_value(scale_string);
-   ret.scalar_base_mult(scale_value);
-   return ret;
+   return bn256::g1::scalar_base_mult(scale_value);
 }
 
 static bn256::g2 make_scaled_g2(const std::string& scale_string) {
-   bn256::g2 ret;
    int512_t scale_value(scale_string);
-   ret.scalar_base_mult(scale_value);
-   return ret;
+   return bn256::g2::scalar_base_mult(scale_value);
 }
 
 static bn256::gt make_scaled_gt(const bn256::gt& a, const std::string& scale_string) {
    bn256::gt ret;
    int512_t scale_value(scale_string);
-   ret.scalar_mult(a, scale_value);
-   return ret;
+   return a.scalar_mult(scale_value);
 }
 
 TEST_CASE("test_pairings", "[main]") {
@@ -53,7 +48,7 @@ TEST_CASE("test_pairings", "[main]") {
    CHECK(bn256::pairing_check(g1_vec, g2_vec)); // MultiAte check gave false negative!
 
    auto p0 = bn256::gt{};
-   p0.add(p1, pn1);
+   p0 = p1.add(pn1);
    auto p0_2 = bn256::pair(a1, b0);
    CHECK (p0.string() == p0_2.string()); // Pairing mismatch
 

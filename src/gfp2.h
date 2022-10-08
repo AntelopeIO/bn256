@@ -4,48 +4,51 @@
 
 namespace bn256 {
 
-    // gfp2 implements a field of size p² as a quadratic extension of the base field
-    // where i²=-1.
-    struct gfp2 {
-        gfp x_{};
-        gfp y_{};
+// gfp2 implements a field of size p² as a quadratic extension of the base field
+// where i²=-1.
+struct gfp2 {
+   gfp x_;
+   gfp y_;
 
-        static gfp2 gfp2_decode(const gfp2& in);
+   static gfp2 gfp2_decode(const gfp2& in) noexcept;
 
-        const gfp2& set_zero();
+   static constexpr gfp2 zero() noexcept { return {}; }
+   static constexpr gfp2 one() noexcept { return {{}, gfp::one()}; }
 
-        const gfp2& set_one();
+   void set_zero() noexcept { *this = zero(); }
+   void set_one() noexcept { *this = one(); }
 
-        [[nodiscard]] bool is_zero() const;
+   bool is_zero() const noexcept { return *this == zero(); }
+   bool is_one() const noexcept { return *this == one(); }
 
-        [[nodiscard]] bool is_one() const;
+   gfp2 conjugate() const noexcept;
 
-        const gfp2& conjugate(const gfp2& a);
+   gfp2 neg() const noexcept;
 
-        const gfp2& neg(const gfp2& a);
+   gfp2 add(const gfp2& b) const noexcept;
 
-        const gfp2& add(const gfp2& a, const gfp2& b);
+   gfp2 sub(const gfp2& b) const noexcept;
 
-        const gfp2& sub(const gfp2& a, const gfp2& b);
+   gfp2 mul(const gfp2& b) const noexcept;
 
-        const gfp2& mul(const gfp2& a, const gfp2& b);
+   gfp2 mul_scalar(const gfp& b) const noexcept;
 
-        const gfp2& mul_scalar(const gfp2& a, const gfp& b);
+   gfp2 mul_xi() const noexcept;
 
-        const gfp2& mul_xi(const gfp2& a);
+   gfp2 square() const noexcept;
 
-        const gfp2& square(const gfp2& a);
+   gfp2 invert() const noexcept;
 
-        const gfp2& invert(const gfp2& a);
+   bool operator==(const gfp2& rhs) const noexcept {
+      static_assert(std::is_standard_layout_v<gfp2>);
+      return memcmp(this, &rhs, sizeof(*this)) == 0;
+   }
 
-        bool operator==(const gfp2& rhs) const;
+   bool operator!=(const gfp2& rhs) const noexcept { return !(*this == rhs); }
 
-        bool operator!=(const gfp2& rhs) const;
+   std::string string() const;
+};
 
-        std::string string() const;
+std::ostream& operator<<(std::ostream& os, const gfp2& v);
 
-    };
-
-    std::ostream& operator << (std::ostream& os, const gfp2& v);
-
-}
+} // namespace bn256

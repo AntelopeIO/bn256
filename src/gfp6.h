@@ -4,53 +4,54 @@
 
 namespace bn256 {
 
-   // gfp6 implements the field of size p⁶ as a cubic extension of gfp2 where τ³=ξ
-   // and ξ=i+9.
-   struct gfp6 {
-      // value is xτ² + yτ + z
-      gfp2 x_;
-      gfp2 y_;
-      gfp2 z_;
+// gfp6 implements the field of size p⁶ as a cubic extension of gfp2 where τ³=ξ
+// and ξ=i+9.
+struct gfp6 {
+   // value is xτ² + yτ + z
+   gfp2 x_;
+   gfp2 y_;
+   gfp2 z_;
 
-      const gfp6& set_zero();
+   static constexpr gfp6 zero() noexcept { return {}; }
+   static constexpr gfp6 one()  noexcept { return { {}, {}, gfp2::one()}; }
 
-      const gfp6& set_one();
+   [[nodiscard]] bool is_zero() const noexcept { return *this == zero(); }
+   [[nodiscard]] bool is_one() const noexcept { return *this == one(); }
 
-      [[nodiscard]] bool is_zero() const;
+   gfp6 neg() const noexcept;
 
-      [[nodiscard]] bool is_one() const;
+   gfp6 frobenius() const noexcept;
 
-      const gfp6& neg(const gfp6& a);
+   gfp6 frobenius_p2() const noexcept;
 
-      const gfp6& frobenius(const gfp6& a);
+   gfp6 frobenius_p4() const noexcept;
 
-      const gfp6& frobenius_p2(const gfp6& a);
+   gfp6 add(const gfp6& b) const noexcept;
 
-      const gfp6& frobenius_p4(const gfp6& a);
+   gfp6 sub(const gfp6& b) const noexcept;
 
-      const gfp6& add(const gfp6& a, const gfp6& b);
+   gfp6 mul(const gfp6& b) const noexcept;
 
-      const gfp6& sub(const gfp6& a, const gfp6& b);
+   gfp6 mul_scalar(const gfp2& b) const noexcept;
 
-      const gfp6& mul(const gfp6& a, const gfp6& b);
+   gfp6 mul_gfp(const gfp& b) const noexcept;
 
-      const gfp6& mul_scalar(const gfp6& a, const gfp2& b);
+   gfp6 mul_tau() const noexcept;
 
-      const gfp6& mul_gfp(const gfp6& a, const gfp& b);
+   gfp6 square() const noexcept;
 
-      const gfp6& mul_tau(const gfp6& a);
+   gfp6 invert() const noexcept;
 
-      const gfp6& square(const gfp6& a);
+   bool operator==(const gfp6& rhs) const noexcept {
+      static_assert(std::is_standard_layout_v<gfp6>);
+      return memcmp(this, &rhs, sizeof(*this)) == 0;
+   }
 
-      const gfp6& invert(const gfp6& a);
+   bool operator!=(const gfp6& rhs) const noexcept { return !(*this == rhs); }
 
-      bool operator==(const gfp6& rhs) const;
+   std::string string() const;
+};
 
-      bool operator!=(const gfp6& rhs) const;
 
-      std::string string();
-
-   };
-
-   std::ostream& operator << (std::ostream& os, const gfp6& v);
-}
+std::ostream& operator<<(std::ostream& os, const gfp6& v);
+} // namespace bn256

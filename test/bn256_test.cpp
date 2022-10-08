@@ -40,35 +40,10 @@ TEST_CASE("test bilinearity", "[bn256]"){
         bn256::gt e1 = bn256::pair(p1, p2);
 
         bn256::gt e2 = bn256::pair(c1, c2);
-        e2.scalar_mult(e2, a);
-        e2.scalar_mult(e2, b);
+        e2 = e2.scalar_mult(a);
+        e2 = e2.scalar_mult(b);
         CHECK(e1 == e2);
     }
-}
-
-static bn256::g1 test_marshal_g1(const int512_t& base) {
-    bn256::g1 ret, t1;
-    t1.scalar_base_mult(base);
-    auto m1 = t1.marshal();
-    auto ec = ret.unmarshal(m1);
-    REQUIRE(ec == std::error_code{});
-    return ret;
-}
-
-static bn256::g2 test_marshal_g2(const int512_t& base) {
-    bn256::g2 ret, t1;
-    t1.scalar_base_mult(base);
-    auto m1 = t1.marshal();
-    auto ec = ret.unmarshal(m1);
-    REQUIRE(ec == std::error_code{});
-    return ret;
-}
-
-static auto test_marshal_pair(const bn256::g1& a, const bn256::g2& b, const int512_t& base) {
-    auto pair = bn256::pair(a, b);
-    pair.scalar_mult(pair, base);
-    pair.marshal();
-    return pair;
 }
 
 TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
@@ -80,29 +55,27 @@ TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
     bn256::g1 pa, pb, pc;
     bn256::g2 qa, qb, qc;
 
-    pa = test_marshal_g1(a);
-    qa = test_marshal_g2(a);
+    REQUIRE(pa.unmarshal(bn256::g1::scalar_base_mult(a).marshal()) == std::error_code{});
+    REQUIRE(qa.unmarshal(bn256::g2::scalar_base_mult(a).marshal()) == std::error_code{});
+    REQUIRE(pb.unmarshal(bn256::g1::scalar_base_mult(b).marshal()) == std::error_code{});
+    REQUIRE(qb.unmarshal(bn256::g2::scalar_base_mult(b).marshal()) == std::error_code{});
+    REQUIRE(pc.unmarshal(bn256::g1::scalar_base_mult(c).marshal()) == std::error_code{});
+    REQUIRE(qc.unmarshal(bn256::g2::scalar_base_mult(c).marshal()) == std::error_code{});
 
-    pb = test_marshal_g1(b);
-    qb = test_marshal_g2(b);
+    auto k1_bytes = bn256::pair(pb, qc).scalar_mult(a).marshal();
+    auto k2_bytes = bn256::pair(pc, qa).scalar_mult(b).marshal();
+    auto k3_bytes = bn256::pair(pa, qb).scalar_mult(c).marshal();
 
-    pc = test_marshal_g1(c);
-    qc = test_marshal_g2(c);
-
-    auto k1_bytes = test_marshal_pair(pb, qc, a);
-    auto k2_bytes = test_marshal_pair(pc, qa, b);
-    auto k3_bytes = test_marshal_pair(pa, qb, c);
     CHECK(k1_bytes == k2_bytes);
     CHECK(k2_bytes == k3_bytes);
 }
 
 TEST_CASE("test g2_self_addition", "[bn256]"){
     int s = rand();
-    bn256::g2 p;
-    p.scalar_base_mult(s);
+    bn256::g2 p = bn256::g2::scalar_base_mult(s);
     REQUIRE(p.p_.is_on_curve());
 
-    p.add(p, p);
+    p = p.add(p);
     auto m = p.marshal();
     CHECK( p.unmarshal(m) == std::error_code{});
 }
@@ -111,8 +84,7 @@ TEST_CASE("test g2_self_addition", "[bn256]"){
 TEST_CASE("test twist point mul", "[bn256]"){
 	const int512_t k("73391516005847081647776723068736393251206848701235344996976057911204818492439");
 	bn256::twist_point tp_gen(bn256::twist_gen);
-	bn256::g2 p;
-	p.scalar_base_mult(k);
+	bn256::g2 p = bn256::g2::scalar_base_mult(k);
 
     const bn256::twist_point expected = {
       {
@@ -128,5 +100,5 @@ TEST_CASE("test twist point mul", "[bn256]"){
       { bn256::new_gfp(0), bn256::new_gfp(0)}
    };
 
-   CHECK(memcmp(&p, &expected, sizeof(p)) == 0);
+   CHECK(p.p_ == expected);
 }

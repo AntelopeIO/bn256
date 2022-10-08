@@ -1,209 +1,180 @@
-#include <twist.h>
-#include <constants.h>
 #include <bitlen.h>
+#include <constants.h>
 #include <sstream>
+#include <twist.h>
 
 namespace bn256 {
 
-   constexpr gfp2 twist_b = {
-      {0x38e7ecccd1dcff67, 0x65f0b37d93ce0d3e, 0xd749d0dd22ac00aa, 0x0141b9ce4a688d4d},
-      {0x3bf938e377b802a8, 0x020b1b273633535d, 0x26b7edf049755260, 0x2514c6324384a86d},
-   };
+constexpr gfp2 twist_b = {
+   { 0x38e7ecccd1dcff67, 0x65f0b37d93ce0d3e, 0xd749d0dd22ac00aa, 0x0141b9ce4a688d4d },
+   { 0x3bf938e377b802a8, 0x020b1b273633535d, 0x26b7edf049755260, 0x2514c6324384a86d },
+};
 
-   std::string twist_point::string() const {
-      auto tmp = make_affine();
-      auto x = gfp2::gfp2_decode(tmp.x_);
-      auto y = gfp2::gfp2_decode(tmp.y_);
+std::string twist_point::string() const {
+   auto tmp = make_affine();
+   auto x   = gfp2::gfp2_decode(tmp.x_);
+   auto y   = gfp2::gfp2_decode(tmp.y_);
 
-      std::string ret;
-      ret.reserve(265);
-      ret.append("(");
-      ret.append(x.string());
-      ret.append(", ");
-      ret.append(y.string());
-      ret.append(")");
-      return ret;
-   }
-
-   bool twist_point::is_on_curve() {
-      auto c = make_affine();
-      if (c.is_infinity()) {
-         return true;
-      }
-
-      gfp2 y2{}, x3{};
-      y2.square(c.y_);
-      x3.square(c.x_);
-      x3.mul(x3, c.x_);
-      x3.add(x3, twist_b);
-
-      if (y2 != x3) {
-         return false;
-      }
-
-      twist_point cneg{};
-      cneg.mul(c, constants::order);
-      return cneg.z_.is_zero();
-   }
-
-   void twist_point::set_infinity() {
-      x_.set_zero();
-      y_.set_one();
-      z_.set_zero();
-      t_.set_zero();
-   }
-
-   bool twist_point::is_infinity() const {
-      return z_.is_zero();
-   }
-
-   void twist_point::add(const twist_point& a, const twist_point& b) {
-      if (a.is_infinity()) {
-         *this = b;
-         return;
-      }
-      if (b.is_infinity()) {
-         *this = a;
-         return;
-      }
-
-      // See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/addition/add-2007-bl.op3
-      gfp2 z12{};
-      z12.square(a.z_);
-      gfp2 z22{};
-      z22.square(b.z_);
-      gfp2 u1{};
-      u1.mul(a.x_, z22);
-      gfp2 u2{};
-      u2.mul(b.x_, z12);
-
-      gfp2 t{};
-      t.mul(b.z_, z22);
-      gfp2 s1{};
-      s1.mul(a.y_, t);
-
-      t.mul(a.z_, z12);
-      gfp2 s2{};
-      s2.mul(b.y_, t);
-
-      gfp2 h{};
-      h.sub(u2, u1);
-      bool x_equal = h.is_zero();
-
-      t.add(h, h);
-      gfp2 i{};
-      i.square(t);
-      gfp2 j{};
-      j.mul(h, i);
-
-      t.sub(s2, s1);
-      bool y_equal = t.is_zero();
-      if (x_equal && y_equal) {
-         double_(a);
-         return;
-      }
-      gfp2 r{};
-      r.add(t, t);
-
-      gfp2 v{};
-      v.mul(u1, i);
-
-      gfp2 t4{};
-      t4.square(r);
-      t.add(v, v);
-      gfp2 t6{};
-      t6.sub(t4, j);
-      x_.sub(t6, t);
-
-      t.sub(v, x_);   // t7
-      t4.mul(s1, j);  // t8
-      t6.add(t4, t4); // t9
-      t4.mul(r, t);   // t10
-      y_.sub(t4, t6);
-
-      t.add(a.z_, b.z_); // t11
-      t4.square(t);    // t12
-      t.sub(t4, z12);  // t13
-      t4.sub(t, z22);  // t14
-      z_.mul(t4, h);
-   }
-
-   void twist_point::double_(const twist_point& a) {
-      // See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/doubling/dbl-2009-l.op3
-      gfp2 A{};
-      A.square(a.x_);
-      gfp2 b{};
-      b.square(a.y_);
-      gfp2 c{};
-      c.square(b);
-
-      gfp2 t{};
-      t.add(a.x_, b);
-      gfp2 t2{};
-      t2.square(t);
-      t.sub(t2, A);
-      t2.sub(t, c);
-      gfp2 d{};
-      d.add(t2, t2);
-      t.add(A, A);
-      gfp2 e{};
-      e.add(t, A);
-      gfp2 f{};
-      f.square(e);
-
-      t.add(d, d);
-      x_.sub(f, t);
-
-      z_.mul(a.y_, a.z_);
-      z_.add(z_, z_);
-
-      t.add(c, c);
-      t2.add(t, t);
-      t.add(t2, t2);
-      y_.sub(d, x_);
-      t2.mul(e, y_);
-      y_.sub(t2, t);
-   }
-
-   void twist_point::mul(const twist_point& a, const int512_t& scalar) {
-      twist_point sum{}, t{};
-
-      for (int i = bitlen(scalar); i >= 0; i--) {
-         t.double_(sum);
-         if (bit_test(scalar, i)) {
-            sum.add(t, a);
-         } else {
-            sum = t;
-         }
-      }
-
-      *this = sum;
-   }
-
-   twist_point twist_point::make_affine() const {
-      if (z_.is_one()) {
-         return *this;
-      } else if (z_.is_zero()) {
-         return {};
-      }
-      gfp2 z_inv{}, t{}, z_inv2{};
-      z_inv.invert(z_);
-      t.mul(y_, z_inv);
-      z_inv2.square(z_inv);
-
-      twist_point result;
-      result.y_.mul(t, z_inv2);
-      t.mul(x_, z_inv2);
-      result.x_= t;
-      result.z_.set_one();
-      result.t_.set_one();
-      return result;
-   }
-
-   void twist_point::neg(const twist_point& a) {
-      x_ = a.x_;
-      y_.neg(a.y_);
-      z_ = a.z_;
-      t_.set_zero();
-   }
+   std::string ret;
+   ret.reserve(265);
+   ret.append("(");
+   ret.append(x.string());
+   ret.append(", ");
+   ret.append(y.string());
+   ret.append(")");
+   return ret;
 }
+
+bool twist_point::is_on_curve() const noexcept {
+   auto c = make_affine();
+   if (c.is_infinity()) {
+      return true;
+   }
+
+   gfp2 y2 = c.y_.square();
+   gfp2 x3 = c.x_.square().mul(c.x_).add(twist_b);
+
+   if (y2 != x3)
+      return false;
+
+   twist_point cneg = c.mul(constants::order);
+   return cneg.z_.is_zero();
+}
+
+twist_point twist_point::add(const twist_point& b) const noexcept {
+   const twist_point& a = *this;
+
+   if (a.is_infinity()) {
+      return b;
+   }
+   if (b.is_infinity()) {
+      return a;
+   }
+
+   // See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/addition/add-2007-bl.op3
+   gfp2 z12 = a.z_.square();
+   gfp2 z22 = b.z_.square();
+   gfp2 u1  = a.x_.mul(z22);
+   gfp2 u2  = b.x_.mul(z12);
+
+   gfp2 t  = b.z_.mul(z22);
+   gfp2 s1 = a.y_.mul(t);
+
+   t       = a.z_.mul(z12);
+   gfp2 s2 = b.y_.mul(t);
+
+   gfp2 h       = u2.sub(u1);
+   bool x_equal = h.is_zero();
+
+   t      = h.add(h);
+   gfp2 i = t.square();
+   gfp2 j = h.mul(i);
+
+   t            = s2.sub(s1);
+   bool y_equal = t.is_zero();
+   if (x_equal && y_equal) {
+      return a.double_();
+   }
+
+   gfp2 r = t.add(t);
+
+   gfp2 v = u1.mul(i);
+
+   twist_point c;
+
+   gfp2 t4 = r.square();
+   t       = v.add(v);
+   gfp2 t6 = t4.sub(j);
+   c.x_    = t6.sub(t);
+
+   t    = v.sub(c.x_); // t7
+   t4   = s1.mul(j);   // t8
+   t6   = t4.add(t4);  // t9
+   t4   = r.mul(t);    // t10
+   c.y_ = t4.sub(t6);
+
+   t    = a.z_.add(b.z_); // t11
+   t4   = t.square();     // t12
+   t    = t4.sub(z12);    // t13
+   t4   = t.sub(z22);     // t14
+   c.z_ = t4.mul(h);
+   c.t_ = {};
+   return c;
+}
+
+twist_point twist_point::double_() const noexcept {
+   const twist_point& a = *this;
+
+   // See http://hyperelliptic.org/EFD/g1p/auto-code/shortw/jacobian-0/doubling/dbl-2009-l.op3
+   gfp2 A = a.x_.square();
+   gfp2 B = a.y_.square();
+   gfp2 C = B.square();
+
+   gfp2 t  = a.x_.add(B);
+   gfp2 t2 = t.square();
+   t       = t2.sub(A);
+   t2      = t.sub(C);
+   gfp2 d  = t2.add(t2);
+   t       = A.add(A);
+   gfp2 e  = t.add(A);
+   gfp2 f  = e.square();
+
+   twist_point c;
+
+   t    = d.add(d);
+   c.x_ = f.sub(t);
+
+   c.z_ = a.y_.mul(a.z_);
+   c.z_ = c.z_.add(c.z_);
+
+   t    = C.add(C);
+   t2   = t.add(t);
+   t    = t2.add(t2);
+   c.y_ = d.sub(c.x_);
+   t2   = e.mul(c.y_);
+   c.y_ = t2.sub(t);
+   c.t_ = {};
+   return c;
+}
+
+twist_point twist_point::mul(const int512_t& scalar) const noexcept {
+   const twist_point& a = *this;
+   twist_point        sum{}, t;
+
+   for (int i = bitlen(scalar); i >= 0; i--) {
+      t = sum.double_();
+      if (bit_test(scalar, i)) {
+         sum = t.add(a);
+      } else {
+         sum = t;
+      }
+   }
+
+   return sum;
+}
+
+twist_point twist_point::make_affine() const noexcept {
+   if (z_.is_one()) {
+      return *this;
+   } else if (z_.is_zero()) {
+      return { gfp2::zero(), gfp2::one(), gfp2::zero() };
+   }
+
+   gfp2 z_inv  = z_.invert();
+   gfp2 t      = y_.mul(z_inv);
+   gfp2 z_inv2 = z_inv.square();
+
+   twist_point c;
+   c.y_ = t.mul(z_inv2);
+   t    = x_.mul(z_inv2);
+   c.x_ = t;
+   c.z_.set_one();
+   c.t_.set_one();
+   return c;
+}
+
+twist_point twist_point::neg() const noexcept {
+   const twist_point& a = *this;
+   return { a.x_, a.y_.neg(), a.z_, gfp2::zero() };
+}
+} // namespace bn256

@@ -3,7 +3,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 
 namespace bn256 {
-   using namespace boost::multiprecision;
+using namespace boost::multiprecision;
 
-   std::size_t bitlen(const int512_t& value);
-}
+std::size_t bitlen(const int512_t& value) noexcept;
+} // namespace bn256

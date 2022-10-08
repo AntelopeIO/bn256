@@ -1,59 +1,62 @@
 #pragma once
 
-#include <gfp6.h>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <gfp6.h>
 
 using boost::multiprecision::int512_t;
 
 namespace bn256 {
 
-   // gfp12 implements the field of size p¹² as a quadratic extension of gfp6
-   // where ω²=τ.
-   struct gfp12 {
-      // value is xω + y
-      gfp6 x_;
-      gfp6 y_;
+// gfp12 implements the field of size p¹² as a quadratic extension of gfp6
+// where ω²=τ.
+struct gfp12 {
+   // value is xω + y
+   gfp6 x_;
+   gfp6 y_;
 
-      const gfp12& set_zero();
+   static constexpr gfp12 zero() noexcept { return {}; }
+   static constexpr gfp12 one() noexcept { return {{}, gfp6::one()}; }
 
-      const gfp12& set_one();
+   void set_zero() noexcept { *this = zero(); }
+   void set_one() noexcept { *this = one(); }
 
-      [[nodiscard]] bool is_zero() const;
+   bool is_zero() const noexcept { return *this == zero(); }
+   bool is_one() const noexcept { return *this == one(); }
 
-      [[nodiscard]] bool is_one() const;
+   gfp12 conjugate() const noexcept;
 
-      const gfp12& conjugate(const gfp12& a);
+   gfp12 neg() const noexcept;
 
-      const gfp12& neg(const gfp12& a);
+   gfp12 frobenius() const noexcept;
 
-      const gfp12& frobenius(const gfp12& a);
+   gfp12 frobenius_p2() const noexcept;
 
-      const gfp12& frobenius_p2(const gfp12& a);
+   gfp12 frobenius_p4() const noexcept;
 
-      const gfp12& frobenius_p4(const gfp12& a);
+   gfp12 add(const gfp12& b) const noexcept;
 
-      const gfp12& add(const gfp12& a, const gfp12& b);
+   gfp12 sub(const gfp12& b) const noexcept;
 
-      const gfp12& sub(const gfp12& a, const gfp12& b);
+   gfp12 mul(const gfp12& b) const noexcept;
 
-      const gfp12& mul(const gfp12& a, const gfp12& b);
+   gfp12 mul_scalar(const gfp6& b) const noexcept;
 
-      const gfp12& mul_scalar(const gfp12& a, const gfp6& b);
+   gfp12 exp(const int512_t& power) const noexcept;
 
-      const gfp12& exp(const gfp12& a, const int512_t& power);
+   gfp12 square() const noexcept;
 
-      const gfp12& square(const gfp12& a);
+   gfp12 invert() const noexcept;
 
-      const gfp12& invert(const gfp12& a);
+   bool operator==(const gfp12& rhs) const noexcept {
+      static_assert(std::is_standard_layout_v<gfp12>);
+      return memcmp(this, &rhs, sizeof(*this)) == 0;
+   }
 
-      bool operator==(const gfp12& rhs) const;
+   bool operator!=(const gfp12& rhs) const noexcept { return !(*this == rhs); }
 
-      bool operator!=(const gfp12& rhs) const;
+   std::string string() const;
+};
 
-      std::string string();
+std::ostream& operator<<(std::ostream& os, const gfp12& v);
 
-   };
-
-   std::ostream& operator << (std::ostream& os, const gfp12& v);
-
-}
+} // namespace bn256
