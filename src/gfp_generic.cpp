@@ -11,12 +11,12 @@ namespace bn256 {
    static void gfp_carry(gfp& a, uint64_t head) {
       gfp b{};
       uint64_t carry = 0;
-      for (auto i = 0; i < constants::p2.size(); ++i) {
+      for (std::size_t i = 0; i < constants::p2.size(); ++i) {
          const auto pi = constants::p2[i];
          const auto ai = a[i];
          const auto bi = ai - pi - carry;
          b[i] = bi;
-         carry = (pi & ~ai | (pi | ~ai) & bi) >> 63ull;
+         carry = ((pi & ~ai) | ((pi | ~ai) & bi)) >> 63ull;
       }
       carry = carry & ~head;
 
@@ -31,24 +31,24 @@ namespace bn256 {
 
    void gfp_neg(gfp& c, const gfp& a) {
       uint64_t carry = 0;
-      for (auto i = 0; i < constants::p2.size(); ++i) {
+      for (std::size_t i = 0; i < constants::p2.size(); ++i) {
          const auto pi = constants::p2[i];
          const auto ai = a[i];
          const auto ci = pi - ai - carry;
          c[i] = ci;
-         carry = (ai & ~pi | (ai | ~pi) & ci) >> 63ull;
+         carry = ((ai & ~pi) | ((ai | ~pi) & ci)) >> 63ull;
       }
       gfp_carry(c, 0);
    }
 
    void gfp_add(gfp& c, const gfp& a, const gfp& b) {
       uint64_t carry = 0;
-      for (auto i = 0; i < a.size(); ++i) {
+      for (std::size_t i = 0; i < a.size(); ++i) {
          const auto ai = a[i];
          const auto bi = b[i];
          const auto ci = ai + bi + carry;
          c[i] = ci;
-         carry = (ai & bi | (ai | bi) & ~ci) >> 63ull;
+         carry = ((ai & bi) | ((ai | bi) & ~ci)) >> 63ull;
       }
       gfp_carry(c, carry);
    }
@@ -56,20 +56,20 @@ namespace bn256 {
    void gfp_sub(gfp& c, const gfp& a, const gfp& b) {
       uint64_t carry = 0;
       gfp t{};
-      for (auto i = 0; i < constants::p2.size(); ++i) {
+      for (std::size_t  i = 0; i < constants::p2.size(); ++i) {
          const auto pi = constants::p2[i];
          const auto bi = b[i];
          const auto ti = pi - bi - carry;
          t[i] = ti;
-         carry = (bi & ~pi | (bi | ~pi) & ti) >> 63ull;
+         carry = ((bi & ~pi) | ((bi | ~pi) & ti)) >> 63ull;
       }
       carry = 0;
-      for (auto i = 0; i < a.size(); ++i) {
+      for (std::size_t  i = 0; i < a.size(); ++i) {
          auto ai = a[i];
          auto ti = t[i];
          auto ci = ai + ti + carry;
          c[i] = ci;
-         carry = (ai & ti | (ai | ti) & ~ci) >> 63ull;
+         carry = ((ai & ti) | ((ai | ti) & ~ci)) >> 63ull;
       }
       gfp_carry(c, carry);
    }
@@ -79,13 +79,13 @@ namespace bn256 {
       constexpr uint64_t mask32 = 0xffffffff;
       uint64_array_32_t array32{};
 
-      for (auto i = 0; i < a.size(); ++i) {
+      for (std::size_t  i = 0; i < a.size(); ++i) {
          const auto ai = a[i];
          const uint64_t a0 = ai & mask16;
          const uint64_t a1 = (ai >> 16ull) & mask16;
          const uint64_t a2 = (ai >> 32ull) & mask16;
          const uint64_t a3 = (ai >> 48ull);
-         for (auto j = 0; j < b.size(); ++j) {
+         for (std::size_t  j = 0; j < b.size(); ++j) {
             const uint64_t bj = b[j];
             const uint64_t b0 = bj & mask32;
             const uint64_t b2 = bj >> 32ull;
@@ -107,7 +107,7 @@ namespace bn256 {
             const auto yi = (array32[block + i] << shift) + head;
             const auto zi = xi + yi + carry;
             array32[block] = zi;
-            carry = (xi & yi | (xi | yi) & ~zi) >> 63ull;
+            carry = ((xi & yi) | ((xi | yi) & ~zi)) >> 63ull;
             head = array32[block + i] >> (64ull - shift);
          }
       }
@@ -127,7 +127,7 @@ namespace bn256 {
       constexpr uint64_t mask16 = 0x0000ffff;
       constexpr uint64_t mask32 = 0xffffffff;
       uint64_array_18_t array18{};
-      for (auto i = 0; i < a.size(); ++i) {
+      for (std::size_t i = 0; i < a.size(); ++i) {
          const uint64_t ai = a[i];
          const uint64_t a0 = ai & mask16;
          const uint64_t a1 = (ai >> 16ull) & mask16;
@@ -158,7 +158,7 @@ namespace bn256 {
             const uint64_t yi = (array18[block + i] << shift) + head;
             const uint64_t zi = xi + yi + carry;
             array18[block] = zi;
-            carry = (xi & yi | (xi | yi) & ~zi) >> 63ull;
+            carry = ((xi & yi) | ((xi | yi) & ~zi)) >> 63ull;
             head = array18[block + i] >> (64ull - shift);
          }
       }
@@ -183,12 +183,12 @@ namespace bn256 {
 
       uint64_t carry = 0;
       uint64_array_8_t array8_zi{};
-      for (auto i = 0; i < array8_t1.size(); ++i) {
+      for (std::size_t i = 0; i < array8_t1.size(); ++i) {
          const auto t1_i = array8_t1[i];
          const auto t2_i = array8_t2[i];
          const auto zi = t1_i + t2_i + carry;
          array8_zi[i] = zi;
-         carry = (t1_i & t2_i | (t1_i | t2_i) & ~zi) >> 63ull;
+         carry = ((t1_i & t2_i) | ((t1_i | t2_i) & ~zi)) >> 63ull;
       }
 
       c = {array8_zi[4], array8_zi[5], array8_zi[6], array8_zi[7]};
