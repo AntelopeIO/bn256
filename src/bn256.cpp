@@ -379,7 +379,7 @@ namespace bn256 {
    bool pairing_check(std::vector<g1>& a, std::vector<g2>& b) {
       gfp12 acc{};
       acc.set_one();
-      for (auto i = 0; i < a.size(); ++i) {
+      for (std::size_t i = 0; i < a.size(); ++i) {
          if (a[i].p_.is_infinity() || b[i].p_.is_infinity()) {
             continue;
          }
