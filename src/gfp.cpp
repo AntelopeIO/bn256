@@ -25,7 +25,7 @@ namespace bn256 {
       sum.set(constants::rn1);
       power.set(f);
 
-      for (auto word = 0; word < bits.size(); word++) {
+      for (std::size_t word = 0; word < bits.size(); word++) {
          for (auto bit = 0; bit < 64; bit++) {
             if (((bits[word] >> bit) & 1) == 1) {
                gfp_mul(sum, sum, power);
