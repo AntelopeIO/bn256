@@ -47,6 +47,8 @@ g1::g1(const curve_point& p) {
    memcpy(this, &p, sizeof(*this));
 }
 
+g1 g1::curve_gen{bn256::curve_gen};
+
 curve_point& g1::p() {
    static_assert(sizeof(*this) == sizeof(curve_point));
    return *reinterpret_cast<curve_point*>(p_);
@@ -60,7 +62,7 @@ const curve_point& g1::p() const {
 std::string g1::string() const { return p().string(); }
 
 // scalar_base_mult returns g*k where g is the generator of the group
-g1 g1::scalar_base_mult(const int512_t& k) noexcept { return g1{ curve_gen.mul(k) }; }
+g1 g1::scalar_base_mult(const int512_t& k) noexcept { return g1{ bn256::curve_gen.mul(k) }; }
 
 // scalar_mult returns a*k
 g1 g1::scalar_mult(const int512_t& k) const noexcept { return g1{ p().mul(k) }; }
@@ -124,6 +126,9 @@ g2::g2(const twist_point& p) {
    memcpy(this, &p, sizeof(*this));
 }
 
+g2 g2::twist_gen{bn256::twist_gen};
+
+
 twist_point& g2::p() {
    static_assert(sizeof(*this) == sizeof(twist_point));
    return *reinterpret_cast<twist_point*>(p_);
@@ -138,7 +143,7 @@ std::string g2::string() const { return p().string(); }
 
 // scalar_base_mult sets g2 to g*k where g is the generator of the group and then
 // returns out.
-g2 g2::scalar_base_mult(const int512_t& k) noexcept { return g2{ twist_gen.mul(k) }; }
+g2 g2::scalar_base_mult(const int512_t& k) noexcept { return g2{ bn256::twist_gen.mul(k) }; }
 
 // scalar_mult sets g2 to a*k and then returns g2.
 g2 g2::scalar_mult(const int512_t& k) const noexcept { return g2{ p().mul(k) }; }

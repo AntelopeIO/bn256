@@ -41,6 +41,8 @@ class g1 {
    g1() = default;
    explicit g1(const curve_point&);
 
+   static g1 curve_gen;
+
    curve_point& p();
    const curve_point& p() const;
 
@@ -77,6 +79,8 @@ class g2 {
  public:
    g2() = default;
    explicit g2(const twist_point&);
+
+   static g2 twist_gen;
 
    twist_point& p();
    const twist_point& p() const;

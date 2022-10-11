@@ -26,7 +26,7 @@ if(NOT span_POPULATED)
 endif()
 
 
-find_package(Boost 1.78 REQUIRED)
+find_package(Boost REQUIRED)
 add_subdirectory(src)
 enable_testing()
 add_subdirectory(test)
