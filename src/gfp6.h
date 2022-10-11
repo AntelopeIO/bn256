@@ -200,12 +200,11 @@ struct gfp6 {
       return os << "(" << v.x_ << ", " << v.y_ << ", " << v.z_ << ")";
    }
 
-   bool operator==(const gfp6& rhs) const noexcept {
-      static_assert(std::is_standard_layout_v<gfp6>);
-      return memcmp(this, &rhs, sizeof(*this)) == 0;
+   constexpr bool operator==(const gfp6& rhs) const noexcept {
+      return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_;
    }
 
-   bool operator!=(const gfp6& rhs) const noexcept { return !(*this == rhs); }
+   constexpr bool operator!=(const gfp6& rhs) const noexcept { return !(*this == rhs); }
 };
 
 } // namespace bn256

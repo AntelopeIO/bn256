@@ -144,12 +144,11 @@ struct gfp12 {
 
    friend std::ostream& operator<<(std::ostream& os, const gfp12& v) { return os << "(" << v.x_ << "," << v.y_ << ")"; }
 
-   bool operator==(const gfp12& rhs) const noexcept {
-      static_assert(std::is_standard_layout_v<gfp12>);
-      return memcmp(this, &rhs, sizeof(*this)) == 0;
+   constexpr bool operator==(const gfp12& rhs) const noexcept {
+      return x_ == rhs.x_ && y_ == rhs.y_;
    }
 
-   bool operator!=(const gfp12& rhs) const noexcept { return !(*this == rhs); }
+   constexpr bool operator!=(const gfp12& rhs) const noexcept { return !(*this == rhs); }
 };
 
 } // namespace bn256

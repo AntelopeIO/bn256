@@ -219,12 +219,11 @@ struct curve_point {
       return { a.x_, a.y_.neg(), a.z_, gfp{ 0 } };
    }
 
-   bool operator==(const curve_point& rhs) const noexcept {
-      static_assert(std::is_standard_layout_v<curve_point>);
-      return memcmp(this, &rhs, sizeof(*this)) == 0;
+   constexpr bool operator==(const curve_point& rhs) const noexcept {
+      return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_ && t_ == rhs.t_;
    }
 
-   bool operator!=(const curve_point& rhs) const noexcept { return !(*this == rhs); }
+   constexpr bool operator!=(const curve_point& rhs) const noexcept { return !(*this == rhs); }
 };
 
 inline constexpr curve_point curve_gen = { new_gfp(1), new_gfp(2), new_gfp(1), new_gfp(1) };
