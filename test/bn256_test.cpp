@@ -2,6 +2,8 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <memory>
 #include <catch2/catch_test_macros.hpp>
+#include "twist.h"
+#include "curve.h"
 
 using namespace boost::multiprecision::literals;
 using namespace boost::multiprecision;
@@ -34,7 +36,7 @@ TEST_CASE("test bilinearity", "[bn256]"){
     bn256::g1 c1{bn256::curve_gen};
     bn256::g2 c2{bn256::twist_gen};
 
-    for (auto i = 0; i < 2; ++i) {
+    for (auto i = 0U; i < 2; ++i) {
         auto [a, p1] = bn256::ramdom_g1();
         auto [b, p2] = bn256::ramdom_g2();
         bn256::gt e1 = bn256::pair(p1, p2);
@@ -73,7 +75,7 @@ TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
 TEST_CASE("test g2_self_addition", "[bn256]"){
     int s = rand();
     bn256::g2 p = bn256::g2::scalar_base_mult(s);
-    REQUIRE(p.p_.is_on_curve());
+    REQUIRE(p.p().is_on_curve());
 
     p = p.add(p);
     auto m = p.marshal();
@@ -100,5 +102,5 @@ TEST_CASE("test twist point mul", "[bn256]"){
       { bn256::new_gfp(0), bn256::new_gfp(0)}
    };
 
-   CHECK(p.p_ == expected);
+   CHECK(p.p() == expected);
 }

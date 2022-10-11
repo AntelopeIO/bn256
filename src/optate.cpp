@@ -5,17 +5,6 @@
 
 namespace bn256 {
 
-// struct line_function_result_t {
-//    gfp2 a_;
-//    gfp2 b_;
-//    gfp2 c_;
-//    twist_point out_;
-// };
-
-// std::ostream& operator<<(std::ostream& os, const line_function_result_t& lfr) {
-//    return os << "  a: " << lfr.a_ << ",\n  b:" << lfr.b_ << ",\n  c: " << lfr.c_ << ",\n  out: " << lfr.out_ << "\n";
-// }
-
 auto line_function_add(const twist_point& r, const twist_point& p, const curve_point& q, const gfp2& r2) noexcept {
    // See the mixed addition algorithm from "Faster Computation of the
    // Tate Pairing", http://arxiv.org/pdf/0904.0854v3.pdf

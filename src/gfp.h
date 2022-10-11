@@ -1,87 +1,120 @@
 #pragma once
 #include "gfp_generic.h"
-#include <array>
-#include <cstdint>
 #include <iosfwd>
-#include <nonstd/span.hpp>
 #include <string>
 #include <system_error>
+#include "span.h"
 
 namespace bn256 {
 
-typedef std::array<uint64_t, 4>                       uint64_array_4_t;
-typedef std::array<uint8_t, sizeof(uint64_array_4_t)> uint8_array_32_t;
+enum class unmarshal_error { NO_ERROR = 0, COORDINATE_EXCEEDS_MODULUS = 1, COORDINATE_EQUALS_MODULUS, MALFORMED_POINT };
 
-enum class unmarshal_error { COORDINATE_EXCEEDS_MODULUS = 1, COORDINATE_EQUALS_MODULUS, MALFORMED_POINT };
+namespace constants {
+   // rn1 is R^-1 where R = 2^256 mod p.
+   inline constexpr array<uint64_t, 4> rn1 = { 0xed84884a014afa37, 0xeb2022850278edf8, 0xcf63e9cfb74492d9,
+                                               0x2e67157159e5c639 };
 
-namespace {
-   struct unmarshal_error_category : std::error_category {
-      const char* name() const noexcept override { return "unmarshall"; }
-      std::string message(int ev) const override {
-         switch (static_cast<unmarshal_error>(ev)) {
-            case unmarshal_error::COORDINATE_EXCEEDS_MODULUS: return "coordinate exceeds modulus";
-            case unmarshal_error::COORDINATE_EQUALS_MODULUS: return "coordinate equal modulus";
-            case unmarshal_error::MALFORMED_POINT: return "malformed point";
-            default: return "(unrecognized error)";
-         }
-      }
-   };
-} // namespace
+   // r2 is R^2 where R = 2^256 mod p.
+   inline constexpr array<uint64_t, 4> r2 = { 0xf32cfc5b538afa89, 0xb5e71911d44501fb, 0x47ab1eff0a417ff6,
+                                              0x06d89f71cab8351f };
 
-inline std::error_code make_error_code(unmarshal_error e) noexcept {
-   static const unmarshal_error_category category;
-   return { static_cast<int>(e), category };
-}
+   // r3 is R^3 where R = 2^256 mod p.
+   inline constexpr array<uint64_t, 4> r3 = { 0xb1cd6dafda1530df, 0x62f210e6a7283db6, 0xef7f0b0c0ada0afb,
+                                              0x20fd6e902d592544 };
+} // namespace constants
 
-struct gfp : std::array<uint64_t, 4> {
+struct gfp : array<uint64_t, 4> {
 
    static constexpr gfp zero() noexcept { return {}; }
-   static constexpr gfp one() noexcept {
-        return { 0xd35d438dc58f0d9d, 0x0a78eb28f5c70b3d, 0x666ea36f7879462c, 0x0e0a77c19a07df2f };
+
+   constexpr gfp neg() const noexcept { return { gfp_neg(*this) }; }
+
+   constexpr gfp add(const gfp& other) const noexcept { return { gfp_add(*this, other) }; }
+
+   constexpr gfp sub(const gfp& other) const noexcept { return { gfp_sub(*this, other) }; }
+
+   constexpr gfp mul(const gfp& other) const noexcept { return { gfp_mul(*this, other) }; }
+
+   constexpr gfp invert() const noexcept {
+      constexpr array<uint64_t, 4> bits = { 0x3c208c16d87cfd45, 0x97816a916871ca8d, 0xb85045b68181585d,
+                                            0x30644e72e131a029 };
+
+      gfp  sum{ constants::rn1 };
+      auto power = *this;
+
+      for (auto word = 0; word < bits.size(); word++) {
+         for (auto bit = 0; bit < 64; bit++) {
+            if (((bits[word] >> bit) & 1) == 1) {
+               sum = sum.mul(power);
+            }
+            power = power.mul(power);
+         }
+      }
+
+      return sum.mul({ constants::r3 });
    }
 
-   gfp invert() const noexcept;
-
-   gfp neg() const noexcept {
-      gfp r;
-      gfp_neg(r, *this);
-      return r;
+   constexpr void marshal(std::span<uint8_t, 32> out) const noexcept {
+      for (auto w = 0; w < 4; w++) {
+         for (auto b = 0; b < 8; b++) {
+            uint8_t t      = ((*this)[3 - w] >> (56 - 8 * b));
+            out[8 * w + b] = t;
+         }
+      }
    }
 
-   gfp add(const gfp& other) const noexcept {
-      gfp r;
-      gfp_add(r, *this, other);
-      return r;
+   unmarshal_error unmarshal(std::span<const uint8_t, 32> in) noexcept {
+      gfp& result = *this;
+      // Unmarshal the bytes into little endian form
+      for (auto w = 0; w < 4; w++) {
+         result[3 - w] = 0;
+         for (auto b = 0; b < 8; b++) { result[3 - w] += uint64_t(in[8 * w + b]) << (56 - 8 * b); }
+      }
+
+      // Ensure the point respects the curve modulus
+      for (auto i = 3; i >= 0; i--) {
+         if (result[i] < constants::p2[i]) {
+            return unmarshal_error::NO_ERROR;
+         }
+         if (result[i] > constants::p2[i]) {
+            return unmarshal_error::COORDINATE_EXCEEDS_MODULUS;
+         }
+      }
+      return unmarshal_error::MALFORMED_POINT;
    }
 
-   gfp sub(const gfp& other) const noexcept {
-      gfp r;
-      gfp_sub(r, *this, other);
-      return r;
+   constexpr gfp mont_encode() const noexcept { return mul({ constants::r2 }); }
+
+   constexpr gfp mont_decode() const noexcept { return mul(gfp{ 1 }); }
+
+   std::string string() const {
+      std::string result;
+      result.resize(64);
+
+      auto buf = result.data();
+      for (int i = size() - 1; i >= 0; --i) {
+         const char           hex_table[] = "0123456789abcdef";
+         const unsigned char* p           = reinterpret_cast<const unsigned char*>(&(*this)[i]) + 8;
+         for (int i = 0; i < sizeof(uint64_t); ++i) {
+            unsigned x = *(--p);
+            *buf++     = hex_table[(x >> 4)];
+            *buf++     = hex_table[x & 0x0F];
+         }
+      }
+      return result;
    }
-
-   gfp mul(const gfp& other) const noexcept {
-      gfp r;
-      gfp_mul(r, *this, other);
-      return r;
-   }
-
-   void marshal(nonstd::span<uint8_t, 32> out) const noexcept;
-
-   [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t, 32> input) noexcept;
-
-   gfp mont_encode() const noexcept;
-
-   gfp mont_decode() const noexcept;
-
-   std::string string() const;
 };
 
-gfp           new_gfp(int64_t x) noexcept;
-std::ostream& operator<<(std::ostream& os, const gfp& v);
-} // namespace bn256
+constexpr gfp new_gfp(int64_t x) noexcept {
+   gfp out{};
+   if (x >= 0) {
+      out = { uint64_t(x) };
+   } else {
+      out = { uint64_t(-x) };
+      out = out.neg();
+   }
+   return out.mont_encode();
+}
 
-namespace std {
-template <>
-struct is_error_code_enum<bn256::unmarshal_error> : true_type {};
-} // namespace std
+inline std::ostream& operator<<(std::ostream& os, const gfp& v) { return os << v.string(); }
+} // namespace bn256

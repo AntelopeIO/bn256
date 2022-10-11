@@ -19,35 +19,30 @@
 // https://moderncrypto.org/mail-archive/curves/2016/000740.html.)
 
 #include <boost/multiprecision/cpp_int.hpp>
-#include <curve.h>
-#include <gfp12.h>
-#include <twist.h>
 #include <utility>
+#include <array>
+#include <system_error>
+#include "span.h"
 
 using boost::multiprecision::int512_t;
 
 namespace bn256 {
 
-// curveGen is the generator of G₁.
-const curve_point curve_gen = { new_gfp(1), new_gfp(2), new_gfp(1), new_gfp(1) };
-
-static const twist_point twist_gen = {
-   {
-         { 0xafb4737da84c6140, 0x6043dd5a5802d8c4, 0x09e950fc52a02f86, 0x14fef0833aea7b6b },
-         { 0x8e83b5d102bc2026, 0xdceb1935497b0172, 0xfbb8264797811adf, 0x19573841af96503b },
-   },
-   {
-         { 0x64095b56c71856ee, 0xdc57f922327d3cbb, 0x55f935be33351076, 0x0da4a0e693fd6482 },
-         { 0x619dfa9d886be9f6, 0xfe7fd297f59e9b78, 0xff9e1a62231b7dfe, 0x28fd7eebae9e4206 },
-   },
-   { new_gfp(0), new_gfp(1) },
-   { new_gfp(0), new_gfp(1) }
-};
+struct curve_point;
+struct twist_point;
+struct gfp12;
 
 // G1 is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
-struct g1 {
-   curve_point p_;
+class g1 {
+   uint64_t p_[4 * 4];
+
+ public:
+   g1() = default;
+   explicit g1(const curve_point&);
+
+   curve_point& p();
+   const curve_point& p() const;
 
    static g1 scalar_base_mult(const int512_t& k) noexcept;
 
@@ -57,27 +52,34 @@ struct g1 {
 
    g1 neg();
 
-   void                    marshal(nonstd::span<uint8_t, 64> out) const noexcept;
+   void                    marshal(std::span<uint8_t, 64> out) const noexcept;
    std::array<uint8_t, 64> marshal() const noexcept {
       std::array<uint8_t, 64> result;
       marshal(result);
       return result;
    }
 
-   [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t, 64> in) noexcept;
+   [[nodiscard]] std::error_code unmarshal(std::span<const uint8_t, 64> in) noexcept;
 
-   bool operator==(const g1& rhs) const noexcept { return p_ == rhs.p_; }
+   bool operator==(const g1& rhs) const noexcept { return memcmp(p_, rhs.p_, sizeof(*this)) == 0; }
    bool operator!=(const g1& rhs) const noexcept { return !(*this == rhs); }
 
    std::string string() const;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const g1& v) { return os << v.p_.string(); }
+inline std::ostream& operator<<(std::ostream& os, const g1& v) { return os << v.string(); }
 
 // g2 is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
-struct g2 {
-   twist_point p_;
+class g2 {
+   uint64_t p_[4 * 2 * 4];
+
+ public:
+   g2() = default;
+   explicit g2(const twist_point&);
+
+   twist_point& p();
+   const twist_point& p() const;
 
    static g2 scalar_base_mult(const int512_t& k) noexcept;
 
@@ -87,38 +89,46 @@ struct g2 {
 
    g2 neg() const noexcept;
 
-   void                     marshal(nonstd::span<uint8_t, 128> out) const noexcept;
+   void                     marshal(std::span<uint8_t, 128> out) const noexcept;
    std::array<uint8_t, 128> marshal() const noexcept {
       std::array<uint8_t, 128> result;
       marshal(result);
       return result;
    }
 
-   [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t, 128> m) noexcept;
+   [[nodiscard]] std::error_code unmarshal(std::span<const uint8_t, 128> m) noexcept;
 
-   bool operator==(const g2& rhs) const noexcept { return p_ == rhs.p_; }
+   bool operator==(const g2& rhs) const noexcept { return memcmp(p_, rhs.p_, sizeof(*this)) == 0; }
    bool operator!=(const g2& rhs) const noexcept { return !(*this == rhs); }
 
    std::string string() const;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const g2& v) { return os << v.p_.string(); }
+inline std::ostream& operator<<(std::ostream& os, const g2& v) { return os << v.string(); }
 
 // GT is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
-struct gt {
-   gfp12 p_;
+class gt {
+
+   uint64_t p_[4 * 2 * 3 * 2];
+
+ public:
+   gt() = default;
+   explicit gt(const gfp12&);
+
+   gfp12& p();
+   const gfp12& p() const;
 
    gt scalar_mult(const int512_t& k) const noexcept;
 
-   gt add(const gt& b) const noexcept ;
+   gt add(const gt& b) const noexcept;
 
    gt neg() const noexcept;
 
    gt finalize() const noexcept;
 
    // marshal converts g2 to a byte slice.
-   void                     marshal(nonstd::span<uint8_t, 384> out) const noexcept;
+   void                     marshal(std::span<uint8_t, 384> out) const noexcept;
    std::array<uint8_t, 384> marshal() const noexcept {
       std::array<uint8_t, 384> result;
       marshal(result);
@@ -127,9 +137,9 @@ struct gt {
 
    // unmarshal sets gt to the result of converting the output of marshal back into
    // a group element and then returns unmarshal_status.
-   [[nodiscard]] std::error_code unmarshal(nonstd::span<const uint8_t, 384> m) noexcept;
+   [[nodiscard]] std::error_code unmarshal(std::span<const uint8_t, 384> m) noexcept;
 
-   bool operator==(const gt& rhs) const noexcept { return p_ == rhs.p_; }
+   bool operator==(const gt& rhs) const noexcept { return memcmp(p_, rhs.p_, sizeof(*this)) == 0; }
    bool operator!=(const gt& rhs) const noexcept { return !(*this == rhs); }
 
    std::string string() const;

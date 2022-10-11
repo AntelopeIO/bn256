@@ -40,6 +40,8 @@ TEST_CASE("test_pairings", "[main]") {
    auto pn1 = bn256::pair(a1, bn1);
    auto np1 = bn256::pair(an1, b1);
 
+   CHECK(pn1 == np1);
+
    CHECK(pn1.string() == np1.string()); // Pairing mismatch
 
    std::vector<bn256::g1> g1_vec = {a1, an1};
