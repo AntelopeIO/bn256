@@ -99,7 +99,7 @@ struct twist_point {
 
       gfp2 v = u1.mul(i);
 
-      twist_point c;
+      twist_point c = {};
 
       gfp2 t4 = r.square();
       t       = v.add(v);
@@ -157,7 +157,7 @@ struct twist_point {
 
    twist_point mul(const int512_t& scalar) const noexcept {
       const twist_point& a = *this;
-      twist_point        sum{}, t;
+      twist_point        sum{}, t{};
 
       for (int i = bitlen(scalar); i >= 0; i--) {
          t = sum.double_();

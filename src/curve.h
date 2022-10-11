@@ -18,7 +18,7 @@ struct curve_point {
    gfp t_;
 
    static constexpr curve_point infinity() { return { { 0 }, new_gfp(1), { 0 }, { 0 } }; };
-   bool                         is_infinity() const noexcept { return z_ == gfp{ 0 }; }
+   constexpr bool               is_infinity() const noexcept { return z_ == gfp{ 0 }; }
 
    static constexpr gfp curve_b = new_gfp(3);
 
@@ -109,7 +109,7 @@ struct curve_point {
       t      = v.add(v);
       gfp t6 = t4.sub(j);
 
-      curve_point c;
+      curve_point c = {};
 
       c.x_ = t6.sub(t);
 
