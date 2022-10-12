@@ -17,7 +17,6 @@ static bn256::g2 make_scaled_g2(const std::string& scale_string) {
 }
 
 static bn256::gt make_scaled_gt(const bn256::gt& a, const std::string& scale_string) {
-   bn256::gt ret;
    int512_t scale_value(scale_string);
    return a.scalar_mult(scale_value);
 }
