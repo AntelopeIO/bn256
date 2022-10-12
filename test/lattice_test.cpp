@@ -8,8 +8,6 @@
 using namespace boost::multiprecision::literals;
 using namespace boost::multiprecision;
 
-constexpr int test_fail = 1;
-constexpr int test_pass = 0;
 
 TEST_CASE("test lattice reduce curve", "[lattice]"){
     constexpr std::size_t max_bitlen = 130;

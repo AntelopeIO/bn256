@@ -25,8 +25,12 @@ if(NOT span_POPULATED)
   FetchContent_Populate(span)
 endif()
 
+add_compile_options(-Wall)
+
 
 find_package(Boost REQUIRED)
 add_subdirectory(src)
+
+
 enable_testing()
 add_subdirectory(test)

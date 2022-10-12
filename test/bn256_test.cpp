@@ -85,7 +85,6 @@ TEST_CASE("test g2_self_addition", "[bn256]"){
 
 TEST_CASE("test twist point mul", "[bn256]"){
 	const int512_t k("73391516005847081647776723068736393251206848701235344996976057911204818492439");
-	bn256::twist_point tp_gen(bn256::twist_gen);
 	bn256::g2 p = bn256::g2::scalar_base_mult(k);
 
     const bn256::twist_point expected = {

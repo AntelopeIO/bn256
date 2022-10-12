@@ -23,6 +23,7 @@ TEST_CASE("test_gfp_add", "[gfp]"){
    constexpr bn256::gfp a = {0x0123456789abcdef, 0xfedcba9876543210, 0xdeadbeefdeadbeef, 0xfeebdaedfeebdaed};
    constexpr bn256::gfp b = {0xfedcba9876543210, 0x0123456789abcdef, 0xfeebdaedfeebdaed, 0xdeadbeefdeadbeef};
    constexpr bn256::gfp w = {0xc3df73e9278302b8, 0x687e956e978e3572, 0x254954275c18417f, 0xad354b6afc67f9b4};
+   static_assert( bn256::gfp_add(a, b) == w );
    CHECK(bn256::gfp_add(a, b) == w);
 }
 
@@ -32,6 +33,7 @@ TEST_CASE("test_gfp_sub", "[gfp]"){
    constexpr bn256::gfp a = {0x0123456789abcdef, 0xfedcba9876543210, 0xdeadbeefdeadbeef, 0xfeebdaedfeebdaed};
    constexpr bn256::gfp b = {0xfedcba9876543210, 0x0123456789abcdef, 0xfeebdaedfeebdaed, 0xdeadbeefdeadbeef};
    constexpr bn256::gfp w = {0x02468acf13579bdf, 0xfdb97530eca86420, 0xdfc1e401dfc1e402, 0x203e1bfe203e1bfd};
+   static_assert( bn256::gfp_sub(a, b) == w );
    CHECK( bn256::gfp_sub(a, b) == w);
 }
 
@@ -41,5 +43,6 @@ TEST_CASE("test_gfp_mul", "[gfp]"){
    constexpr bn256::gfp a = {0x0123456789abcdef, 0xfedcba9876543210, 0xdeadbeefdeadbeef, 0xfeebdaedfeebdaed};
    constexpr bn256::gfp b = {0xfedcba9876543210, 0x0123456789abcdef, 0xfeebdaedfeebdaed, 0xdeadbeefdeadbeef};
    constexpr bn256::gfp w = {0xcbcbd377f7ad22d3, 0x3b89ba5d849379bf, 0x87b61627bd38b6d2, 0xc44052a2a0e654b2};
+   static_assert( bn256::gfp_mul(a, b) == w );
    CHECK(bn256::gfp_mul(a, b) == w);
 }

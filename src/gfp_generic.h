@@ -1,7 +1,7 @@
 #pragma once
+#include "array.h"
 #include <cstddef>
 #include <cstdint>
-#include "array.h"
 namespace bn256 {
 
 namespace constants {
@@ -23,7 +23,7 @@ constexpr array<uint64_t, 4> gfp_carry(const array<uint64_t, 4>& a, uint64_t hea
       const auto ai = a[i];
       const auto bi = ai - pi - carry;
       b[i]          = bi;
-      carry         = (pi & ~ai | (pi | ~ai) & bi) >> 63ull;
+      carry         = ((pi & ~ai) | ((pi | ~ai) & bi)) >> 63ull;
    }
    carry = carry & ~head;
 
@@ -44,7 +44,7 @@ constexpr array<uint64_t, 4> gfp_neg(const array<uint64_t, 4>& a) noexcept {
       const auto ai = a[i];
       const auto ci = pi - ai - carry;
       c[i]          = ci;
-      carry         = (ai & ~pi | (ai | ~pi) & ci) >> 63ull;
+      carry         = ((ai & ~pi) | ((ai | ~pi) & ci)) >> 63ull;
    }
    return gfp_carry(c, 0);
 }
@@ -57,7 +57,7 @@ constexpr array<uint64_t, 4> gfp_add(const array<uint64_t, 4>& a, const array<ui
       const auto bi = b[i];
       const auto ci = ai + bi + carry;
       c[i]          = ci;
-      carry         = (ai & bi | (ai | bi) & ~ci) >> 63ull;
+      carry         = ((ai & bi) | ((ai | bi) & ~ci)) >> 63ull;
    }
    return gfp_carry(c, carry);
 }
@@ -70,7 +70,7 @@ constexpr array<uint64_t, 4> gfp_sub(const array<uint64_t, 4>& a, const array<ui
       const auto bi = b[i];
       const auto ti = pi - bi - carry;
       t[i]          = ti;
-      carry         = (bi & ~pi | (bi | ~pi) & ti) >> 63ull;
+      carry         = ((bi & ~pi) | ((bi | ~pi) & ti)) >> 63ull;
    }
    carry = 0;
    array<uint64_t, 4> c{};
@@ -79,7 +79,7 @@ constexpr array<uint64_t, 4> gfp_sub(const array<uint64_t, 4>& a, const array<ui
       auto ti = t[i];
       auto ci = ai + ti + carry;
       c[i]    = ci;
-      carry   = (ai & ti | (ai | ti) & ~ci) >> 63ull;
+      carry   = ((ai & ti) | ((ai | ti) & ~ci)) >> 63ull;
    }
    return gfp_carry(c, carry);
 }
@@ -117,7 +117,7 @@ constexpr array<uint64_t, 8> full_mul(const array<uint64_t, 4>& a, const array<u
          const auto yi    = (buff[block + i] << shift) + head;
          const auto zi    = xi + yi + carry;
          buff[block]      = zi;
-         carry            = (xi & yi | (xi | yi) & ~zi) >> 63ull;
+         carry            = ((xi & yi) | ((xi | yi) & ~zi)) >> 63ull;
          head             = buff[block + i] >> (64ull - shift);
       }
    }
@@ -159,7 +159,7 @@ constexpr array<uint64_t, 4> half_mul(const array<uint64_t, 4>& a, const array<u
          const uint64_t yi    = (buff[block + i] << shift) + head;
          const uint64_t zi    = xi + yi + carry;
          buff[block]          = zi;
-         carry                = (xi & yi | (xi | yi) & ~zi) >> 63ull;
+         carry                = ((xi & yi) | ((xi | yi) & ~zi)) >> 63ull;
          head                 = buff[block + i] >> (64ull - shift);
       }
    }
@@ -177,7 +177,7 @@ constexpr array<uint64_t, 4> gfp_mul(const array<uint64_t, 4>& a, const array<ui
       const auto ti = t[i];
       const auto zi = Ti + ti + carry;
       T[i]          = zi;
-      carry         = (Ti & ti | (Ti | ti) & ~zi) >> 63ull;
+      carry         = ((Ti & ti) | ((Ti | ti) & ~zi)) >> 63ull;
    }
 
    return gfp_carry({ T[4], T[5], T[6], T[7] }, carry);
