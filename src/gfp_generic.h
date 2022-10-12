@@ -95,7 +95,7 @@ constexpr array<uint64_t, 8> full_mul(const array<uint64_t, 4>& a, const array<u
       const uint64_t a1 = (ai >> 16ull) & mask16;
       const uint64_t a2 = (ai >> 32ull) & mask16;
       const uint64_t a3 = (ai >> 48ull);
-      for (auto j = 0; j < b.size(); ++j) {
+      for (std::size_t j = 0; j < b.size(); ++j) {
          const uint64_t bj  = b[j];
          const uint64_t b0  = bj & mask32;
          const uint64_t b2  = bj >> 32ull;
@@ -134,7 +134,7 @@ constexpr array<uint64_t, 4> half_mul(const array<uint64_t, 4>& a, const array<u
       const uint64_t a1 = (ai >> 16ull) & mask16;
       const uint64_t a2 = (ai >> 32ull) & mask16;
       const uint64_t a3 = (ai >> 48ull);
-      for (auto j = 0; j < b.size(); ++j) {
+      for (std::size_t j = 0; j < b.size(); ++j) {
          const auto bj = b[j];
          if (i + j > 3) {
             break;

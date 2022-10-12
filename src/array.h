@@ -18,7 +18,7 @@ struct array {
    constexpr std::size_t size() const noexcept { return N; }
 
    constexpr bool operator==(const array<uint64_t, 4>& other) const noexcept {
-      for (int i = 0; i < N; ++i)
+      for (std::size_t i = 0; i < N; ++i)
          if (v_[i] != other[i])
             return false;
       return true;

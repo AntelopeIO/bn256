@@ -42,7 +42,7 @@ struct gfp : array<uint64_t, 4> {
       gfp  sum{ constants::rn1 };
       auto power = *this;
 
-      for (auto word = 0; word < bits.size(); word++) {
+      for (std::size_t  word = 0; word < bits.size(); word++) {
          for (auto bit = 0; bit < 64; bit++) {
             if (((bits[word] >> bit) & 1) == 1) {
                sum = sum.mul(power);
@@ -95,7 +95,7 @@ struct gfp : array<uint64_t, 4> {
       for (int i = size() - 1; i >= 0; --i) {
          const char           hex_table[] = "0123456789abcdef";
          const unsigned char* p           = reinterpret_cast<const unsigned char*>(&(*this)[i]) + 8;
-         for (int i = 0; i < sizeof(uint64_t); ++i) {
+         for (std::size_t i = 0; i < sizeof(uint64_t); ++i) {
             unsigned x = *(--p);
             *buf++     = hex_table[(x >> 4)];
             *buf++     = hex_table[x & 0x0F];
