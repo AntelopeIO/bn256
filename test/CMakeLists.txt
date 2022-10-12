@@ -1,5 +1,3 @@
-
-
 function(add_test_executable TARGET )
   add_executable (${TARGET} ${ARGN})
   target_include_directories(${TARGET} PRIVATE ${Boost_INCLUDE_DIRS})
@@ -10,12 +8,11 @@ function(add_test_executable TARGET )
   )
 endfunction()
 
-
 add_test_executable(gfp_test gfp_test.cpp)
 add_test_executable(bn256_test bn256_test.cpp)
 add_test_executable(lattice_test lattice_test.cpp)
 add_test_executable(example_test example_test.cpp)
 add_test_executable(main_test main_test.cpp)
 
-add_executable (benchmark benchmark.cpp)
-target_link_libraries(benchmark bn256)
+add_executable (bn256_benchmark bn256_benchmark.cpp)
+target_link_libraries(bn256_benchmark bn256)
