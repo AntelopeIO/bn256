@@ -17,70 +17,72 @@ namespace constants {
 
 constexpr array<uint64_t, 4> gfp_carry(const array<uint64_t, 4>& a, uint64_t head) noexcept {
    array<uint64_t, 4> b{};
-   uint64_t           carry = 0;
-   for (auto i = 0U; i < constants::p2.size(); ++i) {
-      const auto pi = constants::p2[i];
-      const auto ai = a[i];
-      const auto bi = ai - pi - carry;
-      b[i]          = bi;
-      carry         = ((pi & ~ai) | ((pi | ~ai) & bi)) >> 63ull;
-   }
-   carry = carry & ~head;
+   uint64_t           carry = {};
 
-   // if b is negative, then return a.
-   // else return b.
-   carry                     = -carry;
-   const auto         ncarry = ~carry;
-   array<uint64_t, 4> c      = {};
-   for (auto i = 0U; i < 4; i++) { c[i] = (a[i] & carry) | (b[i] & ncarry); }
-   return c;
+   carry = __builtin_sub_overflow(a[0], constants::p2[0], &b[0]);
+   carry = __builtin_sub_overflow(a[1], carry, &b[1]);
+   carry += __builtin_sub_overflow(b[1], constants::p2[1], &b[1]);
+   carry = __builtin_sub_overflow(a[2], carry, &b[2]);
+   carry += __builtin_sub_overflow(b[2], constants::p2[2], &b[2]);
+   carry = __builtin_sub_overflow(a[3], carry, &b[3]);
+   carry += __builtin_sub_overflow(b[3], constants::p2[3], &b[3]);
+   carry = __builtin_sub_overflow(head, carry, &head);
+
+   return carry ? a : b;
 }
 
 constexpr array<uint64_t, 4> gfp_neg(const array<uint64_t, 4>& a) noexcept {
    uint64_t           carry = 0;
-   array<uint64_t, 4> c{};
-   for (auto i = 0U; i < constants::p2.size(); ++i) {
-      const auto pi = constants::p2[i];
-      const auto ai = a[i];
-      const auto ci = pi - ai - carry;
-      c[i]          = ci;
-      carry         = ((ai & ~pi) | ((ai | ~pi) & ci)) >> 63ull;
-   }
-   return gfp_carry(c, 0);
+   array<uint64_t, 4> b{};
+
+   carry = __builtin_sub_overflow(constants::p2[0], a[0], &b[0]);
+   carry = __builtin_sub_overflow(constants::p2[1], carry, &b[1]);
+   carry += __builtin_sub_overflow(b[1], a[1], &b[1]);
+   carry = __builtin_sub_overflow(constants::p2[2], carry, &b[2]);
+   carry += __builtin_sub_overflow(b[2], a[2], &b[2]);
+   carry = __builtin_sub_overflow(constants::p2[3], carry, &b[3]);
+   carry += __builtin_sub_overflow(b[3], a[3], &b[3]);
+   return gfp_carry(b, 0);
 }
 
 constexpr array<uint64_t, 4> gfp_add(const array<uint64_t, 4>& a, const array<uint64_t, 4>& b) noexcept {
    uint64_t           carry = 0;
-   array<uint64_t, 4> c     = {};
-   for (auto i = 0U; i < a.size(); ++i) {
-      const auto ai = a[i];
-      const auto bi = b[i];
-      const auto ci = ai + bi + carry;
-      c[i]          = ci;
-      carry         = ((ai & bi) | ((ai | bi) & ~ci)) >> 63ull;
-   }
+   array<uint64_t, 4> c{};
+
+   carry = __builtin_add_overflow(a[0], b[0], &c[0]);
+   carry = __builtin_add_overflow(a[1], carry, &c[1]);
+   carry += __builtin_add_overflow(c[1], b[1], &c[1]);
+   carry = __builtin_add_overflow(a[2], carry, &c[2]);
+   carry += __builtin_add_overflow(c[2], b[2], &c[2]);
+   carry = __builtin_add_overflow(a[3], carry, &c[3]);
+   carry += __builtin_add_overflow(c[3], b[3], &c[3]);
+
    return gfp_carry(c, carry);
 }
 
 constexpr array<uint64_t, 4> gfp_sub(const array<uint64_t, 4>& a, const array<uint64_t, 4>& b) noexcept {
    uint64_t           carry = 0;
    array<uint64_t, 4> t{};
-   for (auto i = 0U; i < constants::p2.size(); ++i) {
-      const auto pi = constants::p2[i];
-      const auto bi = b[i];
-      const auto ti = pi - bi - carry;
-      t[i]          = ti;
-      carry         = ((bi & ~pi) | ((bi | ~pi) & ti)) >> 63ull;
-   }
+
+   carry = __builtin_sub_overflow(constants::p2[0], b[0], &t[0]);
+   carry = __builtin_sub_overflow(constants::p2[1], carry, &t[1]);
+   carry += __builtin_sub_overflow(t[1], b[1], &t[1]);
+   carry = __builtin_sub_overflow(constants::p2[2], carry, &t[2]);
+   carry += __builtin_sub_overflow(t[2], b[2], &t[2]);
+   carry = __builtin_sub_overflow(constants::p2[3], carry, &t[3]);
+   __builtin_sub_overflow(t[3], b[3], &t[3]);
+
    carry = 0;
    array<uint64_t, 4> c{};
-   for (auto i = 0U; i < a.size(); ++i) {
-      auto ai = a[i];
-      auto ti = t[i];
-      auto ci = ai + ti + carry;
-      c[i]    = ci;
-      carry   = ((ai & ti) | ((ai | ti) & ~ci)) >> 63ull;
-   }
+
+   carry = __builtin_add_overflow(a[0], t[0], &c[0]);
+   carry = __builtin_add_overflow(a[1], carry, &c[1]);
+   carry += __builtin_add_overflow(c[1], t[1], &c[1]);
+   carry = __builtin_add_overflow(a[2], carry, &c[2]);
+   carry += __builtin_add_overflow(c[2], t[2], &c[2]);
+   carry = __builtin_add_overflow(a[3], carry, &c[3]);
+   carry += __builtin_add_overflow(c[3], t[3], &c[3]);
+
    return gfp_carry(c, carry);
 }
 
