@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gfp.h"
+#include "gfp2.h"
 #include "lattice.h"
 #include <boost/multiprecision/cpp_int.hpp>
 

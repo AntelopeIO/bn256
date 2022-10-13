@@ -1,6 +1,6 @@
 #pragma once
-#include <gfp.h>
-#include <gfp_generic.h>
+#include "gfp.h"
+#include "gfp_generic.h"
 
 namespace bn256 {
 

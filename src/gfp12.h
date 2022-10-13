@@ -1,8 +1,8 @@
 #pragma once
 
 #include <boost/multiprecision/cpp_int.hpp>
-#include <gfp6.h>
-#include <bitlen.h>
+#include "gfp6.h"
+#include "bitlen.h"
 
 using boost::multiprecision::int512_t;
 namespace bn256 {

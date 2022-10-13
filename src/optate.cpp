@@ -1,6 +1,5 @@
-#include <array>
-#include <constants.h>
-#include <optate.h>
+#include "constants.h"
+#include "optate.h"
 #include <tuple>
 
 namespace bn256 {

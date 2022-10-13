@@ -1,8 +1,5 @@
 #pragma once
 #include <boost/multiprecision/cpp_int.hpp>
-#include <gfp.h>
-#include <gfp2.h>
-#include <gfp6.h>
 
 namespace bn256::constants {
 

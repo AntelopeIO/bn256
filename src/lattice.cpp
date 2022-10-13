@@ -1,5 +1,5 @@
-#include <bitlen.h>
-#include <lattice.h>
+#include "bitlen.h"
+#include "lattice.h"
 
 namespace bn256 {
 

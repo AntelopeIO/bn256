@@ -1,6 +1,6 @@
 function(add_test_executable TARGET )
   add_executable (${TARGET} ${ARGN})
-  target_include_directories(${TARGET} PRIVATE ${Boost_INCLUDE_DIRS})
+  target_include_directories(${TARGET} PRIVATE ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/../src)
   target_link_libraries (${TARGET} PRIVATE bn256 Catch2::Catch2WithMain)
   add_test(
     NAME ${TARGET}

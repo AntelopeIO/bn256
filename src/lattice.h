@@ -1,6 +1,6 @@
 #pragma once
 #include <boost/multiprecision/cpp_int.hpp>
-#include <constants.h>
+#include "constants.h"
 
 namespace bn256 {
 

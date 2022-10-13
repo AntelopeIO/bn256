@@ -1,9 +1,8 @@
 #include <bn256.h>
 #include <boost/multiprecision/cpp_int.hpp>
-#include <curve.h>
-#include <optate.h>
-#include <random_256.h>
-#include <sstream>
+#include "curve.h"
+#include "optate.h"
+#include "random_256.h"
 
 namespace bn256 {
 using namespace boost::multiprecision::literals;

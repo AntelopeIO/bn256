@@ -1,9 +1,8 @@
 #pragma once
 
-#include <twist.h>
-#include <curve.h>
-#include <gfp2.h>
-#include <gfp12.h>
+#include "twist.h"
+#include "curve.h"
+#include "gfp12.h"
 
 namespace bn256 {
 
