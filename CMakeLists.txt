@@ -4,14 +4,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall)
+
 find_package(Boost REQUIRED)
+
 add_subdirectory(src)
-add_subdirectory(third-party/span)
+
 option(BN256_ENABLE_TEST "BN256_ENABLE_TEST" ON)
 if (BN256_ENABLE_TEST)
    enable_testing()
-   add_subdirectory(test)
    add_subdirectory(third-party/Catch2)
+   add_subdirectory(test)
 endif ()
-
-
