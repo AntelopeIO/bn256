@@ -87,85 +87,37 @@ constexpr array<uint64_t, 4> gfp_sub(const array<uint64_t, 4>& a, const array<ui
 }
 
 constexpr array<uint64_t, 8> full_mul(const array<uint64_t, 4>& a, const array<uint64_t, 4>& b) noexcept {
-   constexpr uint64_t  mask16 = 0x0000ffff;
-   constexpr uint64_t  mask32 = 0xffffffff;
-   array<uint64_t, 32> buff{};
+   array<uint64_t, 9> c{};
+   auto add_to_c = [&c](__int128_t x, int index) {
+        uint64_t upper = x >> 64;
+        uint64_t carry = __builtin_add_overflow( c[index], static_cast<uint64_t>(x), &c[index]);
+        carry = __builtin_add_overflow(c[index+1], carry, &c[index+1]);
+        carry += __builtin_add_overflow(upper, c[index+1], &c[index+1]);
+        __builtin_add_overflow(c[index+2], carry, &c[index+2]);
+    };
 
-   for (auto i = 0U; i < a.size(); ++i) {
-      const auto     ai = a[i];
-      const uint64_t a0 = ai & mask16;
-      const uint64_t a1 = (ai >> 16ull) & mask16;
-      const uint64_t a2 = (ai >> 32ull) & mask16;
-      const uint64_t a3 = (ai >> 48ull);
-      for (std::size_t j = 0; j < b.size(); ++j) {
-         const uint64_t bj  = b[j];
-         const uint64_t b0  = bj & mask32;
-         const uint64_t b2  = bj >> 32ull;
-         const uint64_t off = 4ull * (i + j);
-         buff[off + 0] += a0 * b0;
-         buff[off + 1] += a1 * b0;
-         buff[off + 2] += a2 * b0 + a0 * b2;
-         buff[off + 3] += a3 * b0 + a1 * b2;
-         buff[off + 4] += a2 * b2;
-         buff[off + 5] += a3 * b2;
-      }
-   }
-   for (uint64_t i = 1ull; i < 4ull; i++) {
-      const auto shift = 16ull * i;
-      uint64_t   head = 0ull, carry = 0ull;
-      for (uint64_t j = 0ull; j < 8ull; j++) {
-         const auto block = 4ull * j;
-         const auto xi    = buff[block];
-         const auto yi    = (buff[block + i] << shift) + head;
-         const auto zi    = xi + yi + carry;
-         buff[block]      = zi;
-         carry            = ((xi & yi) | ((xi | yi) & ~zi)) >> 63ull;
-         head             = buff[block + i] >> (64ull - shift);
-      }
-   }
-   return { buff[0], buff[4], buff[8], buff[12], buff[16], buff[20], buff[24], buff[28] };
+   for (int i = 0; i < 4; ++i)
+      for (int j = 0; j < 4; ++j) { add_to_c(static_cast<__uint128_t>(b[i]) * a[j], i + j); }
+   return { c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7] };
 }
 
 constexpr array<uint64_t, 4> half_mul(const array<uint64_t, 4>& a, const array<uint64_t, 4>& b) noexcept {
-   constexpr uint64_t  mask16 = 0x0000ffff;
-   constexpr uint64_t  mask32 = 0xffffffff;
-   array<uint64_t, 18> buff{};
-   for (auto i = 0U; i < a.size(); ++i) {
-      const uint64_t ai = a[i];
-      const uint64_t a0 = ai & mask16;
-      const uint64_t a1 = (ai >> 16ull) & mask16;
-      const uint64_t a2 = (ai >> 32ull) & mask16;
-      const uint64_t a3 = (ai >> 48ull);
-      for (std::size_t j = 0; j < b.size(); ++j) {
-         const auto bj = b[j];
-         if (i + j > 3) {
+   array<uint64_t, 6> c{};
+   auto               add_to_c = [&c](__int128_t x, int index) {
+      uint64_t upper = x >> 64;
+      uint64_t carry = __builtin_add_overflow(c[index], static_cast<uint64_t>(x), &c[index]);
+      carry          = __builtin_add_overflow(c[index + 1], carry, &c[index + 1]);
+      carry += __builtin_add_overflow(upper, c[index + 1], &c[index + 1]);
+      __builtin_add_overflow(c[index + 2], carry, &c[index + 2]);
+   };
+
+   for (int i = 0; i < 4; ++i)
+      for (int j = 0; j < 4; ++j) {
+         if ((i + j) > 3)
             break;
-         }
-         const uint64_t b0  = bj & mask32;
-         const uint64_t b2  = bj >> 32ull;
-         const uint64_t off = 4 * (i + j);
-         buff[off + 0] += a0 * b0;
-         buff[off + 1] += a1 * b0;
-         buff[off + 2] += a2 * b0 + a0 * b2;
-         buff[off + 3] += a3 * b0 + a1 * b2;
-         buff[off + 4] += a2 * b2;
-         buff[off + 5] += a3 * b2;
+         add_to_c(static_cast<__uint128_t>(b[i]) * a[j], i + j);
       }
-   }
-   for (uint64_t i = 1ull; i < 4ull; i++) {
-      const uint64_t shift = 16ull * i;
-      uint64_t       head = 0ull, carry = 0ull;
-      for (uint64_t j = 0ull; j < 4ull; j++) {
-         const uint64_t block = 4ull * j;
-         const uint64_t xi    = buff[block];
-         const uint64_t yi    = (buff[block + i] << shift) + head;
-         const uint64_t zi    = xi + yi + carry;
-         buff[block]          = zi;
-         carry                = ((xi & yi) | ((xi | yi) & ~zi)) >> 63ull;
-         head                 = buff[block + i] >> (64ull - shift);
-      }
-   }
-   return { buff[0], buff[4], buff[8], buff[12] };
+   return { c[0], c[1], c[2], c[3] };
 }
 
 constexpr array<uint64_t, 4> gfp_mul(const array<uint64_t, 4>& a, const array<uint64_t, 4>& b) noexcept {
@@ -174,13 +126,21 @@ constexpr array<uint64_t, 4> gfp_mul(const array<uint64_t, 4>& a, const array<ui
    auto t = full_mul(m, constants::p2);
 
    uint64_t carry = 0;
-   for (auto i = 0U; i < T.size(); ++i) {
-      const auto Ti = T[i];
-      const auto ti = t[i];
-      const auto zi = Ti + ti + carry;
-      T[i]          = zi;
-      carry         = ((Ti & ti) | ((Ti | ti) & ~zi)) >> 63ull;
-   }
+   carry = __builtin_add_overflow(T[0], t[0], &T[0]);
+   carry = __builtin_add_overflow(T[1], carry, &T[1]);
+   carry += __builtin_add_overflow(T[1], t[1], &T[1]);
+   carry = __builtin_add_overflow(T[2], carry, &T[2]);
+   carry += __builtin_add_overflow(T[2], t[2], &T[2]);
+   carry = __builtin_add_overflow(T[3], carry, &T[3]);
+   carry += __builtin_add_overflow(T[3], t[3], &T[3]);
+   carry = __builtin_add_overflow(T[4], carry, &T[4]);
+   carry = __builtin_add_overflow(T[4], t[4], &T[4]);
+   carry = __builtin_add_overflow(T[5], carry, &T[5]);
+   carry += __builtin_add_overflow(T[5], t[5], &T[5]);
+   carry = __builtin_add_overflow(T[6], carry, &T[6]);
+   carry += __builtin_add_overflow(T[6], t[6], &T[6]);
+   carry = __builtin_add_overflow(T[7], carry, &T[7]);
+   __builtin_add_overflow(T[7], t[7], &T[7]);
 
    return gfp_carry({ T[4], T[5], T[6], T[7] }, carry);
 }
