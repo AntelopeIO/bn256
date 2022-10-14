@@ -22,7 +22,7 @@
 #include <utility>
 #include <array>
 #include <system_error>
-#include "span.h"
+#include <span.h>
 
 using boost::multiprecision::int512_t;
 
