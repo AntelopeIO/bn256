@@ -49,7 +49,7 @@ TEST_CASE("test_pairings", "[main]") {
    CHECK(bn256::pairing_check(g1_vec, g2_vec)); // MultiAte check gave false negative!
 
    auto p0 = bn256::gt{};
-   p0 = p1.mul(pn1);
+   p0 = p1.add(pn1);
    auto p0_2 = bn256::pair(a1, b0);
    CHECK (p0.string() == p0_2.string()); // Pairing mismatch
 

@@ -125,7 +125,7 @@ class gt {
 
    gt scalar_mult(const int512_t& k) const noexcept;
 
-   gt mul(const gt& b) const noexcept;
+   gt add(const gt& b) const noexcept;
 
    gt neg() const noexcept;
 
