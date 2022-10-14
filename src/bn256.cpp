@@ -226,8 +226,8 @@ const gfp12& gt::p() const {
 // scalar_mult return a*k
 gt gt::scalar_mult(const int512_t& k) const noexcept { return gt{ p().exp(k) }; }
 
-// add sets gt to a+b and then returns gt.
-gt gt::add(const gt& b) const noexcept { return gt{ p().add(b.p()) }; }
+// add sets gt to a*b and then returns gt.
+gt gt::mul(const gt& b) const noexcept { return gt{ p().mul(b.p()) }; }
 
 // neg sets g2 to -a and then returns g2.
 gt gt::neg() const noexcept { return gt{ p().conjugate() }; }
