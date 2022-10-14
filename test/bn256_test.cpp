@@ -18,7 +18,7 @@ TEST_CASE("test g1 marshall", "[bn256]"){
     REQUIRE( gb.unmarshal(ma) == std::error_code{});
 
     gb.marshal(mb);
-    CHECK(ma == mb);
+    CHECK(ma == mb); // "fail if bytes are different"
 }
 
 TEST_CASE("test g2 marshall", "[bn256]"){
@@ -29,7 +29,7 @@ TEST_CASE("test g2 marshall", "[bn256]"){
     bn256::g2 gb{};
     REQUIRE( gb.unmarshal(ma) ==  std::error_code{});
     gb.marshal(mb);
-    CHECK(ma == mb);
+    CHECK(ma == mb); // "fail if bytes are different"
 }
 
 TEST_CASE("test bilinearity", "[bn256]"){
@@ -44,7 +44,7 @@ TEST_CASE("test bilinearity", "[bn256]"){
         bn256::gt e2 = bn256::pair(c1, c2);
         e2 = e2.scalar_mult(a);
         e2 = e2.scalar_mult(b);
-        CHECK(e1 == e2);
+        CHECK(e1 == e2); // "fail if keys didn't agree"
     }
 }
 
@@ -68,18 +68,18 @@ TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
     auto k2_bytes = bn256::pair(pc, qa).scalar_mult(b).marshal();
     auto k3_bytes = bn256::pair(pa, qb).scalar_mult(c).marshal();
 
-    CHECK(k1_bytes == k2_bytes);
+    CHECK(k1_bytes == k2_bytes); // "fail if keys didn't agree"
     CHECK(k2_bytes == k3_bytes);
 }
 
 TEST_CASE("test g2_self_addition", "[bn256]"){
     int s = rand();
     bn256::g2 p = bn256::g2::scalar_base_mult(s);
-    REQUIRE(p.p().is_on_curve());
+    REQUIRE(p.p().is_on_curve()); // "fail if p isn't on curve"
 
     p = p.add(p);
     auto m = p.marshal();
-    CHECK( p.unmarshal(m) == std::error_code{});
+    CHECK( p.unmarshal(m) == std::error_code{}); // "fail if unmarshalling p.Add(p, p) ∉ G₂"
 }
 
 
