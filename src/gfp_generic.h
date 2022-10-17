@@ -1,21 +1,17 @@
 #pragma once
-#include "array.h"
 #include <cstddef>
 #include <cstdint>
+#include "gfp_native.h"
 namespace bn256 {
 
-namespace constants {
-   // p2 is p, represented as little-endian 64-bit words.
-   inline constexpr array<uint64_t, 4> p2 = { 0x3c208c16d87cfd47, 0x97816a916871ca8d, 0xb85045b68181585d,
-                                              0x30644e72e131a029 };
 
-   // np is the negative inverse of p, mod 2^256.
-   inline constexpr array<uint64_t, 4> np = { 0x87d20782e4866389, 0x9ede7d651eca6ac9, 0xd8afcbd01833da80,
-                                              0xf57a22b791888c6b };
-
-} // namespace constants
 
 constexpr array<uint64_t, 4> gfp_carry(const array<uint64_t, 4>& a, uint64_t head) noexcept {
+
+   if (BN256_ALLOW_GFP_NATIVE) {
+      return native::gfp_carry(a, head);
+   }
+
    array<uint64_t, 4> b{};
    uint64_t           carry = {};
 
@@ -32,6 +28,11 @@ constexpr array<uint64_t, 4> gfp_carry(const array<uint64_t, 4>& a, uint64_t hea
 }
 
 constexpr array<uint64_t, 4> gfp_neg(const array<uint64_t, 4>& a) noexcept {
+
+   if (BN256_ALLOW_GFP_NATIVE) {
+      return native::gfp_neg(a);
+   }
+
    uint64_t           carry = 0;
    array<uint64_t, 4> b{};
 
@@ -46,6 +47,11 @@ constexpr array<uint64_t, 4> gfp_neg(const array<uint64_t, 4>& a) noexcept {
 }
 
 constexpr array<uint64_t, 4> gfp_add(const array<uint64_t, 4>& a, const array<uint64_t, 4>& b) noexcept {
+
+   if (BN256_ALLOW_GFP_NATIVE) {
+      return native::gfp_add(a, b);
+   }
+
    uint64_t           carry = 0;
    array<uint64_t, 4> c{};
 
@@ -61,6 +67,11 @@ constexpr array<uint64_t, 4> gfp_add(const array<uint64_t, 4>& a, const array<ui
 }
 
 constexpr array<uint64_t, 4> gfp_sub(const array<uint64_t, 4>& a, const array<uint64_t, 4>& b) noexcept {
+
+   if (BN256_ALLOW_GFP_NATIVE) {
+      return native::gfp_sub(a, b);
+   }
+
    uint64_t           carry = 0;
    array<uint64_t, 4> t{};
 
@@ -121,6 +132,11 @@ constexpr array<uint64_t, 4> half_mul(const array<uint64_t, 4>& a, const array<u
 }
 
 constexpr array<uint64_t, 4> gfp_mul(const array<uint64_t, 4>& a, const array<uint64_t, 4>& b) noexcept {
+
+   if (BN256_ALLOW_GFP_NATIVE) {
+      return native::gfp_mul(a, b);
+   }
+
    auto T = full_mul(a, b);
    auto m = half_mul({ T[0], T[1], T[2], T[3] }, constants::np);
    auto t = full_mul(m, constants::p2);
