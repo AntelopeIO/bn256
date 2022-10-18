@@ -1,5 +1,6 @@
-project(bn256)
+project(bn256 LANGUAGES C CXX ASM)
 cmake_minimum_required(VERSION 3.8)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

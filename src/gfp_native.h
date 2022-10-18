@@ -35,6 +35,8 @@ namespace constants {
 
 #if __x86_64__
 #   include "gfp_amd64.h"
+#else
+#warning "not x86"
 #endif
 
 #ifndef BN256_NATIVE_ENABLED
