@@ -1,0 +1,6 @@
+[submodule "third-party/Catch2"]
+	path = third-party/Catch2
+	url = https://github.com/catchorg/Catch2
+[submodule "third-party/span"]
+	path = third-party/span
+	url = https://github.com/martinmoene/span-lite

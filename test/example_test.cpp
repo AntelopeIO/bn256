@@ -1,35 +1,9 @@
 #include <bn256.h>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <random_256.h>
 
-using namespace boost::multiprecision::literals;
-using namespace boost::multiprecision;
-
-constexpr int test_fail = 1;
-constexpr int test_pass = 0;
-
-static bn256::g1 make_scaled_g1(const int512_t& scale_value) {
-   bn256::g1 ret;
-   ret.scalar_base_mult(scale_value);
-   return ret;
-}
-
-static bn256::g2 make_scaled_g2(const int512_t& scale_value) {
-   bn256::g2 ret;
-   ret.scalar_base_mult(scale_value);
-   return ret;
-}
-
-static bn256::gt make_scaled_pair(const bn256::g1& a, const bn256::g2& b, const int512_t& scale_value) {
-   bn256::gt ret = bn256::pair(a, b);
-   ret.scalar_mult(ret, scale_value);
-   return ret;
-}
-
-int test_example_pair() {
-   int rc = test_pass;
-
-   std::cout << std::endl << "test_example_pair:" << std::endl;
+TEST_CASE("test example pair", "[example]") {
 
    bn256::random_256 rand;
 
@@ -37,37 +11,19 @@ int test_example_pair() {
    auto b = rand.sample();
    auto c = rand.sample();
 
-   auto pa = make_scaled_g1(a);
-   auto qa = make_scaled_g2(a);
+   auto pa = bn256::g1::scalar_base_mult(a);
+   auto qa = bn256::g2::scalar_base_mult(a);
 
-   auto pb = make_scaled_g1(b);
-   auto qb = make_scaled_g2(b);
+   auto pb = bn256::g1::scalar_base_mult(b);
+   auto qb = bn256::g2::scalar_base_mult(b);
 
-   auto pc = make_scaled_g1(c);
-   auto qc = make_scaled_g2(c);
+   auto pc = bn256::g1::scalar_base_mult(c);
+   auto qc = bn256::g2::scalar_base_mult(c);
 
-   auto k1 = make_scaled_pair(pb, qc, a);
-   auto k2 = make_scaled_pair(pc, qa, b);
-   auto k3 = make_scaled_pair(pa, qb, c);
+   auto k1 = bn256::pair(pb, qc).scalar_mult(a);
+   auto k2 = bn256::pair(pc, qa).scalar_mult(b);
+   auto k3 = bn256::pair(pa, qb).scalar_mult(c);
 
-   if (k1 != k2) {
-      std::cout << k1.string() << std::endl;
-      std::cout << k2.string() << std::endl;
-      std::cout << "k1 != k2" << std::endl;
-      rc = test_fail;
-   }
-   if (k1 != k3) {
-      std::cout << k1.string() << std::endl;
-      std::cout << k3.string() << std::endl;
-      std::cout << "k1 != k3" << std::endl;
-      rc = test_fail;
-   }
-
-   return rc;
-}
-
-int main() {
-   int rc = test_pass;
-   rc += test_example_pair();
-   return rc;
+   CHECK(k1 == k2);
+   CHECK(k1 == k3);
 }
