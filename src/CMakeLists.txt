@@ -4,4 +4,9 @@ add_library (
         optate.cpp
         bn256.cpp
         random_256.cpp)
-target_include_directories (bn256 PUBLIC ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/../include ../third-party/span/include)
+target_include_directories (bn256 PUBLIC
+   ${CMAKE_CURRENT_SOURCE_DIR}/
+   ../include
+   ../third-party/span/include
+   ../third-party/boost_1_80_0
+)

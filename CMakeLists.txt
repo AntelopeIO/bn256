@@ -5,8 +5,6 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall -mbmi2)
 
-find_package(Boost REQUIRED)
-
 add_subdirectory(src)
 
 option(BN256_ENABLE_TEST "BN256_ENABLE_TEST" ON)
