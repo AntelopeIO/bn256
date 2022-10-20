@@ -16,6 +16,8 @@ struct array {
    constexpr T&          operator[](std::size_t i) noexcept { return v_[i]; }
    constexpr const T&    operator[](std::size_t i) const noexcept { return v_[i]; }
    constexpr std::size_t size() const noexcept { return N; }
+   constexpr T*          data() noexcept { return v_; }
+   constexpr const T*    data() const noexcept { return v_; }
 
    constexpr bool operator==(const array<T, N>& other) const noexcept {
       for (std::size_t i = 0; i < N; ++i)
