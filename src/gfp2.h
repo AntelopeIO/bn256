@@ -108,7 +108,7 @@ struct gfp2 {
       return x_ == rhs.x_ && y_ == rhs.y_;
    }
 
-   bool operator!=(const gfp2& rhs) const noexcept { return !(*this == rhs); }
+   constexpr bool operator!=(const gfp2& rhs) const noexcept { return !(*this == rhs); }
 };
 
 namespace constants {

@@ -155,7 +155,7 @@ struct twist_point {
       return c;
    }
 
-   twist_point mul(const int512_t& scalar) const noexcept {
+   constexpr twist_point mul(const int512_t& scalar) const noexcept {
       const twist_point& a = *this;
       twist_point        sum{}, t{};
 
@@ -186,8 +186,8 @@ struct twist_point {
       c.y_ = t.mul(z_inv2);
       t    = x_.mul(z_inv2);
       c.x_ = t;
-      c.z_.set_one();
-      c.t_.set_one();
+      c.z_ = gfp2::one();
+      c.t_ = gfp2::one();
       return c;
    }
 
