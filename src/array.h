@@ -46,22 +46,36 @@ struct array {
 namespace bn256 {
 template <std::size_t N>
 constexpr int bitlen(std::span<const uint64_t, N> a) {
-   const auto max_bitlen = N*sizeof(uint64_t)*8;
-   int leading_sign_bits = 0;
-   for (int i = N-1; i > 0; --i) {
-      auto sign_bits_in_limb = __builtin_clrsbll(a[i]) + 1;
-      leading_sign_bits += sign_bits_in_limb;
-      if (sign_bits_in_limb != 64)
-         return max_bitlen - leading_sign_bits;
+   auto bit_length = N*sizeof(uint64_t)*8;
+   const int64_t all_sign_bits = static_cast<int64_t>(a[N-1]) >> 63;
+
+   int i = N-1;
+   while (i >0 && a[i] == all_sign_bits) {
+        bit_length -= sizeof(uint64_t)*8;
+        --i;
    }
-   auto sign_bits_in_limb = __builtin_clrsbll(a[0]) + ((int64_t)a[0] >= 0);
-   leading_sign_bits += sign_bits_in_limb;
-   return max_bitlen - leading_sign_bits;
+   if (a[i]==0 ) return 0;
+   return bit_length - __builtin_clzll(all_sign_bits == 0 ? a[i] : -a[i]);
 }
 
 static_assert(bitlen<4>(array<uint64_t,4>{0, 0, 0, 0x0FFFFFFFFFFFFFFF}) == 252);
 static_assert(bitlen<4>(array<uint64_t,4>{0, 0, 0x0FFFFFFFFFFFFFFF, 0}) == 188);
 static_assert(bitlen<4>(array<uint64_t,4>{0x0FFFFFFFFFFFFFFF, 0, 0, 0}) == 60);
+static_assert(bitlen<4>(array<uint64_t,4>{0, 0, 0, 0x8FFFFFFFFFFFFFFF}) == 255);
+static_assert(bitlen<4>(array<uint64_t,4>{0, 0, 0, 0x7FFFFFFFFFFFFFFF}) == 255);
+static_assert(bitlen<4>(array<uint64_t,4>{0, 0, 0x7FFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF}) == 192);
+static_assert(bitlen<4>(array<uint64_t,4>{0, 0, 0x7FFFFFFFFFFFFFFF, 0}) == 191);
+static_assert(bitlen<4>(array<uint64_t,4>{0, 0, 0x8FFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF}) == 191);
+static_assert(bitlen<4>(array<uint64_t,4>{0, 0, 0x8FFFFFFFFFFFFFFF, 0}) == 192);
+static_assert(bitlen<4>(array<uint64_t,4>{0x7FFFFFFFFFFFFFFF, 0, 0, 0}) == 63);
+static_assert(bitlen<4>(array<uint64_t,4>{0x8FFFFFFFFFFFFFFF, 0, 0, 0}) == 64);
+static_assert(bitlen<4>(array<uint64_t,4>{0x7FFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF}) == 64);
+static_assert(bitlen<4>(array<uint64_t,4>{0x8FFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF}) == 63);
+static_assert(bitlen<4>(array<uint64_t,4>{0, 0, 0, 0}) == 0);
+
+constexpr int bitlen(const array<uint64_t, 4>& a) {
+   return bitlen<4>(std::span<const uint64_t, 4>(a));
+}
 
 template <std::size_t N>
 constexpr bool bit_test(std::span<const uint64_t, N> value, int i) {

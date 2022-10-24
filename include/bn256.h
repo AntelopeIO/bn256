@@ -18,13 +18,10 @@
 // However, recent improvements in attacks mean that is no longer true. See
 // https://moderncrypto.org/mail-archive/curves/2016/000740.html.)
 
-#include <boost/multiprecision/cpp_int.hpp>
 #include <utility>
 #include <array>
 #include <system_error>
 #include <span.h>
-
-using boost::multiprecision::int512_t;
 
 namespace bn256 {
 

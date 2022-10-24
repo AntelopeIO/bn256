@@ -1,6 +1,8 @@
 #pragma once
+#include "array.h"
 #include "bitint_arithmetic.h"
-#include <array.h>
+#include <iostream>
+#include <iomanip>
 namespace bn256 {
 
 constexpr uint64_t signbits(int64_t a) { return a < 0 ? UINT64_MAX : 0; }
@@ -13,8 +15,8 @@ struct int512_t {
             (uint64_t)a, signbits(a), signbits(a), signbits(a), signbits(a), signbits(a), signbits(a), signbits(a)
          } {}
 
-   constexpr int512_t(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t a4, uint64_t a5, uint64_t a6,
-                      uint64_t a7)
+   constexpr int512_t(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3, uint64_t a4 = 0, uint64_t a5 = 0,
+                      uint64_t a6 = 0, uint64_t a7 = 0)
        : limbs_{ a0, a1, a2, a3, a4, a5, a6, a7 } {}
 
    constexpr int512_t(const int512_t& other) : limbs_{ other.limbs_ } {}
@@ -170,18 +172,6 @@ struct int512_t {
       return count;
    }
 
-   friend constexpr int leading_zeros(const int512_t& a) {
-      int count = 0;
-      for (int i = 7; i >= 0; --i) {
-         if (a.limbs_[i] == 0)
-            count += 64;
-         else {
-            return count + __builtin_clzll(a.limbs_[i]);
-         }
-      }
-      return count;
-   }
-
    friend constexpr std::tuple<int512_t, int512_t> unsigned_divmod(int512_t a, const int512_t& b) {
       int shift_bits = leading_zeros(b) - leading_zeros(a);
       if (shift_bits < 0) {
@@ -214,9 +204,7 @@ struct int512_t {
       return { quotient, remainder };
    }
 
-   friend constexpr int512_t operator/(const int512_t& a, const int512_t& b) {
-      return std::get<0>(divmod(a, b));
-   }
+   friend constexpr int512_t operator/(const int512_t& a, const int512_t& b) { return std::get<0>(divmod(a, b)); }
 
    friend constexpr int512_t& operator/=(int512_t& a, const int512_t& b) {
       a = a / b;
@@ -232,14 +220,48 @@ struct int512_t {
       a = a % b;
       return a;
    }
+
+   friend constexpr int bitlen(const int512_t& a) { return bitlen<8>(std::span<const uint64_t, 8>(a.limbs_)); }
+
+   friend constexpr bool bit_test(const int512_t& a, int i) {
+      return bit_test<8>(std::span<const uint64_t, 8>(a.limbs_), i);
+   }
 };
 
 template <char... Chars>
 constexpr int512_t operator""_i512() {
+
+   auto parse_heximal = [](const char* str) {
+      int512_t r{};
+      int      i = 0;
+
+      auto is_hex_digit = [](char digit) {
+         auto between = [digit](char b, char e) { return digit >= b && digit <= e; };
+         return between('0', '9') || between('A', 'F') || between('a', 'f');
+      };
+      while (char digit = str[i++]) {
+         if (!is_hex_digit(digit))
+            throw "invalid digits";
+         unsigned char digit_value = 0;
+         if (digit >= 'a')
+            digit_value = digit - 'a' + 10;
+         else if (digit >= 'A')
+            digit_value = digit - 'A' + 10;
+         else
+            digit_value = digit - '0';
+         r <<= 4;
+         r |= digit_value;
+      }
+      return r;
+   };
+
    const char str[]{ Chars..., '\0' };
    int512_t   r{};
-   int        i          = 0;
-   bool       is_negtive = (str[0] == '-');
+   int        i = 0;
+   if (str[0] == '0' && str[1] == 'x')
+      return parse_heximal(str + 2);
+
+   bool is_negtive = (str[0] == '-');
    if (is_negtive)
       ++i;
 
@@ -251,5 +273,36 @@ constexpr int512_t operator""_i512() {
    }
    return is_negtive ? int512_t{} - r : r;
 }
+
+inline std::ostream& operator << (std::ostream& os, const int512_t& a) {
+    auto flags = os.flags();
+    if (flags & std::ios_base::hex) {
+        bool need_fill = false;
+        for (int i = a.limbs_.size()-1; i >=0; --i) {
+            if (!need_fill && a.limbs_[i] == 0) continue;
+            if (need_fill) os << std::setfill('0') << std::setw(16);
+            os << a.limbs_[i];
+            need_fill = true;
+        }
+        if (!need_fill) os << 0;
+    } else if (flags & std::ios_base::dec) {
+        char digits[156];
+        digits[155] = 0;
+        auto tmp = abs(a);
+        int i = 154;
+        if (!tmp) os << 0;
+        else {
+            while (tmp) {
+                auto [quotient, remainder] = divmod(tmp, 10);
+                digits[i--] = '0' + remainder.limbs_[0];
+                tmp = quotient;
+            }
+            if (is_neg(a)) digits[i--] = '-';
+            os << digits + i + 1;
+        }
+    }
+    return os;
+}
+
 
 } // namespace bn256

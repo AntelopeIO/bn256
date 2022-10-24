@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 #if !(defined(__BYTE_ORDER__) && __BYTE_ORDER__ == 1234)
 #error This library only supports little endian architecture
 #endif
@@ -16,6 +17,7 @@
 #if defined(__amd64__)
 #   include <x86intrin.h>
 #endif
+#include <iostream>
 
 namespace bn256 {
 constexpr bool subborrow_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noexcept {
@@ -108,69 +110,71 @@ constexpr bool addcarry_u512(bool carry, const uint64_t* a, const uint64_t* b, u
       return;
    }
 #endif
-   uint64_t ax = 0, bx = 0, dx = 0;
+   uint64_t ax = 0, bx = 0, cx = 0, dx = 0, rsi = 0;
+   uint64_t r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, r13 = 0, r14 = 0, r15 = 0, rbp = 0;
    bool     carry = false;
+   r9    = mulx_u64(b[2], a[0], &r10);
+   bx    = mulx_u64(b[3], a[0], &cx);
+   carry = addcarry_u64(false, r10, bx, &bx);
+   carry = addcarry_u64(carry, 0, cx, &cx);
+   r13   = mulx_u64(b[2], a[1], &ax);
+   carry = addcarry_u64(false, bx, r13, &r13);
+   cx    = addcarry_u64(carry, cx, ax, &ax);
+   r12   = mulx_u64(b[3], a[1], &r15);
+   carry = addcarry_u64(false, ax, r12, &r12);
+   carry = addcarry_u64(carry, cx, r15, &r15);
 
-   c[5]  = 0;
-   dx    = b[0];
-   c[0]  = mulx_u64(dx, a[0], &c[1]);
-   ax    = mulx_u64(dx, a[1], &c[2]);
-   carry = addcarry_u64(false, c[1], ax, &c[1]);
-   ax    = mulx_u64(dx, a[2], &c[3]);
-   carry = addcarry_u64(carry, c[2], ax, &c[2]);
-   ax    = mulx_u64(dx, a[3], &c[4]);
-   carry = addcarry_u64(carry, c[3], ax, &c[3]);
-   carry = addcarry_u64(carry, c[4], 0, &c[4]);
-   carry = addcarry_u64(carry, c[5], 0, &c[5]);
+   c[0]  = mulx_u64(b[0], a[0], &ax);
+   rbp   = mulx_u64(b[1], a[0], &r14);
+   carry = addcarry_u64(false, ax, rbp, &rbp);
+   carry = addcarry_u64(carry, 0, r14, &r14);
+   dx    = mulx_u64(b[0], a[1], &ax);
+   carry = addcarry_u64(false, rbp, dx, &c[1]);
+   r14   = addcarry_u64(carry, r14, ax, &ax);
+   r10   = mulx_u64(b[1], a[1], &rbp);
+   carry = addcarry_u64(false, ax, r10, &r10);
+   ax    = r14;
+   addcarry_u64(carry, ax, rbp, &rbp);
+   carry = addcarry_u64(false, r9, r10, &r10);
+   carry = addcarry_u64(carry, r13, rbp, &rbp);
+   carry = addcarry_u64(carry, 0, r12, &r12);
+   carry = addcarry_u64(carry, 0, r15, &r15);
 
-   c[6]  = 0;
-   dx    = b[1];
-   ax    = mulx_u64(dx, a[0], &bx);
-   carry = addcarry_u64(0, c[1], ax, &c[1]);
-   carry = addcarry_u64(carry, c[2], bx, &c[2]);
-   ax    = mulx_u64(dx, a[2], &bx);
-   carry = addcarry_u64(carry, c[3], ax, &c[3]);
-   carry = addcarry_u64(carry, c[4], bx, &c[4]);
-   carry = addcarry_u64(carry, c[5], 0, &c[5]);
-   ax    = mulx_u64(dx, a[1], &bx);
-   carry = addcarry_u64(0, c[2], ax, &c[2]);
-   carry = addcarry_u64(carry, c[3], bx, &c[3]);
-   ax    = mulx_u64(dx, a[3], &bx);
-   carry = addcarry_u64(carry, c[4], ax, &c[4]);
-   carry = addcarry_u64(carry, c[5], bx, &c[5]);
-   carry = addcarry_u64(carry, c[6], 0, &c[6]);
+   r14   = mulx_u64(b[0], a[2], &ax);
+   r11   = mulx_u64(b[1], a[2], &r8);
+   carry = addcarry_u64(false, ax, r11, &r11);
+   carry = addcarry_u64(carry, 0, r8, &r8);
+   cx    = mulx_u64(b[0], a[3], &r9);
+   carry = addcarry_u64(false, r11, cx, &cx);
+   dx    = addcarry_u64(carry, r8, r9, &r9);
+   bx    = mulx_u64(b[1], a[3], &r11);
+   carry = addcarry_u64(false, r9, bx, &bx);
+   ax    = dx;
+   carry = addcarry_u64(carry, dx, r11, &r11);
+   carry = addcarry_u64(false, r10, r14, &c[2]);
+   carry = addcarry_u64(carry, rbp, cx, &c[3]);
+   carry = addcarry_u64(carry, 0, bx, &bx);
+   carry = addcarry_u64(carry, 0, r11, &r11);
+   carry = addcarry_u64(false, r12, bx, &bx);
+   carry = addcarry_u64(carry, r15, r11, &r11);
 
-   c[7]  = 0;
-   dx    = b[2];
-   ax    = mulx_u64(dx, a[0], &bx);
-   carry = addcarry_u64(0, c[2], ax, &c[2]);
-   carry = addcarry_u64(carry, c[3], bx, &c[3]);
-   ax    = mulx_u64(dx, a[2], &bx);
-   carry = addcarry_u64(carry, c[4], ax, &c[4]);
-   carry = addcarry_u64(carry, c[5], bx, &c[5]);
-   carry = addcarry_u64(carry, c[6], 0, &c[6]);
-   ax    = mulx_u64(dx, a[1], &bx);
-   carry = addcarry_u64(0, c[3], ax, &c[3]);
-   carry = addcarry_u64(carry, c[4], bx, &c[4]);
-   ax    = mulx_u64(dx, a[3], &bx);
-   carry = addcarry_u64(carry, c[5], ax, &c[5]);
-   carry = addcarry_u64(carry, c[6], bx, &c[6]);
-   carry = addcarry_u64(carry, c[7], 0, &c[7]);
+   r8    = mulx_u64(b[2], a[2], &r9);
 
-   dx    = b[3];
-   ax    = mulx_u64(dx, a[0], &bx);
-   carry = addcarry_u64(0, c[3], ax, &c[3]);
-   carry = addcarry_u64(carry, c[4], bx, &c[4]);
-   ax    = mulx_u64(dx, a[2], &bx);
-   carry = addcarry_u64(carry, c[5], ax, &c[5]);
-   carry = addcarry_u64(carry, c[6], bx, &c[6]);
-   carry = addcarry_u64(carry, c[7], 0, &c[7]);
-   ax    = mulx_u64(dx, a[1], &bx);
-   carry = addcarry_u64(0, c[4], ax, &c[4]);
-   carry = addcarry_u64(carry, c[5], bx, &c[5]);
-   ax    = mulx_u64(dx, a[3], &bx);
-   carry = addcarry_u64(carry, c[6], ax, &c[6]);
-   carry = addcarry_u64(carry, c[7], bx, &c[7]);
+   rbp   = mulx_u64(b[3], a[2], &r15);
+   r10   = carry;
+   carry = addcarry_u64(false, r9, rbp, &rbp);
+   carry = addcarry_u64(carry, 0, r15, &r15);
+   ax    = mulx_u64(b[2], a[3], &r9);
+   carry = addcarry_u64(false, rbp, ax, &ax);
+   carry = addcarry_u64(carry, r15, r9, &r9);
+   rbp   = carry;
+   dx    = mulx_u64(b[3], a[3], &rsi);
+   carry = addcarry_u64(false, r9, dx, &dx);
+   carry = addcarry_u64(carry, rbp, rsi, &rsi);
+   carry = addcarry_u64(false, bx, r8, &c[4]);
+   carry = addcarry_u64(carry, r11, ax, &c[5]);
+   carry = addcarry_u64(carry, r10, dx, &c[6]);
+   addcarry_u64(carry, 0, rsi, &c[7]);
 }
 
 [[gnu::always_inline]] [[gnu::hot]]

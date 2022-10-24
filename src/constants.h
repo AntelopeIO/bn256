@@ -1,6 +1,5 @@
 #pragma once
 #include "array.h"
-#include <boost/multiprecision/cpp_int.hpp>
 
 namespace bn256::constants {
 

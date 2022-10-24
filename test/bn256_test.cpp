@@ -1,17 +1,8 @@
 #include <bn256.h>
-#include <boost/multiprecision/cpp_int.hpp>
 #include <memory>
 #include <catch2/catch_test_macros.hpp>
 #include "twist.h"
 #include "curve.h"
-
-
-
-std::array<uint64_t, 4> to_u256(boost::multiprecision::int512_t x) {
-    uint64_t r[8]= {};
-    boost::multiprecision::export_bits(x, &r[0], 64, false);
-    return {r[0], r[1], r[2], r[3]};
-}
 
 TEST_CASE("test g1 marshall", "[bn256]"){
     auto [_, ga] = bn256::ramdom_g1();
@@ -89,8 +80,8 @@ TEST_CASE("test g2_self_addition", "[bn256]"){
 
 
 TEST_CASE("test twist point mul", "[bn256]"){
-	const boost::multiprecision::int512_t k("73391516005847081647776723068736393251206848701235344996976057911204818492439");
-	bn256::g2 p = bn256::g2::scalar_base_mult(to_u256(k));
+	const bn256::uint256_t k = {0x1ee155ddfb789c17, 0x2fe306f28ed08574, 0x8f80f739c3f3b7a3, 0xa2422041c5891a94};
+	bn256::g2 p = bn256::g2::scalar_base_mult(k);
 
     const bn256::twist_point expected = {
       {

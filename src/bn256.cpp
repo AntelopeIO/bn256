@@ -1,12 +1,11 @@
 #include <bn256.h>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <vector>
 #include "curve.h"
 #include "optate.h"
 #include "random_256.h"
 
 namespace bn256 {
-using namespace boost::multiprecision::literals;
-using namespace boost::multiprecision;
+
 
 namespace {
    struct unmarshal_error_category : std::error_category {
@@ -36,8 +35,7 @@ struct is_error_code_enum<bn256::unmarshal_error> : true_type {};
 namespace bn256 {
 
 std::tuple<uint256_t, g1> ramdom_g1() {
-   random_256 rand;
-   auto       k = rand.sample();
+   auto       k = random_256();
    return std::tuple(k, g1::scalar_base_mult(k));
 }
 
@@ -114,8 +112,7 @@ std::error_code g1::unmarshal(std::span<const uint8_t, 64> m) noexcept {
 }
 
 std::tuple<uint256_t, g2> ramdom_g2() {
-   random_256 rand;
-   auto       k = rand.sample();
+   auto       k = random_256();
    return std::make_tuple(k, g2::scalar_base_mult(k));
 }
 

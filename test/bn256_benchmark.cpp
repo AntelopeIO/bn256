@@ -3,6 +3,7 @@
 #include "bn256.h"
 
 #include <chrono>
+#include <iostream>
 
 
 template <typename Fun>

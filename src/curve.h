@@ -2,9 +2,6 @@
 
 #include "gfp2.h"
 #include "lattice.h"
-#include <boost/multiprecision/cpp_int.hpp>
-
-using boost::multiprecision::int512_t;
 
 namespace bn256 {
 
