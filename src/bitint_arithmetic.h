@@ -186,38 +186,35 @@ constexpr void half_mul_u256(const uint64_t* a, const uint64_t* b, uint64_t* c) 
       return;
    }
 #endif
-   uint64_t ax = 0, bx = 0, dx = 0;
-   bool     carry = false;
+   uint64_t r10=0, r14=0, rax=0, rbx=0, rcx=0, rdx=0, rsi=0, rdi=0;
+   bool     carry = 0;
 
-   dx    = b[0];
-   c[0]  = mulx_u64(dx, a[0], &c[1]);
-   ax    = mulx_u64(dx, a[1], &c[2]);
-   carry = addcarry_u64(false, c[1], ax, &c[1]);
-   ax    = mulx_u64(dx, a[2], &c[3]);
-   carry = addcarry_u64(carry, c[2], ax, &c[2]);
-   ax    = mulx_u64(dx, a[3], &bx);
-   addcarry_u64(carry, c[3], ax, &c[3]);
+   r14   = mulx_u64(a[0], b[2], &rdx);
+   rsi   = a[0] * b[3];
+   carry = addcarry_u64(false, rsi, rdx, &rdx);
+   rbx   = a[1] * b[2];
+   carry = addcarry_u64(false, rdx, rbx, &rbx);
+   r10   = mulx_u64(a[2], b[0], &rdx);
+   rsi   = a[2] * b[1];
+   carry = addcarry_u64(false, rsi, rdx, &rdx);
+   rdi   = b[0] * a[3];
+   carry = addcarry_u64(false, rdx, rdi, &rdi);
+   carry = addcarry_u64(false, r14, r10, &r10);
+   carry = addcarry_u64(carry, rbx, rdi, &rdi);
 
-   dx    = b[1];
-   ax    = mulx_u64(dx, a[0], &bx);
-   carry = addcarry_u64(0, c[1], ax, &c[1]);
-   carry = addcarry_u64(carry, c[2], bx, &c[2]);
-   ax    = mulx_u64(dx, a[2], &bx);
-   carry = addcarry_u64(carry, c[3], ax, &c[3]);
-   ax    = mulx_u64(dx, a[1], &bx);
-   carry = addcarry_u64(0, c[2], ax, &c[2]);
-   addcarry_u64(carry, c[3], bx, &c[3]);
+   c[0]  = mulx_u64(a[0], b[0], &rsi);
+   rcx   = mulx_u64(b[1], a[0], &rbx);
+   carry = addcarry_u64(false, rsi, rcx, &rcx);
+   carry = addcarry_u64(carry, 0, rbx, &rbx);
 
-   dx    = b[2];
-   ax    = mulx_u64(dx, a[0], &bx);
-   carry = addcarry_u64(0, c[2], ax, &c[2]);
-   carry = addcarry_u64(carry, c[3], bx, &c[3]);
-   ax    = mulx_u64(dx, a[1], &bx);
-   addcarry_u64(0, c[3], ax, &c[3]);
-
-   dx = b[3];
-   ax = mulx_u64(dx, a[0], &bx);
-   addcarry_u64(0, c[3], ax, &c[3]);
+   rax   = mulx_u64(b[0], a[1], &rsi);
+   carry = addcarry_u64(false, rcx, rax, &c[1]);
+   rcx   = addcarry_u64(carry, rbx, rsi, &rsi);
+   rdx   = mulx_u64(a[1], b[1], &rbx);
+   carry = addcarry_u64(false, rsi, rdx, &rdx);
+   carry = addcarry_u64(carry, rcx, rbx, &rbx);
+   carry = addcarry_u64(false, r10, rdx, &c[2]);
+   carry = addcarry_u64(carry, rdi, rbx, &c[3]);
 }
 
 } // namespace bn256
