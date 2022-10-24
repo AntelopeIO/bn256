@@ -7,10 +7,20 @@ int main() {
 }
 "  HAVE_EXTINT)
 
+# include(CheckCXXSourceRuns)
+# check_cxx_source_runs(<code> <resultVar>)
+
+# int main ()
+# {
+#   __builtin_cpu_init ();
+#   return (__builtin_cpu_supports ("bmi2"))
+# }
+
+
 add_library (
         bn256
-        lattice.cpp
-        optate.cpp
+        # lattice.cpp
+        # optate.cpp
         bn256.cpp
         random_256.cpp)
 target_include_directories (bn256 PUBLIC ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/../include ../third-party/span/include)

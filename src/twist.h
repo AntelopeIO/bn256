@@ -1,11 +1,7 @@
 #pragma once
 
-#include <boost/multiprecision/cpp_int.hpp>
 #include "gfp2.h"
-#include "bitlen.h"
 #include "constants.h"
-
-using boost::multiprecision::int512_t;
 
 namespace bn256 {
 
@@ -155,7 +151,7 @@ struct twist_point {
       return c;
    }
 
-   twist_point mul(const int512_t& scalar) const noexcept {
+   constexpr twist_point mul(std::span<const uint64_t, 4> scalar) const noexcept {
       const twist_point& a = *this;
       twist_point        sum{}, t{};
 

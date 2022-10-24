@@ -2,23 +2,25 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-using namespace boost::multiprecision::literals;
-using namespace boost::multiprecision;
+
+bn256::uint256_t string_to_u256(const std::string& scale_string) {
+   boost::multiprecision::uint256_t value(scale_string);
+   std::array<uint64_t, 4> r{};
+   boost::multiprecision::export_bits(value, &r[0], 64, false);
+   return r;
+}
 
 
 static bn256::g1 make_scaled_g1(const std::string& scale_string) {
-   int512_t scale_value(scale_string);
-   return bn256::g1::scalar_base_mult(scale_value);
+   return bn256::g1::scalar_base_mult(string_to_u256(scale_string));
 }
 
 static bn256::g2 make_scaled_g2(const std::string& scale_string) {
-   int512_t scale_value(scale_string);
-   return bn256::g2::scalar_base_mult(scale_value);
+   return bn256::g2::scalar_base_mult(string_to_u256(scale_string));
 }
 
 static bn256::gt make_scaled_gt(const bn256::gt& a, const std::string& scale_string) {
-   int512_t scale_value(scale_string);
-   return a.scalar_mult(scale_value);
+   return a.scalar_mult(string_to_u256(scale_string));
 }
 
 TEST_CASE("test_pairings", "[main]") {

@@ -5,8 +5,13 @@
 #include "twist.h"
 #include "curve.h"
 
-using namespace boost::multiprecision::literals;
-using namespace boost::multiprecision;
+
+
+std::array<uint64_t, 4> to_u256(boost::multiprecision::int512_t x) {
+    uint64_t r[8]= {};
+    boost::multiprecision::export_bits(x, &r[0], 64, false);
+    return {r[0], r[1], r[2], r[3]};
+}
 
 TEST_CASE("test g1 marshall", "[bn256]"){
     auto [_, ga] = bn256::ramdom_g1();
@@ -50,9 +55,9 @@ TEST_CASE("test bilinearity", "[bn256]"){
 
 TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
 
-    int a = rand();
-    int b = rand();
-    int c = rand();
+    std::array<uint64_t, 4> a = {(uint64_t)rand(), 0, 0, 0};
+    std::array<uint64_t, 4> b = {(uint64_t)rand(), 0, 0, 0};
+    std::array<uint64_t, 4> c = {(uint64_t)rand(), 0, 0, 0};
 
     bn256::g1 pa, pb, pc;
     bn256::g2 qa, qb, qc;
@@ -73,7 +78,7 @@ TEST_CASE("test tripartite_diffie_hellman", "[bn256]"){
 }
 
 TEST_CASE("test g2_self_addition", "[bn256]"){
-    int s = rand();
+    std::array<uint64_t, 4> s = {(uint64_t)rand(), 0, 0, 0};
     bn256::g2 p = bn256::g2::scalar_base_mult(s);
     REQUIRE(p.p().is_on_curve()); // "fail if p isn't on curve"
 
@@ -84,8 +89,8 @@ TEST_CASE("test g2_self_addition", "[bn256]"){
 
 
 TEST_CASE("test twist point mul", "[bn256]"){
-	const int512_t k("73391516005847081647776723068736393251206848701235344996976057911204818492439");
-	bn256::g2 p = bn256::g2::scalar_base_mult(k);
+	const boost::multiprecision::int512_t k("73391516005847081647776723068736393251206848701235344996976057911204818492439");
+	bn256::g2 p = bn256::g2::scalar_base_mult(to_u256(k));
 
     const bn256::twist_point expected = {
       {

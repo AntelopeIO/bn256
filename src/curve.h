@@ -168,29 +168,27 @@ struct curve_point {
       return c;
    }
 
-   curve_point mul(const int512_t& scalar) const noexcept {
+   curve_point mul(std::span<const uint64_t, 4> scalar) const noexcept {
       const curve_point& a = *this;
 
-      std::array<curve_point, 4> precomp{};
+      array<curve_point, 4> precomp{};
 
       precomp[1]    = a;
       precomp[2]    = a;
       precomp[2].x_ = precomp[2].x_.mul(constants::xi_to_2p_squared_minus_2_over_3);
       precomp[3]    = precomp[1].add(precomp[2]);
 
-      const auto multi_scalar = curve_lattice.multi(scalar);
-
       auto        sum = infinity();
       curve_point t{};
 
-      for (int i = multi_scalar.size() - 1; i >= 0; i--) {
+      curve_lattice.foreach_multi_scalar(scalar, [&sum, &t, &precomp] (uint8_t v){
          t = sum.double_();
-         if (multi_scalar[i] == 0) {
+         if (v == 0) {
             sum = t;
          } else {
-            sum = t.add(precomp[multi_scalar[i]]);
+            sum = t.add(precomp[v]);
          }
-      }
+      });
 
       return sum;
    }

@@ -6,7 +6,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 using namespace boost::multiprecision::literals;
-using namespace boost::multiprecision;
 
 
 TEST_CASE("test lattice reduce curve", "[lattice]"){
