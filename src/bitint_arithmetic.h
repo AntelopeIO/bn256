@@ -15,20 +15,21 @@
 
 #if defined(__amd64__)
 #   include <x86intrin.h>
-#   define BN256_NATIVE_ENABLED 1
 #endif
-
-#ifndef BN256_NATIVE_ENABLED
-#   define BN256_NATIVE_ENABLED 0
-#endif
-
-#define BN256_ALLOW_U64_INTRINSIC (BN256_NATIVE_ENABLED && !BN256_IS_CONSTANT_EVALUATED)
 
 namespace bn256 {
 constexpr bool subborrow_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noexcept {
-   if (BN256_ALLOW_U64_INTRINSIC) {
+#if defined(__amd64__)
+   if (!BN256_IS_CONSTANT_EVALUATED) {
       return _subborrow_u64(carry, a, b, (unsigned long long*)c);
    }
+#elif defined(__clang__)
+   if (!BN256_IS_CONSTANT_EVALUATED) {
+      unsigned long long carryout=0;
+      *c = __builtin_subcll(a, b, carry, &carryout);
+      return carryout;
+   }
+#endif
 
    carry = __builtin_sub_overflow(a, carry, c);
    carry |= __builtin_sub_overflow(*c, b, c);
@@ -36,9 +37,17 @@ constexpr bool subborrow_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) no
 }
 
 constexpr bool addcarry_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noexcept {
-   if (BN256_ALLOW_U64_INTRINSIC) {
+#if defined(__amd64__)
+   if (!BN256_IS_CONSTANT_EVALUATED) {
       return _addcarry_u64(carry, a, b, (unsigned long long*)c);
    }
+#elif defined(__clang__)
+   if (!BN256_IS_CONSTANT_EVALUATED) {
+      unsigned long long carryout=0;
+      *c = __builtin_addcll(a, b, carry, &carryout);
+      return carryout;
+   }
+#endif
 
    carry = __builtin_add_overflow(a, carry, c);
    carry |= __builtin_add_overflow(*c, b, c);
@@ -47,7 +56,7 @@ constexpr bool addcarry_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noe
 
 constexpr uint64_t mulx_u64(uint64_t a, uint64_t b, uint64_t* hi) noexcept {
 #ifdef __BMI2__
-   if (BN256_ALLOW_U64_INTRINSIC)
+   if (!BN256_IS_CONSTANT_EVALUATED)
       return _mulx_u64(a, b, (unsigned long long*)hi);
 #endif
    __uint128_t x = a;
@@ -64,6 +73,13 @@ constexpr bool subborrow_u256(bool carry, const uint64_t* a, const uint64_t* b, 
    return carry;
 }
 
+
+constexpr bool subborrow_u512(bool carry, const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
+   carry = subborrow_u256(carry, &a[0], &b[0], &c[0]);
+   carry = subborrow_u256(carry, &a[4], &b[4], &c[4]);
+   return carry;
+}
+
 constexpr bool addcarry_u256(bool carry, const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
    carry = addcarry_u64(carry, a[0], b[0], &c[0]);
    carry = addcarry_u64(carry, a[1], b[1], &c[1]);
@@ -72,8 +88,15 @@ constexpr bool addcarry_u256(bool carry, const uint64_t* a, const uint64_t* b, u
    return carry;
 }
 
-[[gnu::always_inline]] [[gnu::hot]]
-constexpr void full_mul_u256(const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
+
+constexpr bool addcarry_u512(bool carry, const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
+   carry = addcarry_u256(carry, &a[0], &b[0], &c[0]);
+   carry = addcarry_u256(carry, &a[4], &b[4], &c[4]);
+   return carry;
+}
+
+[[gnu::always_inline]] [[gnu::hot]] constexpr void full_mul_u256(const uint64_t* a, const uint64_t* b,
+                                                                 uint64_t* c) noexcept {
 #ifdef BN256_HAS_EXTINT
    if (!BN256_IS_CONSTANT_EVALUATED) {
       using extint_t = _ExtInt(512);
