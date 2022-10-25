@@ -1,0 +1,46 @@
+name: actions
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+jobs:
+  build:
+    runs-on: ${{ matrix.config.vm_image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: Ubuntu
+            mode: Release
+            os: ubuntu
+            vm_image: ubuntu-20.04
+          - name: MacOS
+            mode: Release
+            os: macos
+            vm_image: macos-11
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: 'install OpenSSL (ubuntu)'
+        if: matrix.config.os == 'ubuntu'
+        run: |
+          sudo apt install libssl-dev
+      - name: 'install OpenSSL (macos)'
+        if: matrix.config.os == 'macos'
+        run: |
+          brew install openssl
+      - name: 'configure'
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.mode }} -Bbuild -S.
+      - name: 'compile'
+        run: |
+          cmake --build build
+      - name: 'test'
+        run: |
+          cd build && ctest
