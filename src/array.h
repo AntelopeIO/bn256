@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <cstring>
 #if __cplusplus > 201703L
 #   include <array>
 namespace bn256 {
@@ -47,7 +48,7 @@ namespace bn256 {
 template <std::size_t N>
 constexpr int bitlen(std::span<const uint64_t, N> a) {
    auto bit_length = N*sizeof(uint64_t)*8;
-   const int64_t all_sign_bits = static_cast<int64_t>(a[N-1]) >> 63;
+   const uint64_t all_sign_bits = static_cast<int64_t>(a[N-1]) >> 63;
 
    int i = N-1;
    while (i >0 && a[i] == all_sign_bits) {

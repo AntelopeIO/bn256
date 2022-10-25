@@ -46,7 +46,7 @@ struct lattice {
       auto decomp = decompose(scalar);
 
       int maxlen = 0;
-      for (int i = 0; i < N; ++i) {
+      for (std::size_t i = 0; i < N; ++i) {
          maxlen = std::max(maxlen, bitlen(decomp[i]));
       }
 

@@ -191,7 +191,7 @@ constexpr gfp12 miller(const twist_point& q, const curve_point& p) noexcept {
    //
    // A similar argument can be made for the y value.
 
-   twist_point q1;
+   twist_point q1{};
    q1.x_ = a_affine.x_.conjugate();
    q1.x_ = q1.x_.mul(constants::xi_to_p_minus_1_over_3);
 
@@ -206,7 +206,7 @@ constexpr gfp12 miller(const twist_point& q, const curve_point& p) noexcept {
    // xiToPSquaredMinus1Over3 is ∈ GF(p). With y we get a factor of -1. We
    // ignore this to end up with -Q2.
 
-   twist_point minus_q2;
+   twist_point minus_q2{};
    minus_q2.x_ = a_affine.x_.mul_scalar(constants::xi_to_p_squared_minus_1_over_3);
    minus_q2.y_ = a_affine.y_;
    minus_q2.z_.set_one();

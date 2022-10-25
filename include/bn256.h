@@ -22,6 +22,7 @@
 #include <array>
 #include <system_error>
 #include <span.h>
+#include <cstring>
 
 namespace bn256 {
 
@@ -61,7 +62,7 @@ class g1 {
 
    [[nodiscard]] std::error_code unmarshal(std::span<const uint8_t, 64> in) noexcept;
 
-   bool operator==(const g1& rhs) const noexcept { return memcmp(p_, rhs.p_, sizeof(*this)) == 0; }
+   bool operator==(const g1& rhs) const noexcept { return std::memcmp(p_, rhs.p_, sizeof(*this)) == 0; }
    bool operator!=(const g1& rhs) const noexcept { return !(*this == rhs); }
 
    std::string string() const;
@@ -100,7 +101,7 @@ class g2 {
 
    [[nodiscard]] std::error_code unmarshal(std::span<const uint8_t, 128> m) noexcept;
 
-   bool operator==(const g2& rhs) const noexcept { return memcmp(p_, rhs.p_, sizeof(*this)) == 0; }
+   bool operator==(const g2& rhs) const noexcept { return std::memcmp(p_, rhs.p_, sizeof(*this)) == 0; }
    bool operator!=(const g2& rhs) const noexcept { return !(*this == rhs); }
 
    std::string string() const;
@@ -141,7 +142,7 @@ class gt {
    // a group element and then returns unmarshal_status.
    [[nodiscard]] std::error_code unmarshal(std::span<const uint8_t, 384> m) noexcept;
 
-   bool operator==(const gt& rhs) const noexcept { return memcmp(p_, rhs.p_, sizeof(*this)) == 0; }
+   bool operator==(const gt& rhs) const noexcept { return std::memcmp(p_, rhs.p_, sizeof(*this)) == 0; }
    bool operator!=(const gt& rhs) const noexcept { return !(*this == rhs); }
 
    std::string string() const;

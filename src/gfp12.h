@@ -14,8 +14,8 @@ struct gfp12 {
    static constexpr gfp12 zero() noexcept { return {}; }
    static constexpr gfp12 one() noexcept { return { {}, gfp6::one() }; }
 
-   void set_zero() noexcept { *this = zero(); }
-   void set_one() noexcept { *this = one(); }
+   constexpr void set_zero() noexcept { *this = zero(); }
+   constexpr void set_one() noexcept { *this = one(); }
 
    constexpr bool is_zero() const noexcept { return *this == zero(); }
    constexpr bool is_one() const noexcept { return *this == one(); }
