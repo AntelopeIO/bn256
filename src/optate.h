@@ -145,7 +145,7 @@ constexpr array<int8_t, 65> six_u_plus_2_naf = { 0,  0, 0, 1,  0, 1, 0, -1, 0, 0
 
 // miller implements the Miller loop for calculating the Optimal Ate pairing.
 // See algorithm 1 from http://cryptojedi.org/papers/dclxvi-20100714.pdf
-constexpr gfp12 miller(const twist_point& q, const curve_point& p) noexcept {
+inline gfp12 miller(const twist_point& q, const curve_point& p) noexcept {
    gfp12 ret = gfp12::one();
 
    twist_point a_affine = q.make_affine();
@@ -228,7 +228,7 @@ constexpr gfp12 miller(const twist_point& q, const curve_point& p) noexcept {
 // finalExponentiation computes the (p¹²-1)/Order-th power of an element of
 // GF(p¹²) to obtain an element of GT (steps 13-15 of algorithm 1 from
 // http://cryptojedi.org/papers/dclxvi-20100714.pdf)
-constexpr gfp12 final_exponentiation(const gfp12& in) noexcept {
+inline gfp12 final_exponentiation(const gfp12& in) noexcept {
    gfp12 t1{};
 
    // This is the p^6-Frobenius
@@ -283,7 +283,7 @@ constexpr gfp12 final_exponentiation(const gfp12& in) noexcept {
    return t0;
 }
 
-constexpr gfp12 optimal_ate(const twist_point& a, const curve_point& b) noexcept {
+inline gfp12 optimal_ate(const twist_point& a, const curve_point& b) noexcept {
    auto e   = miller(a, b);
    auto ret = final_exponentiation(e);
 
