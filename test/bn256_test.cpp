@@ -80,7 +80,7 @@ TEST_CASE("test g2_self_addition", "[bn256]"){
 
 
 TEST_CASE("test twist point mul", "[bn256]"){
-	const bn256::uint256_t k = {0x1ee155ddfb789c17, 0x2fe306f28ed08574, 0x8f80f739c3f3b7a3, 0xa2422041c5891a94};
+	const bn256::uint255_t k = {0x1ee155ddfb789c17, 0x2fe306f28ed08574, 0x8f80f739c3f3b7a3, 0xa2422041c5891a94};
 	bn256::g2 p = bn256::g2::scalar_base_mult(k);
 
     const bn256::twist_point expected = {

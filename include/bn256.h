@@ -30,7 +30,8 @@ struct curve_point;
 struct twist_point;
 struct gfp12;
 
-using uint256_t = std::array<uint64_t, 4>;
+// uint255_t should be a 255 bits integer in little endian format
+using uint255_t = std::array<uint64_t, 4>;
 // G1 is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
 class g1 {
@@ -45,9 +46,9 @@ class g1 {
    curve_point& p();
    const curve_point& p() const;
 
-   static g1 scalar_base_mult(const uint256_t& k) noexcept;
+   static g1 scalar_base_mult(const uint255_t& k) noexcept;
 
-   g1 scalar_mult(const uint256_t& k) const noexcept;
+   g1 scalar_mult(const uint255_t& k) const noexcept;
 
    g1 add(const g1& b) const noexcept;
 
@@ -84,9 +85,9 @@ class g2 {
    twist_point& p();
    const twist_point& p() const;
 
-   static g2 scalar_base_mult(const uint256_t& k) noexcept;
+   static g2 scalar_base_mult(const uint255_t& k) noexcept;
 
-   g2 scalar_mult(const uint256_t& k) const noexcept;
+   g2 scalar_mult(const uint255_t& k) const noexcept;
 
    g2 add(const g2& b) const noexcept;
 
@@ -122,7 +123,7 @@ class gt {
    gfp12& p();
    const gfp12& p() const;
 
-   gt scalar_mult(const uint256_t& k) const noexcept;
+   gt scalar_mult(const uint255_t& k) const noexcept;
 
    gt add(const gt& b) const noexcept;
 
@@ -161,7 +162,7 @@ bool pairing_check(std::vector<g1>& a, std::vector<g2>& b) noexcept;
 // to pair(g1,g2).
 gt miller(const g1& g1, const g2& g2) noexcept;
 
-std::tuple<uint256_t, g1> ramdom_g1();
-std::tuple<uint256_t, g2> ramdom_g2();
+std::tuple<uint255_t, g1> ramdom_g1();
+std::tuple<uint255_t, g2> ramdom_g2();
 
 } // namespace bn256

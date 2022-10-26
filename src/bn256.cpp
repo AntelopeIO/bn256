@@ -2,7 +2,7 @@
 #include <vector>
 #include "curve.h"
 #include "optate.h"
-#include "random_256.h"
+#include "random_255.h"
 
 namespace bn256 {
 
@@ -34,8 +34,8 @@ struct is_error_code_enum<bn256::unmarshal_error> : true_type {};
 
 namespace bn256 {
 
-std::tuple<uint256_t, g1> ramdom_g1() {
-   auto       k = random_256();
+std::tuple<uint255_t, g1> ramdom_g1() {
+   auto       k = random_255();
    return std::tuple(k, g1::scalar_base_mult(k));
 }
 
@@ -59,10 +59,10 @@ const curve_point& g1::p() const {
 std::string g1::string() const { return p().string(); }
 
 // scalar_base_mult returns g*k where g is the generator of the group
-g1 g1::scalar_base_mult(const uint256_t& k) noexcept { return g1{ bn256::curve_gen.mul(k) }; }
+g1 g1::scalar_base_mult(const uint255_t& k) noexcept { return g1{ bn256::curve_gen.mul(k) }; }
 
 // scalar_mult returns a*k
-g1 g1::scalar_mult(const uint256_t& k) const noexcept { return g1{ p().mul(k) }; }
+g1 g1::scalar_mult(const uint255_t& k) const noexcept { return g1{ p().mul(k) }; }
 
 // add sets g1 to a+b and then returns g1.
 g1 g1::add(const g1& b) const noexcept { return g1{ p().add(b.p()) }; }
@@ -111,8 +111,8 @@ std::error_code g1::unmarshal(std::span<const uint8_t, 64> m) noexcept {
    return {};
 }
 
-std::tuple<uint256_t, g2> ramdom_g2() {
-   auto       k = random_256();
+std::tuple<uint255_t, g2> ramdom_g2() {
+   auto       k = random_255();
    return std::make_tuple(k, g2::scalar_base_mult(k));
 }
 
@@ -139,10 +139,10 @@ std::string g2::string() const { return p().string(); }
 
 // scalar_base_mult sets g2 to g*k where g is the generator of the group and then
 // returns out.
-g2 g2::scalar_base_mult(const uint256_t& k) noexcept { return g2{ bn256::twist_gen.mul(k) }; }
+g2 g2::scalar_base_mult(const uint255_t& k) noexcept { return g2{ bn256::twist_gen.mul(k) }; }
 
 // scalar_mult sets g2 to a*k and then returns g2.
-g2 g2::scalar_mult(const uint256_t& k) const noexcept { return g2{ p().mul(k) }; }
+g2 g2::scalar_mult(const uint255_t& k) const noexcept { return g2{ p().mul(k) }; }
 
 // add sets g2 to a+b and then returns g2.
 g2 g2::add(const g2& b) const noexcept { return g2{ p().add(b.p()) }; }
@@ -221,7 +221,7 @@ const gfp12& gt::p() const {
 }
 
 // scalar_mult return a*k
-gt gt::scalar_mult(const uint256_t& k) const noexcept { return gt{ p().exp(k) }; }
+gt gt::scalar_mult(const uint255_t& k) const noexcept { return gt{ p().exp(k) }; }
 
 // add sets gt to a*b and then returns gt.
 gt gt::add(const gt& b) const noexcept { return gt{ p().mul(b.p()) }; }

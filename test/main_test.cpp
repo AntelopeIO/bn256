@@ -2,21 +2,21 @@
 #include <catch2/catch_test_macros.hpp>
 
 
-static bn256::g1 make_scaled_g1(bn256::uint256_t scalar) {
+static bn256::g1 make_scaled_g1(bn256::uint255_t scalar) {
    return bn256::g1::scalar_base_mult(scalar);
 }
 
-static bn256::g2 make_scaled_g2(bn256::uint256_t scalar) {
+static bn256::g2 make_scaled_g2(bn256::uint255_t scalar) {
    return bn256::g2::scalar_base_mult(scalar);
 }
 
-static bn256::gt make_scaled_gt(const bn256::gt& a, bn256::uint256_t scalar) {
+static bn256::gt make_scaled_gt(const bn256::gt& a, bn256::uint255_t scalar) {
    return a.scalar_mult(scalar);
 }
 
 TEST_CASE("test_pairings", "[main]") {
    // n1 =  21888242871839275222246405745257275088548364400416034343698204186575808495616
-   constexpr bn256::uint256_t n1 = {0x43e1f593f0000000, 0x2833e84879b97091, 0xb85045b68181585d, 0x30644e72e131a029 };
+   constexpr bn256::uint255_t n1 = {0x43e1f593f0000000, 0x2833e84879b97091, 0xb85045b68181585d, 0x30644e72e131a029 };
    auto a1 = make_scaled_g1({ 1, 0, 0, 0});
    auto a2 = make_scaled_g1({ 2, 0, 0, 0});
    auto a37 = make_scaled_g1({ 37, 0, 0, 0});

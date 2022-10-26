@@ -50,7 +50,6 @@ constexpr bool addcarry_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noe
       return carryout;
    }
 #endif
-
    carry = __builtin_add_overflow(a, carry, c);
    carry |= __builtin_add_overflow(*c, b, c);
    return carry;
@@ -110,6 +109,7 @@ constexpr bool addcarry_u512(bool carry, const uint64_t* a, const uint64_t* b, u
       return;
    }
 #endif
+   // the code below is transcribed from the x86-64 assembly produced by Clang-13 using above _ExtInt feature
    uint64_t ax = 0, bx = 0, cx = 0, dx = 0, rsi = 0;
    uint64_t r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, r13 = 0, r14 = 0, r15 = 0, rbp = 0;
    bool     carry = false;
@@ -190,6 +190,7 @@ constexpr void half_mul_u256(const uint64_t* a, const uint64_t* b, uint64_t* c) 
       return;
    }
 #endif
+   // the code below is transcribed from the x86-64 assembly produced by Clang-13 using above _ExtInt feature
    uint64_t r10=0, r14=0, rax=0, rbx=0, rcx=0, rdx=0, rsi=0, rdi=0;
    bool     carry = 0;
 
