@@ -155,7 +155,20 @@ std::ostream& operator<<(std::ostream& os, const gt& v);
 gt pair(const g1& g1, const g2& g2) noexcept;
 
 // pairing_check calculates the Optimal Ate pairing for a set of points.
-bool pairing_check(std::vector<g1>& a, std::vector<g2>& b) noexcept;
+bool pairing_check(std::span<const g1> a, std::span<const g2> b) noexcept;
+
+/// pairing_check calculates the Optimal Ate pairing for for a set of points.
+///  @param marshaled_g1g2_pairs marshaled g1 g2 pair sequence
+///  @return -1 for unmarshal error, 0 for unsuccessful pairing and 1 for successful pairing
+int32_t pairing_check(std::span<const uint8_t> marshaled_g1g2_pairs, std::function<void()> yield);
+
+/// adds two marshaled g1 points and then marshal the sum into result
+/// @return -1 for unmarshal error, 0 for success
+int32_t g1_add(std::span<const uint8_t, 64> marshaled_lhs, std::span<const uint8_t, 64> marshaled_rhs, std::span<uint8_t, 64> result);
+
+/// multiply a g1 point with a 255 bits little endian scalar and then marshal the product into result
+/// @return -1 for unmarshal error, 0 for success
+int32_t g1_scalar_mul(std::span<const uint8_t, 64> marshaled_g1, std::span<const uint8_t, 32> scalar, std::span<uint8_t, 64> result);
 
 // miller applies Miller's algorithm, which is a bilinear function from
 // the source groups to F_p^12. miller(g1, g2).finalize() is equivalent

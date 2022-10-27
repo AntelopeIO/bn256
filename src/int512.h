@@ -1,8 +1,8 @@
 #pragma once
 #include "array.h"
 #include "bitint_arithmetic.h"
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 namespace bn256 {
 
 constexpr uint64_t signbits(int64_t a) { return a < 0 ? UINT64_MAX : 0; }
@@ -274,35 +274,56 @@ constexpr int512_t operator""_i512() {
    return is_negtive ? int512_t{} - r : r;
 }
 
-inline std::ostream& operator << (std::ostream& os, const int512_t& a) {
-    auto flags = os.flags();
-    if (flags & std::ios_base::hex) {
-        bool need_fill = false;
-        for (int i = a.limbs_.size()-1; i >=0; --i) {
-            if (!need_fill && a.limbs_[i] == 0) continue;
-            if (need_fill) os << std::setfill('0') << std::setw(16);
-            os << a.limbs_[i];
-            need_fill = true;
-        }
-        if (!need_fill) os << 0;
-    } else if (flags & std::ios_base::dec) {
-        char digits[156];
-        digits[155] = 0;
-        auto tmp = abs(a);
-        int i = 154;
-        if (!tmp) os << 0;
-        else {
-            while (tmp) {
-                auto [quotient, remainder] = divmod(tmp, 10);
-                digits[i--] = '0' + remainder.limbs_[0];
-                tmp = quotient;
-            }
-            if (is_neg(a)) digits[i--] = '-';
-            os << digits + i + 1;
-        }
-    }
-    return os;
+inline std::ostream& operator<<(std::ostream& os, const int512_t& a) {
+   auto flags = os.flags();
+   if (flags & std::ios_base::hex) {
+      bool need_fill = false;
+      for (int i = a.limbs_.size() - 1; i >= 0; --i) {
+         if (!need_fill && a.limbs_[i] == 0)
+            continue;
+         if (need_fill)
+            os << std::setfill('0') << std::setw(16);
+         os << a.limbs_[i];
+         need_fill = true;
+      }
+      if (!need_fill)
+         os << 0;
+   } else if (flags & std::ios_base::dec) {
+      char digits[156];
+      digits[155] = 0;
+      auto tmp    = abs(a);
+      int  i      = 154;
+      if (!tmp)
+         os << 0;
+      else {
+         while (tmp) {
+            auto [quotient, remainder] = divmod(tmp, 10);
+            digits[i--]                = '0' + remainder.limbs_[0];
+            tmp                        = quotient;
+         }
+         if (is_neg(a))
+            digits[i--] = '-';
+         os << digits + i + 1;
+      }
+   }
+   return os;
 }
 
+namespace testing {
+
+   static_assert(leading_zeros(int512_t{ 0, 0, 0, 0, 0, 0, 0, 0x0FFFFFFFFFFFFFFF }) == 4);
+   static_assert(leading_zeros(int512_t{ 0, 0, 0, 0, 0, 0, 0x0FFFFFFFFFFFFFFF, 0 }) == 68);
+   static_assert(leading_zeros(int512_t{ 0x0FFFFFFFFFFFFFFF, 0, 0, 0, 0, 0, 0, 0 }) == 452);
+
+   static_assert( 21888242871839275222246405745257275088548364400416034343698204186575808495617_i512 == abs(21888242871839275222246405745257275088548364400416034343698204186575808495617_i512));
+   static_assert( 21888242871839275222246405745257275088548364400416034343698204186575808495617_i512 == abs(-21888242871839275222246405745257275088548364400416034343698204186575808495617_i512));
+
+
+   static_assert(
+         21888242871839275222246405745257275088548364400416034343698204186575808495617_i512 *
+               21888242871839275222246405745257275088696311157297823662689037894645226208583_i512 ==
+         479095176016622842441988045216678740796014021984371259138060142739732051292045946981843177216315114219669975956079051917369253052711332371532837883280711_i512);
+   static_assert(divmod(1000_i512, 9_i512) == std::make_tuple(111_i512, 1_i512));
+} // namespace testing
 
 } // namespace bn256
