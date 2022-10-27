@@ -14,10 +14,18 @@ struct curve_point {
    gfp z_;
    gfp t_;
 
+#if defined (__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
    static constexpr curve_point infinity() { return { { 0 }, new_gfp(1), { 0 }, { 0 } }; };
    constexpr bool               is_infinity() const noexcept { return z_ == gfp{ 0 }; }
 
    static constexpr gfp curve_b = new_gfp(3);
+
+#if defined (__clang__)
+#pragma clang diagnostic pop
+#endif
 
    std::string string() const {
       auto tmp = make_affine();
@@ -84,7 +92,7 @@ struct curve_point {
       // with the notations below.
       gfp h = u2.sub(u1);
 
-      bool x_equal = h == gfp{ 0 };
+      bool x_equal = h == gfp{};
 
       t = h.add(h);
       // i = 4h²
@@ -93,7 +101,7 @@ struct curve_point {
       gfp j = h.mul(i);
 
       t            = s2.sub(s1);
-      bool y_equal = t == gfp{ 0 };
+      bool y_equal = t == gfp{};
       if (x_equal && y_equal) {
          return a.double_();
       }
@@ -194,7 +202,7 @@ struct curve_point {
       if (z_ == new_gfp(1)) {
          return *this;
       } else if (z_ == new_gfp(0)) {
-         return { { 0 }, new_gfp(1), new_gfp(0), { 0 } };
+         return { {}, new_gfp(1), new_gfp(0), {} };
       }
 
       curve_point c{ x_, y_, new_gfp(1), new_gfp(1) };
@@ -211,7 +219,7 @@ struct curve_point {
 
    constexpr curve_point neg() const noexcept {
       const curve_point& a = *this;
-      return { a.x_, a.y_.neg(), a.z_, gfp{ 0 } };
+      return { a.x_, a.y_.neg(), a.z_, gfp{} };
    }
 
    constexpr bool operator==(const curve_point& rhs) const noexcept {

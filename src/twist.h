@@ -19,11 +19,17 @@ struct twist_point {
    }
 
    [[nodiscard]] constexpr bool is_infinity() const noexcept { return z_ == gfp2::zero(); }
-
+#if defined (__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
    static constexpr gfp2 twist_b = {
       { 0x38e7ecccd1dcff67, 0x65f0b37d93ce0d3e, 0xd749d0dd22ac00aa, 0x0141b9ce4a688d4d },
       { 0x3bf938e377b802a8, 0x020b1b273633535d, 0x26b7edf049755260, 0x2514c6324384a86d },
    };
+#if defined (__clang__)
+#pragma clang diagnostic pop
+#endif
 
    std::string string() const {
       auto tmp = make_affine();
@@ -199,6 +205,11 @@ struct twist_point {
    constexpr bool operator!=(const twist_point& rhs) const noexcept { return !(*this == rhs); }
 };
 
+#if defined (__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
+
 inline constexpr twist_point twist_gen = {
    {
          { 0xafb4737da84c6140, 0x6043dd5a5802d8c4, 0x09e950fc52a02f86, 0x14fef0833aea7b6b },
@@ -211,6 +222,9 @@ inline constexpr twist_point twist_gen = {
    { new_gfp(0), new_gfp(1) },
    { new_gfp(0), new_gfp(1) }
 };
+#if defined (__clang__)
+#pragma clang diagnostic pop
+#endif
 
 inline std::ostream& operator<<(std::ostream& os, const twist_point& v) { return os << v.string(); }
 } // namespace bn256

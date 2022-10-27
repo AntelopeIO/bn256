@@ -113,6 +113,10 @@ struct gfp2 {
 };
 
 namespace constants {
+#if defined (__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
    // xi_to_p_minus_1_over_6 is ξ^((p-1)/6) where ξ = i+9.
    inline constexpr gfp2 xi_to_p_minus_1_over_6 = {
       { 0xa222ae234c492d72, 0xd00f02a4565de15b, 0xdc2ff3a253dfc926, 0x10a75716b3899551 },
@@ -148,6 +152,9 @@ namespace constants {
       { 0x5dddfd154bd8c949, 0x62cb29a5a4445b60, 0x37bc870a0c7dd2b9, 0x24830a9d3171f0fd },
       { 0x7361d77f843abe92, 0xa5bb2bd3273411fb, 0x9c941f314b3e2399, 0x15df9cddbb9fd3ec }
    };
+#if defined (__clang__)
+#pragma clang diagnostic pop
+#endif
 } // namespace constants
 
 } // namespace bn256

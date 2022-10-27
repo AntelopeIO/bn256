@@ -83,6 +83,11 @@ struct gfp : array<uint64_t, 4> {
       return unmarshal_error::MALFORMED_POINT;
    }
 
+#if defined (__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
+
    constexpr gfp mont_encode() const noexcept { return mul({ constants::r2 }); }
 
    constexpr gfp mont_decode() const noexcept { return mul(gfp{ 1 }); }
@@ -115,6 +120,10 @@ constexpr gfp new_gfp(int64_t x) noexcept {
    }
    return out.mont_encode();
 }
+
+#if defined (__clang__)
+#pragma clang diagnostic pop
+#endif
 
 inline std::ostream& operator<<(std::ostream& os, const gfp& v) { return os << v.string(); }
 } // namespace bn256

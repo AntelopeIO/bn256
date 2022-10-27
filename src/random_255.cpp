@@ -6,7 +6,7 @@ std::array<uint64_t, 4>  random_255() {
    // the random number should be a 255 bits integer
    std::array<uint64_t, 4> result{};
 
-   for (int i = 0; i < result.size(); ++i) {
+   for (auto i = 0U; i < result.size(); ++i) {
       uint64_t r = rand();
       r <<= 32;
       r |= rand();

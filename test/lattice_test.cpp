@@ -6,7 +6,7 @@
 
 
 TEST_CASE("test lattice reduce curve", "[lattice]"){
-    constexpr std::size_t max_bitlen = 130;
+    constexpr int max_bitlen = 130;
     auto k = bn256::random_255();
     auto ks = bn256::curve_lattice.decompose(k);
 
@@ -18,7 +18,7 @@ TEST_CASE("test lattice reduce curve", "[lattice]"){
 
 TEST_CASE("test lattice reduce target", "[lattice]"){
 
-    constexpr std::size_t max_bitlen = 66;
+    constexpr int max_bitlen = 66;
     auto k = bn256::random_255();
     auto ks = bn256::target_lattice.decompose(k);
 

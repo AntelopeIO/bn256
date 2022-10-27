@@ -3,6 +3,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include "twist.h"
 #include "curve.h"
+#if defined (__clang__)
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
 
 TEST_CASE("test g1 marshall", "[bn256]"){
     auto [_, ga] = bn256::ramdom_g1();
