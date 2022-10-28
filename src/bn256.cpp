@@ -74,6 +74,7 @@ void g1::marshal(std::span<uint8_t, 64> m) const noexcept {
    constexpr auto num_bytes = 256 / 8;
    auto           affined   = p().make_affine();
    if (affined.is_infinity()) {
+      memset(m.data(), 0, m.size());
       return;
    }
 
@@ -152,6 +153,7 @@ void g2::marshal(std::span<uint8_t, 128> view) const noexcept {
    constexpr auto num_bytes = 256 / 8;
    auto           affined   = p().make_affine();
    if (affined.is_infinity()) {
+      memset(view.data(), 0, view.size());
       return;
    }
 
@@ -364,7 +366,7 @@ int32_t g1_scalar_mul(std::span<const uint8_t, 64> marshaled_g1, std::span<const
    if (auto err = a.unmarshal(marshaled_g1); err)
       return -1;
    uint255_t k;
-   memcpy(&k, scalar.data(), scalar.size());
+   std::copy(scalar.rbegin(), scalar.rend(), (uint8_t*)&k);
    a.scalar_mult(k).marshal(result);
    return 0;
 }

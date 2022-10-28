@@ -166,7 +166,7 @@ int32_t pairing_check(std::span<const uint8_t> marshaled_g1g2_pairs, std::functi
 /// @return -1 for unmarshal error, 0 for success
 int32_t g1_add(std::span<const uint8_t, 64> marshaled_lhs, std::span<const uint8_t, 64> marshaled_rhs, std::span<uint8_t, 64> result);
 
-/// multiply a g1 point with a 255 bits little endian scalar and then marshal the product into result
+/// multiply a g1 point with a 255 bits big endian integer and then marshal the product into result
 /// @return -1 for unmarshal error, 0 for success
 int32_t g1_scalar_mul(std::span<const uint8_t, 64> marshaled_g1, std::span<const uint8_t, 32> scalar, std::span<uint8_t, 64> result);
 
