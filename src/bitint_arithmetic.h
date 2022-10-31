@@ -56,9 +56,13 @@ constexpr bool addcarry_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noe
 }
 
 constexpr uint64_t mulx_u64(uint64_t a, uint64_t b, uint64_t* hi) noexcept {
-#ifdef __BMI2__
-   if (!BN256_IS_CONSTANT_EVALUATED)
-      return _mulx_u64(a, b, (unsigned long long*)hi);
+#ifdef BN256_HAS_BMI2
+   if (!BN256_IS_CONSTANT_EVALUATED) {
+      unsigned long long local_hi=0;
+      auto r = _mulx_u64(a, b,&local_hi);
+      memcpy(hi, &local_hi, sizeof(*hi));
+      return r;
+   }
 #endif
    __uint128_t x = a;
    x *= b;

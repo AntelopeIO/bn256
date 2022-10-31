@@ -33,4 +33,5 @@ endif()
 
 if (HAVE_BMI2)
         target_compile_options(bn256 PUBLIC -mbmi2)
+        target_compile_definitions(bn256 PRIVATE BN256_HAS_BMI2)
 endif()
