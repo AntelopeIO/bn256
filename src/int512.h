@@ -74,7 +74,7 @@ struct int512_t {
       if (!BN256_IS_CONSTANT_EVALUATED) {
          return memcmp(&a, &b, sizeof(a)) == 0;
       }
-      for (int i = 0; i < a.limbs_.size(); ++i) {
+      for (auto i = 0U; i < a.limbs_.size(); ++i) {
          if (a.limbs_[i] != b.limbs_[i])
             return false;
       }
