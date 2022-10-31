@@ -157,7 +157,7 @@ gt pair(const g1& g1, const g2& g2) noexcept;
 // pairing_check calculates the Optimal Ate pairing for a set of points.
 bool pairing_check(std::span<const g1> a, std::span<const g2> b) noexcept;
 
-/// pairing_check calculates the Optimal Ate pairing for for a set of points.
+/// pairing_check calculates the Optimal Ate pairing for a set of points.
 ///  @param marshaled_g1g2_pairs marshaled g1 g2 pair sequence
 ///  @return -1 for unmarshal error, 0 for unsuccessful pairing and 1 for successful pairing
 int32_t pairing_check(std::span<const uint8_t> marshaled_g1g2_pairs, std::function<void()> yield);
