@@ -227,7 +227,7 @@ struct g1g2_pair {
 template <std::size_t N>
 std::vector<uint8_t> to_bytes(const std::array<g1g2_pair, N>& pairs) {
    auto result = pairs[0].to_bytes();
-   for (int i = 1; i < N; ++i) append(result, pairs[i].to_bytes());
+   for (auto i = 1U; i < N; ++i) append(result, pairs[i].to_bytes());
    return result;
 }
 

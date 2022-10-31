@@ -23,6 +23,7 @@
 #include <system_error>
 #include <span.h>
 #include <cstring>
+#include <functional>
 
 namespace bn256 {
 

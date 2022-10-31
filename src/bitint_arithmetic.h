@@ -63,7 +63,7 @@ constexpr uint64_t mulx_u64(uint64_t a, uint64_t b, uint64_t* hi) noexcept {
    __uint128_t x = a;
    x *= b;
    *hi = static_cast<uint64_t>(x >> 64);
-   return static_cast<uint64_t>(x);
+   return static_cast<uint64_t>(x & 0xFFFFFFFFFFFFFFFFULL);
 }
 
 constexpr bool subborrow_u256(bool carry, const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
