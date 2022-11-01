@@ -4,7 +4,9 @@
 #include <iostream>
 #include <iosfwd>
 #include <catch2/catch_test_macros.hpp>
-
+#if defined (__clang__)
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
 
 // Tests that negation works the same way on both assembly-optimized and C++
 // implementation.

@@ -1,15 +1,12 @@
 #include <bn256.h>
-#include <boost/multiprecision/cpp_int.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <random_256.h>
+#include <random_255.h>
 
 TEST_CASE("test example pair", "[example]") {
 
-   bn256::random_256 rand;
-
-   auto a = rand.sample();
-   auto b = rand.sample();
-   auto c = rand.sample();
+   auto a = bn256::random_255();
+   auto b = bn256::random_255();
+   auto c = bn256::random_255();
 
    auto pa = bn256::g1::scalar_base_mult(a);
    auto qa = bn256::g2::scalar_base_mult(a);

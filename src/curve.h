@@ -2,9 +2,6 @@
 
 #include "gfp2.h"
 #include "lattice.h"
-#include <boost/multiprecision/cpp_int.hpp>
-
-using boost::multiprecision::int512_t;
 
 namespace bn256 {
 
@@ -17,10 +14,18 @@ struct curve_point {
    gfp z_;
    gfp t_;
 
+#if defined (__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
    static constexpr curve_point infinity() { return { { 0 }, new_gfp(1), { 0 }, { 0 } }; };
    constexpr bool               is_infinity() const noexcept { return z_ == gfp{ 0 }; }
 
    static constexpr gfp curve_b = new_gfp(3);
+
+#if defined (__clang__)
+#pragma clang diagnostic pop
+#endif
 
    std::string string() const {
       auto tmp = make_affine();
@@ -87,7 +92,7 @@ struct curve_point {
       // with the notations below.
       gfp h = u2.sub(u1);
 
-      bool x_equal = h == gfp{ 0 };
+      bool x_equal = h == gfp{};
 
       t = h.add(h);
       // i = 4h²
@@ -96,7 +101,7 @@ struct curve_point {
       gfp j = h.mul(i);
 
       t            = s2.sub(s1);
-      bool y_equal = t == gfp{ 0 };
+      bool y_equal = t == gfp{};
       if (x_equal && y_equal) {
          return a.double_();
       }
@@ -168,29 +173,27 @@ struct curve_point {
       return c;
    }
 
-   curve_point mul(const int512_t& scalar) const noexcept {
+   curve_point mul(std::span<const uint64_t, 4> scalar) const noexcept {
       const curve_point& a = *this;
 
-      std::array<curve_point, 4> precomp{};
+      array<curve_point, 4> precomp{};
 
       precomp[1]    = a;
       precomp[2]    = a;
       precomp[2].x_ = precomp[2].x_.mul(constants::xi_to_2p_squared_minus_2_over_3);
       precomp[3]    = precomp[1].add(precomp[2]);
 
-      const auto multi_scalar = curve_lattice.multi(scalar);
-
       auto        sum = infinity();
       curve_point t{};
 
-      for (int i = multi_scalar.size() - 1; i >= 0; i--) {
+      curve_lattice.foreach_multi_scalar(scalar, [&sum, &t, &precomp] (uint8_t v){
          t = sum.double_();
-         if (multi_scalar[i] == 0) {
+         if (v == 0) {
             sum = t;
          } else {
-            sum = t.add(precomp[multi_scalar[i]]);
+            sum = t.add(precomp[v]);
          }
-      }
+      });
 
       return sum;
    }
@@ -199,7 +202,7 @@ struct curve_point {
       if (z_ == new_gfp(1)) {
          return *this;
       } else if (z_ == new_gfp(0)) {
-         return { { 0 }, new_gfp(1), new_gfp(0), { 0 } };
+         return { {}, new_gfp(1), new_gfp(0), {} };
       }
 
       curve_point c{ x_, y_, new_gfp(1), new_gfp(1) };
@@ -216,7 +219,7 @@ struct curve_point {
 
    constexpr curve_point neg() const noexcept {
       const curve_point& a = *this;
-      return { a.x_, a.y_.neg(), a.z_, gfp{ 0 } };
+      return { a.x_, a.y_.neg(), a.z_, gfp{} };
    }
 
    constexpr bool operator==(const curve_point& rhs) const noexcept {

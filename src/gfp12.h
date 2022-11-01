@@ -1,10 +1,7 @@
 #pragma once
 
-#include <boost/multiprecision/cpp_int.hpp>
 #include "gfp6.h"
-#include "bitlen.h"
 
-using boost::multiprecision::int512_t;
 namespace bn256 {
 
 // gfp12 implements the field of size p¹² as a quadratic extension of gfp6
@@ -17,8 +14,8 @@ struct gfp12 {
    static constexpr gfp12 zero() noexcept { return {}; }
    static constexpr gfp12 one() noexcept { return { {}, gfp6::one() }; }
 
-   void set_zero() noexcept { *this = zero(); }
-   void set_one() noexcept { *this = one(); }
+   constexpr void set_zero() noexcept { *this = zero(); }
+   constexpr void set_one() noexcept { *this = one(); }
 
    constexpr bool is_zero() const noexcept { return *this == zero(); }
    constexpr bool is_one() const noexcept { return *this == one(); }
@@ -90,9 +87,9 @@ struct gfp12 {
       return { a.x_.mul(b), a.y_.mul(b) }; // need review ???
    }
 
-   gfp12 exp(const int512_t& power) const noexcept {
+   constexpr gfp12 exp(std::span<const uint64_t, 4> power) const noexcept {
       const gfp12& a   = *this;
-      gfp12        sum = one(), t;
+      gfp12        sum = one(), t{};
 
       for (int i = bitlen(power); i >= 0; i--) {
          t = sum.square();
