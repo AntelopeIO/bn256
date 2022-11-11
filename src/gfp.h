@@ -42,9 +42,9 @@ struct gfp : array<uint64_t, 4> {
       gfp  sum{ constants::rn1 };
       auto power = *this;
 
-      for (std::size_t  word = 0; word < bits.size(); word++) {
-         for (auto bit = 0; bit < 64; bit++) {
-            if (((bits[word] >> bit) & 1) == 1) {
+      for (auto word : bits) {
+         for (auto bit = 0; bit < 64; bit++, word >>=1) {
+            if ((word & 1) == 1) {
                sum = sum.mul(power);
             }
             power = power.mul(power);
