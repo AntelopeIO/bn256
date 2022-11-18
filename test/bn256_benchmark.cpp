@@ -1,6 +1,6 @@
 
 
-#include "bn256.h"
+#include "bn256/bn256.h"
 
 #include <chrono>
 #include <iostream>

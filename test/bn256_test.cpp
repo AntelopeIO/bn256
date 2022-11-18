@@ -1,6 +1,6 @@
 #include "curve.h"
 #include "twist.h"
-#include <bn256.h>
+#include <bn256/bn256.h>
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 

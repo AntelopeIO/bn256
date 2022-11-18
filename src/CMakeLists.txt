@@ -25,15 +25,10 @@ add_library (
         bn256
         bn256.cpp
         random_255.cpp)
-target_include_directories (bn256 PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
-                                         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../third-party/span/include/nonstd>)
+target_include_directories (bn256 PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>"
+                                         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../third-party/span/include>"
+                                         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
-set(HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/../include/bn256.h ${CMAKE_CURRENT_SOURCE_DIR}/../include/span.h)
-if (${CMAKE_CXX_STANDARD} LESS 20)
-  list(APPEND HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/../third-party/span/include/span.hpp)
-endif()
-
-set_target_properties(bn256 PROPERTIES PUBLIC_HEADER ${HEADERS})
 
 
 if (HAVE_EXTINT)
