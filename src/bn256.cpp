@@ -1,7 +1,7 @@
 #include "curve.h"
 #include "optate.h"
 #include "random_255.h"
-#include <bn256.h>
+#include <bn256/bn256.h>
 #include <vector>
 
 namespace bn256 {

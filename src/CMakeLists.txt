@@ -25,7 +25,11 @@ add_library (
         bn256
         bn256.cpp
         random_255.cpp)
-target_include_directories (bn256 PUBLIC ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/../include ../third-party/span/include)
+target_include_directories (bn256 PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>"
+                                         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../third-party/span/include>"
+                                         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+
+
 
 if (HAVE_EXTINT)
         target_compile_definitions(bn256 PUBLIC BN256_HAS_EXTINT)

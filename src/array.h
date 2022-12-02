@@ -8,7 +8,7 @@ template <typename T, std::size_t S>
 using array = std::array<T, S>;
 }
 #else
-#include <span.h>
+#include <bn256/span.h>
 
 namespace bn256 {
 // std::array in C++17 cannot be used in constexpr context; therefore we rollout our own.

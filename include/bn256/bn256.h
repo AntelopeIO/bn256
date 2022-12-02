@@ -21,9 +21,9 @@
 #include <utility>
 #include <array>
 #include <system_error>
-#include <span.h>
 #include <cstring>
 #include <functional>
+#include <bn256/span.h>
 
 namespace bn256 {
 
