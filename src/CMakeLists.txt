@@ -39,3 +39,7 @@ if (HAVE_BMI2)
         target_compile_options(bn256 PUBLIC -mbmi2)
         target_compile_definitions(bn256 PRIVATE BN256_HAS_BMI2)
 endif()
+
+install(TARGETS bn256
+        LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} ${INSTALL_COMPONENT_ARGS}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} ${INSTALL_COMPONENT_ARGS})
