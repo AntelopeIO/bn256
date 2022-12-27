@@ -55,19 +55,21 @@ constexpr bool addcarry_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noe
    return carry;
 }
 
-constexpr uint64_t mulx_u64(uint64_t a, uint64_t b, uint64_t* hi) noexcept {
-#ifdef BN256_HAS_BMI2
-   if (!BN256_IS_CONSTANT_EVALUATED) {
-      unsigned long long local_hi=0;
-      auto r = _mulx_u64(a, b,&local_hi);
-      memcpy(hi, &local_hi, sizeof(*hi));
-      return r;
-   }
-#endif
+constexpr uint64_t mulx_u64_nobmi2(uint64_t a, uint64_t b, uint64_t* hi) noexcept {
    __uint128_t x = a;
    x *= b;
    *hi = static_cast<uint64_t>(x >> 64);
    return static_cast<uint64_t>(x & 0xFFFFFFFFFFFFFFFFULL);
+}
+uint64_t mulx_u64_noconstexpr (uint64_t a, uint64_t b, uint64_t* hi);
+
+constexpr uint64_t mulx_u64(uint64_t a, uint64_t b, uint64_t* hi) noexcept {
+#if defined(__BMI2__)
+   if (!BN256_IS_CONSTANT_EVALUATED) {
+      return mulx_u64_noconstexpr(a, b, hi);
+   }
+#endif
+   return mulx_u64_nobmi2(a, b, hi);
 }
 
 constexpr bool subborrow_u256(bool carry, const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
