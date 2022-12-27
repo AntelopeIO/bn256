@@ -8,6 +8,27 @@ int main() {
 "  HAVE_EXTINT)
 
 
+if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "amd64")
+        include(CheckCXXSourceRuns)
+
+        check_cxx_source_compiles("int main () { return __ELF__; }" IS_X86_64_ELF)
+
+        if (NOT IS_X86_64_ELF)
+                ## For ELF targets, we can use `__attribute__((ifunc("resolver")))` to resolve the function address at runtime
+                ## based on whether the CPU suports BMI2. However, it is not possible for any other targets. We can only detect
+                ## BMI2 at configuration time.
+                set(CMAKE_REQUIRED_FLAGS -mbmi2)
+                check_cxx_source_runs("int main ()
+                {
+                __builtin_cpu_init ();
+                return (__builtin_cpu_supports (\"bmi2\")) == 0;
+                }
+                "
+                HAVE_BMI2)
+        endif()
+endif()
+
+
 add_library (
         bn256
         bn256.cpp
@@ -22,10 +43,8 @@ if (HAVE_EXTINT)
         target_compile_definitions(bn256 PUBLIC BN256_HAS_EXTINT)
 endif()
 
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-mbmi2" HAVE_BMI2)
 
-if (HAVE_BMI2)
+if (IS_X86_64_ELF OR HAVE_BMI2)
         target_compile_options(bn256 PUBLIC -mbmi2)
 endif()
 

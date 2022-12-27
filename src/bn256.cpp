@@ -6,6 +6,30 @@
 
 namespace bn256 {
 
+#if defined(__BMI2__)
+uint64_t mulx_u64_bmi2(uint64_t a, uint64_t b, uint64_t* hi) noexcept {
+   unsigned long long local_hi = 0;
+   auto               r        = _mulx_u64(a, b, &local_hi);
+   memcpy(hi, &local_hi, sizeof(*hi));
+   return r;
+}
+
+#   if defined(__ELF__)
+typedef uint64_t (*mulx_u64_t)(uint64_t a, uint64_t b, uint64_t* hi);
+
+extern "C" mulx_u64_t resolve_mulx_u64() {
+   __builtin_cpu_init();
+   if (__builtin_cpu_supports("bmi2"))
+      return mulx_u64_bmi2;
+   return bn256::mulx_u64_nobmi2;
+}
+
+uint64_t mulx_u64_noconstexpr(uint64_t a, uint64_t b, uint64_t* hi) __attribute__((ifunc("resolve_mulx_u64")));
+#   else
+uint64_t mulx_u64_noconstexpr(uint64_t a, uint64_t b, uint64_t* hi) { return mulx_u64_bmi2(a, b, hi); }
+#   endif
+#endif
+
 namespace {
    struct unmarshal_error_category : std::error_category {
       const char* name() const noexcept override { return "unmarshall"; }
