@@ -1,25 +1,7 @@
-include(CheckCXXSourceCompiles)
-
-check_cxx_source_compiles("
-int main() {
-  using T=_ExtInt(512);
-  return 0;
-}
-"  HAVE_EXTINT)
-
-
 if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "amd64")
-include(CheckCXXSourceRuns)
-set(CMAKE_REQUIRED_FLAGS -mbmi2)
-check_cxx_source_runs("int main ()
-{
-  __builtin_cpu_init ();
-  return (__builtin_cpu_supports (\"bmi2\")) == 0;
-}
-"
- HAVE_BMI2)
+        include(CheckSymbolExists)
+        check_symbol_exists(__ELF__ "stdio.h" IS_ELF_AMD64)
 endif()
-
 
 add_library (
         bn256
@@ -35,9 +17,9 @@ if (HAVE_EXTINT)
         target_compile_definitions(bn256 PUBLIC BN256_HAS_EXTINT)
 endif()
 
-if (HAVE_BMI2)
-        target_compile_options(bn256 PUBLIC -mbmi2)
-        target_compile_definitions(bn256 PRIVATE BN256_HAS_BMI2)
+if(IS_ELF_AMD64)
+        target_sources(bn256 PRIVATE mul_u256_bmi2.cpp mul_u256_nonconstexpr.cpp)
+        set_source_files_properties(mul_u256_bmi2.cpp PROPERTIES COMPILE_FLAGS -mbmi2)
 endif()
 
 if(BN256_INSTALL_COMPONENT)
