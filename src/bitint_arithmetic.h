@@ -56,7 +56,7 @@ constexpr bool addcarry_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noe
 }
 
 constexpr uint64_t mulx_u64(uint64_t a, uint64_t b, uint64_t* hi) noexcept {
-#ifdef __BMI2__
+#ifdef BN256_HAS_BMI2
    if (!BN256_IS_CONSTANT_EVALUATED) {
       unsigned long long local_hi=0;
       auto r = _mulx_u64(a, b,&local_hi);
@@ -100,7 +100,7 @@ constexpr bool addcarry_u512(bool carry, const uint64_t* a, const uint64_t* b, u
    return carry;
 }
 
-[[gnu::always_inline]] [[gnu::hot]] constexpr void full_mul_u256_impl(const uint64_t* a, const uint64_t* b,
+[[gnu::always_inline]] [[gnu::hot]] constexpr void full_mul_u256(const uint64_t* a, const uint64_t* b,
                                                                  uint64_t* c) noexcept {
 #ifdef BN256_HAS_EXTINT
    if (!BN256_IS_CONSTANT_EVALUATED) {
@@ -182,7 +182,7 @@ constexpr bool addcarry_u512(bool carry, const uint64_t* a, const uint64_t* b, u
 }
 
 [[gnu::always_inline]] [[gnu::hot]]
-constexpr void half_mul_u256_impl(const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
+constexpr void half_mul_u256(const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
 #ifdef BN256_HAS_EXTINT
    if (!BN256_IS_CONSTANT_EVALUATED) {
       using extint_t = _ExtInt(256);
@@ -225,29 +225,5 @@ constexpr void half_mul_u256_impl(const uint64_t* a, const uint64_t* b, uint64_t
    carry = addcarry_u64(false, r10, rdx, &c[2]);
    carry = addcarry_u64(carry, rdi, rbx, &c[3]);
 }
-
-#ifndef BN256_MUL_U256_IMPL_ONLY
-void full_mul_u256_nonconstexpr(const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept;
-
-constexpr void full_mul_u256(const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
-#if defined (__ELF__) &&  defined(__amd64__)
-   if (!BN256_IS_CONSTANT_EVALUATED) {
-      return full_mul_u256_nonconstexpr(a, b, c);
-   }
-#endif
-   return full_mul_u256_impl(a, b, c);
-}
-
-void half_mul_u256_nonconstexpr(const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept;
-constexpr void half_mul_u256(const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
-#if defined (__ELF__) &&  defined(__amd64__)
-    if (!BN256_IS_CONSTANT_EVALUATED) {
-      return half_mul_u256_nonconstexpr(a, b, c);
-   }
-#endif
-   return half_mul_u256_impl(a, b, c);
-}
-
-#endif
 
 } // namespace bn256
