@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall)
 
 option(BN256_ENABLE_TEST "BN256_ENABLE_TEST" ON)
+option(BN256_ENABLE_BMI2 "enable bmi2 intruction set, only for supported x86-64 targets" OFF)
 
 add_subdirectory(src)
 
