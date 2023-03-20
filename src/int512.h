@@ -1,6 +1,7 @@
 #pragma once
 #include "array.h"
 #include "bitint_arithmetic.h"
+#include <tuple>
 #include <iomanip>
 #include <iostream>
 namespace bn256 {
