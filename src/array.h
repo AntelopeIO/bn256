@@ -2,11 +2,14 @@
 #include <cstddef>
 #include <cstring>
 #if __cplusplus > 201703L
-#   include <array>
-namespace bn256 {
-template <typename T, std::size_t S>
-using array = std::array<T, S>;
-}
+   #include <span>
+   #include <cstdint>
+   #include <tuple>
+   #include <array>
+   namespace bn256 {
+      template <typename T, std::size_t S>
+      using array = std::array<T, S>;
+   }
 #else
 #include <bn256/span.h>
 

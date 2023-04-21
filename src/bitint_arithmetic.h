@@ -104,7 +104,11 @@ constexpr bool addcarry_u512(bool carry, const uint64_t* a, const uint64_t* b, u
                                                                  uint64_t* c) noexcept {
 #ifdef BN256_HAS_EXTINT
    if (!BN256_IS_CONSTANT_EVALUATED) {
+#if __clang__ && __clang_major__ >= 14
+      using extint_t = _BitInt(512);
+#else
       using extint_t = _ExtInt(512);
+#endif
       extint_t x = 0, y = 0;
       memcpy(&x, a, sizeof(uint64_t) * 4);
       memcpy(&y, b, sizeof(uint64_t) * 4);
@@ -185,7 +189,11 @@ constexpr bool addcarry_u512(bool carry, const uint64_t* a, const uint64_t* b, u
 constexpr void half_mul_u256(const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
 #ifdef BN256_HAS_EXTINT
    if (!BN256_IS_CONSTANT_EVALUATED) {
+#if __clang__ && __clang_major__ >= 14
+      using extint_t = _BitInt(256);
+#else
       using extint_t = _ExtInt(256);
+#endif
       extint_t x = 0, y = 0;
       memcpy(&x, a, sizeof(uint64_t) * 4);
       memcpy(&y, b, sizeof(uint64_t) * 4);

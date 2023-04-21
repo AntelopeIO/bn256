@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef __cpp_lib_span
+#if defined(__cpp_lib_span) || (__cplusplus == 202002L && defined(__has_include) && __has_include(<span>))
 #   include <span>
 #else
 #   include <limits>
