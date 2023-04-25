@@ -329,11 +329,11 @@ int32_t pairing_check(std::span<const uint8_t> marshaled_g1g2_pair, std::functio
    acc.set_one();
    while (data < data_end) {
       g1 a;
-      if (auto err = a.unmarshal({ data, 64 }); err)
+      if (auto err = a.unmarshal(std::span<const uint8_t, 64>{ data, 64 }); err)
          return -1;
       data += 64;
       g2 b;
-      if (auto err = b.unmarshal({ data, 128 }); err)
+      if (auto err = b.unmarshal(std::span<const uint8_t, 128>{ data, 128 }); err)
          return -1;
       data += 128;
       if (a.p().is_infinity() || b.p().is_infinity()) {

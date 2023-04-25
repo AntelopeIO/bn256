@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef __cpp_lib_span
+#if __cplusplus > 201703L
 #   include <span>
 #else
 #   include <limits>
