@@ -24,7 +24,7 @@
 #include <cstring>
 #include <functional>
 #include <cstdint>
-#include <bn256/span.h>
+#include <span>
 
 namespace bn256 {
 

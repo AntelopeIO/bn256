@@ -3,7 +3,7 @@
 #include <iosfwd>
 #include <string>
 #include <system_error>
-#include <bn256/span.h>
+#include <span>
 
 namespace bn256 {
 

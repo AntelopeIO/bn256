@@ -1,51 +1,14 @@
 #pragma once
 #include <cstddef>
 #include <cstring>
-#if __cplusplus > 201703L
-   #include <span>
-   #include <cstdint>
-   #include <tuple>
-   #include <array>
-   namespace bn256 {
-      template <typename T, std::size_t S>
-      using array = std::array<T, S>;
-   }
-#else
-#include <bn256/span.h>
-
+#include <span>
+#include <cstdint>
+#include <tuple>
+#include <array>
 namespace bn256 {
-// std::array in C++17 cannot be used in constexpr context; therefore we rollout our own.
-template <typename T, std::size_t N>
-struct array {
-   T                     v_[N];
-   constexpr T&          operator[](std::size_t i) noexcept { return v_[i]; }
-   constexpr const T&    operator[](std::size_t i) const noexcept { return v_[i]; }
-   constexpr std::size_t size() const noexcept { return N; }
-   constexpr T*          data() noexcept { return v_; }
-   constexpr const T*    data() const noexcept { return v_; }
-
-   constexpr const T*    begin() const noexcept { return v_; }
-   constexpr const T*    end() const noexcept { return v_+N; }
-
-   constexpr bool operator==(const array<T, N>& other) const noexcept {
-      for (std::size_t i = 0; i < N; ++i)
-         if (v_[i] != other[i])
-            return false;
-      return true;
-   }
-
-   constexpr bool operator!=(const array& other) const noexcept { return !(*this == other); }
-
-   constexpr operator std::span<T,N> () noexcept {
-      return std::span<T,N> {v_};
-   }
-
-   constexpr operator std::span<const T,N> () const noexcept {
-      return std::span<const T,N> {v_};
-   }
-};
-} // namespace bn256
-#endif
+   template <typename T, std::size_t S>
+   using array = std::array<T, S>;
+}
 
 namespace bn256 {
 template <std::size_t N>
