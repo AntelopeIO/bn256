@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.12)
+
+# set version and extract major version (currently version_major is 1).
 set(version 1.1.0)
-project(bn256 VERSION ${version})
+string(REPLACE "." ";" version_list ${version}) # transform into list
+list(GET version_list 0 version_major)
+
+project(bn256 VERSION ${version_major})
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -20,12 +25,9 @@ endif()
 
 include(GNUInstallDirs)
 set_property(TARGET bn256 PROPERTY VERSION ${version})
-set_property(TARGET bn256 PROPERTY SOVERSION 1)
-set_property(TARGET bn256 PROPERTY
-  INTERFACE_bn256_MAJOR_VERSION 1)
-set_property(TARGET bn256 APPEND PROPERTY
-  COMPATIBLE_INTERFACE_STRING bn256_MAJOR_VERSION
-)
+set_property(TARGET bn256 PROPERTY SOVERSION ${version_major})
+set_property(TARGET bn256 PROPERTY INTERFACE_bn256_MAJOR_VERSION ${version_major})
+set_property(TARGET bn256 APPEND PROPERTY COMPATIBLE_INTERFACE_STRING bn256_MAJOR_VERSION)
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(DIRECTORY third-party/span/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/bn256)
