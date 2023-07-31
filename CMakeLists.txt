@@ -5,7 +5,7 @@ set(version 1.1.0)
 string(REPLACE "." ";" version_list ${version}) # transform into list
 list(GET version_list 0 version_major)
 
-project(bn256 VERSION ${version_major})
+project(bn256 VERSION ${version})
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS ON)
