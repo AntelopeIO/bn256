@@ -12,7 +12,7 @@ struct lattice {
 
    // decompose takes a scalar mod order as input and finds a short,
    // positive decomposition of it wrt to the lattice basis.
-   constexpr array<int512_t, N> decompose(std::span<const uint64_t, 4> scalar) const noexcept{
+   constexpr std::array<int512_t, N> decompose(std::span<const uint64_t, 4> scalar) const noexcept{
       int512_t              k = {scalar[0], scalar[1], scalar[2], scalar[3], 0, 0, 0, 0};
       // int512_t              k = to_i512(scalar);
       int512_t c[N] = {};
@@ -24,8 +24,8 @@ struct lattice {
       }
 
       // Transform vectors according to c and subtract <k,0,0,...>.
-      array<int512_t, N> out;
-      int512_t              temp;
+      std::array<int512_t, N> out;
+      int512_t                temp;
       for (std::size_t i = 0; i < N; i++) {
          out[i] = 0;
          for (std::size_t j = 0; j < N; j++) {
