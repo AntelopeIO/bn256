@@ -33,7 +33,7 @@ jobs:
       - name: 'setup'
         if: contains(matrix.vm_image, '20.04')
         run: |
-          sudo apt-get install -y g++-10
+          sudo apt-get install -y g++-10 libstdc++-10-dev
           sudo update-alternatives -install /usr/bin/g++ g++ /usr/bin/g++-10 100
       - name: 'configure'
         run: |
