@@ -34,7 +34,8 @@ jobs:
         if: contains(matrix.vm_image, '20.04')
         run: |
           sudo apt-get install -y g++-10 libstdc++-10-dev
-          sudo update-alternatives -install /usr/bin/g++ g++ /usr/bin/g++-10 100
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 100 \
+               --slave /usr/bin/gcc gcc /usr/bin/gcc-10
       - name: 'configure'
         run: |
           cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.mode }} -Bbuild -S.
