@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
-project(bn256 VERSION 1.1.0)
+set(version 1.1.0)
+project(bn256 VERSION ${version})
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -18,7 +19,6 @@ if(BN256_ENABLE_TEST)
 endif()
 
 include(GNUInstallDirs)
-set(version 1.1.0)
 set_property(TARGET bn256 PROPERTY VERSION ${version})
 set_property(TARGET bn256 PROPERTY SOVERSION 1)
 set_property(TARGET bn256 PROPERTY
