@@ -18,7 +18,7 @@ if(BN256_ENABLE_TEST)
 endif()
 
 include(GNUInstallDirs)
-set(version 1.0.0)
+set(version 1.1.0)
 set_property(TARGET bn256 PROPERTY VERSION ${version})
 set_property(TARGET bn256 PROPERTY SOVERSION 1)
 set_property(TARGET bn256 PROPERTY
