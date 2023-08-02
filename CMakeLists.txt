@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.8)
-project(bn256 VERSION 1.0.0)
+cmake_minimum_required(VERSION 3.12)
 
-set(CMAKE_CXX_STANDARD 17)
+project(bn256 VERSION 2.0.0)
+
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall)
@@ -18,14 +19,10 @@ if(BN256_ENABLE_TEST)
 endif()
 
 include(GNUInstallDirs)
-set(version 1.0.0)
-set_property(TARGET bn256 PROPERTY VERSION ${version})
-set_property(TARGET bn256 PROPERTY SOVERSION 1)
-set_property(TARGET bn256 PROPERTY
-  INTERFACE_bn256_MAJOR_VERSION 1)
-set_property(TARGET bn256 APPEND PROPERTY
-  COMPATIBLE_INTERFACE_STRING bn256_MAJOR_VERSION
-)
+set_property(TARGET bn256 PROPERTY VERSION ${bn256_VERSION})
+set_property(TARGET bn256 PROPERTY SOVERSION ${bn256_VERSION_MAJOR})
+set_property(TARGET bn256 PROPERTY INTERFACE_bn256_MAJOR_VERSION ${bn256_VERSION_MAJOR})
+set_property(TARGET bn256 APPEND PROPERTY COMPATIBLE_INTERFACE_STRING bn256_MAJOR_VERSION)
 
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(DIRECTORY third-party/span/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/bn256)
@@ -53,7 +50,7 @@ install(FILES
 
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/bn256-config-version.cmake"
-  VERSION "${version}"
+  VERSION "${bn256_VERSION}"
   COMPATIBILITY AnyNewerVersion
 )
 

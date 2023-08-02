@@ -176,7 +176,7 @@ struct curve_point {
    curve_point mul(std::span<const uint64_t, 4> scalar) const noexcept {
       const curve_point& a = *this;
 
-      array<curve_point, 4> precomp{};
+      std::array<curve_point, 4> precomp{};
 
       precomp[1]    = a;
       precomp[2]    = a;

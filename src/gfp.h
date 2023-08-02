@@ -3,7 +3,7 @@
 #include <iosfwd>
 #include <string>
 #include <system_error>
-#include <bn256/span.h>
+#include <span>
 
 namespace bn256 {
 
@@ -11,19 +11,19 @@ enum class unmarshal_error { NO_ERROR = 0, COORDINATE_EXCEEDS_MODULUS = 1, COORD
 
 namespace constants {
    // rn1 is R^-1 where R = 2^256 mod p.
-   inline constexpr array<uint64_t, 4> rn1 = { 0xed84884a014afa37, 0xeb2022850278edf8, 0xcf63e9cfb74492d9,
-                                               0x2e67157159e5c639 };
+   inline constexpr std::array<uint64_t, 4> rn1 = { 0xed84884a014afa37, 0xeb2022850278edf8, 0xcf63e9cfb74492d9,
+                                                    0x2e67157159e5c639 };
 
    // r2 is R^2 where R = 2^256 mod p.
-   inline constexpr array<uint64_t, 4> r2 = { 0xf32cfc5b538afa89, 0xb5e71911d44501fb, 0x47ab1eff0a417ff6,
-                                              0x06d89f71cab8351f };
+   inline constexpr std::array<uint64_t, 4> r2 = { 0xf32cfc5b538afa89, 0xb5e71911d44501fb, 0x47ab1eff0a417ff6,
+                                                   0x06d89f71cab8351f };
 
    // r3 is R^3 where R = 2^256 mod p.
-   inline constexpr array<uint64_t, 4> r3 = { 0xb1cd6dafda1530df, 0x62f210e6a7283db6, 0xef7f0b0c0ada0afb,
-                                              0x20fd6e902d592544 };
+   inline constexpr std::array<uint64_t, 4> r3 = { 0xb1cd6dafda1530df, 0x62f210e6a7283db6, 0xef7f0b0c0ada0afb,
+                                                   0x20fd6e902d592544 };
 } // namespace constants
 
-struct gfp : array<uint64_t, 4> {
+struct gfp : std::array<uint64_t, 4> {
 
    static constexpr gfp zero() noexcept { return {}; }
 
@@ -36,8 +36,8 @@ struct gfp : array<uint64_t, 4> {
    constexpr gfp mul(const gfp& other) const noexcept { return { gfp_mul(*this, other) }; }
 
    constexpr gfp invert() const noexcept {
-      constexpr array<uint64_t, 4> bits = { 0x3c208c16d87cfd45, 0x97816a916871ca8d, 0xb85045b68181585d,
-                                            0x30644e72e131a029 };
+      constexpr std::array<uint64_t, 4> bits = { 0x3c208c16d87cfd45, 0x97816a916871ca8d, 0xb85045b68181585d,
+                                                 0x30644e72e131a029 };
 
       gfp  sum{ constants::rn1 };
       auto power = *this;

@@ -138,37 +138,54 @@ std::vector<uint8_t> operator""_unhex(const char* str, std::size_t len) { return
 
 std::vector<uint8_t> unhex(const char* str) { return unhex(str, strlen(str)); }
 
+static int32_t g1_add(std::vector<uint8_t>&& marshaled_lhs,
+                      std::vector<uint8_t>&& marshaled_rhs,
+                      std::vector<uint8_t>& result)
+{
+   return bn256::g1_add(std::span<const uint8_t, 64>(marshaled_lhs),
+                        std::span<const uint8_t, 64>(marshaled_rhs),
+                        std::span<uint8_t, 64>(result));
+}
+
+static int32_t g1_scalar_mul(std::vector<uint8_t>&& marshaled_g1,
+                             std::vector<uint8_t>&&  scalar,
+                             std::vector<uint8_t>& result) {
+   return bn256::g1_scalar_mul(std::span<const uint8_t, 64>(marshaled_g1),
+                               std::span<const uint8_t, 32>(scalar),
+                               std::span<uint8_t, 64>(result));
+}
+
 TEST_CASE("test g1_add", "[bn256]") {
 
    std::vector<uint8_t> result;
    result.resize(64);
 
    // test (2 valid points, both on curve)
-   CHECK(bn256::g1_add(
-               "222480c9f95409bfa4ac6ae890b9c150bc88542b87b352e92950c340458b0c092976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae2"_unhex,
-               "1bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f53322a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce4649844"_unhex,
-               result) == 0);
+   CHECK(g1_add(
+            "222480c9f95409bfa4ac6ae890b9c150bc88542b87b352e92950c340458b0c092976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae2"_unhex,
+            "1bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f53322a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce4649844"_unhex,
+            result) == 0);
    CHECK(result ==
          "16c7c4042e3a725ddbacf197c519c3dcad2bc87dfd9ac7e1e1631154ee0b7d9c19cd640dd28c9811ebaaa095a16b16190d08d6906c4f926fce581985fe35be0e"_unhex);
 
    // test (2 valid points, P1 not on curve)
-   CHECK(bn256::g1_add(
-               "222480c9f95409bfa4ac6ae890b9c150bc88542b87b352e92950c340458b0c092976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae2"_unhex,
-               "2a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce46498441bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f5332"_unhex,
+   CHECK(g1_add(
+            "222480c9f95409bfa4ac6ae890b9c150bc88542b87b352e92950c340458b0c092976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae2"_unhex,
+            "2a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce46498441bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f5332"_unhex,
                result) == -1);
 
    //|Fp| = 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47
    // test (P1.x=|Fp|)
-   CHECK(bn256::g1_add(
-               "30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd472976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae2"_unhex,
-               "1bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f53322a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce4649844"_unhex,
-               result) == -1);
+   CHECK(g1_add(
+            "30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd472976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae2"_unhex,
+            "1bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f53322a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce4649844"_unhex,
+            result) == -1);
 
    // test (P1=(0,0))
-   CHECK(bn256::g1_add(
-               "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"_unhex,
-               "1bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f53322a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce4649844"_unhex,
-               result) == 0);
+   CHECK(g1_add(
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"_unhex,
+            "1bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f53322a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce4649844"_unhex,
+            result) == 0);
    CHECK(result ==
          "1bd20beca3d8d28e536d2b5bd3bf36d76af68af5e6c96ca6e5519ba9ff8f53322a53edf6b48bcf5cb1c0b4ad1d36dfce06a79dcd6526f1c386a14d8ce4649844"_unhex);
 }
@@ -177,28 +194,28 @@ TEST_CASE("test g1_scalar_mul", "[bn256]") {
    std::vector<uint8_t> result;
    result.resize(64);
 
-   CHECK(bn256::g1_scalar_mul(
-               "007c43fcd125b2b13e2521e395a81727710a46b34fe279adbf1b94c72f7f91360db2f980370fb8962751c6ff064f4516a6a93d563388518bb77ab9a6b30755be"_unhex,
-               "0312ed43559cf8ecbab5221256a56e567aac5035308e3f1d54954d8b97cd1c9b"_unhex, result) == 0);
+   CHECK(g1_scalar_mul(
+            "007c43fcd125b2b13e2521e395a81727710a46b34fe279adbf1b94c72f7f91360db2f980370fb8962751c6ff064f4516a6a93d563388518bb77ab9a6b30755be"_unhex,
+            "0312ed43559cf8ecbab5221256a56e567aac5035308e3f1d54954d8b97cd1c9b"_unhex, result) == 0);
    CHECK(result ==
          "2d66cdeca5e1715896a5a924c50a149be87ddd2347b862150fbb0fd7d0b1833c11c76319ebefc5379f7aa6d85d40169a612597637242a4bbb39e5cd3b844becd"_unhex);
 
    // test (P1 not on curve)
-   CHECK(bn256::g1_scalar_mul(
-               "0db2f980370fb8962751c6ff064f4516a6a93d563388518bb77ab9a6b30755be007c43fcd125b2b13e2521e395a81727710a46b34fe279adbf1b94c72f7f9136"_unhex,
-               "0312ed43559cf8ecbab5221256a56e567aac5035308e3f1d54954d8b97cd1c9b"_unhex, result) == -1);
+   CHECK(g1_scalar_mul(
+            "0db2f980370fb8962751c6ff064f4516a6a93d563388518bb77ab9a6b30755be007c43fcd125b2b13e2521e395a81727710a46b34fe279adbf1b94c72f7f9136"_unhex,
+            "0312ed43559cf8ecbab5221256a56e567aac5035308e3f1d54954d8b97cd1c9b"_unhex, result) == -1);
 
    //|Fp| = 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47
    // test (P1.y=|Fp|)
 
-   CHECK(bn256::g1_scalar_mul(
-               "2976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae230644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47"_unhex,
-               "0100010001000100010001000100010001000100010001000100010001000100"_unhex, result) == -1);
+   CHECK(g1_scalar_mul(
+            "2976efd698cf23b414ea622b3f720dd9080d679042482ff3668cb2e32cad8ae230644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47"_unhex,
+            "0100010001000100010001000100010001000100010001000100010001000100"_unhex, result) == -1);
 
    // test (P1=(0,0))
-   CHECK(bn256::g1_scalar_mul(
-               "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"_unhex,
-               "0312ed43559cf8ecbab5221256a56e567aac5035308e3f1d54954d8b97cd1c9b"_unhex, result) == 0);
+   CHECK(g1_scalar_mul(
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"_unhex,
+            "0312ed43559cf8ecbab5221256a56e567aac5035308e3f1d54954d8b97cd1c9b"_unhex, result) == 0);
    CHECK(result ==
          "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"_unhex);
 }

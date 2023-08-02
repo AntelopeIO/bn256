@@ -9,7 +9,7 @@ namespace bn256 {
 constexpr uint64_t signbits(int64_t a) { return a < 0 ? UINT64_MAX : 0; }
 
 struct int512_t {
-   array<uint64_t, 8> limbs_;
+   std::array<uint64_t, 8> limbs_;
 
    constexpr int512_t(int64_t a = 0)
        : limbs_{
