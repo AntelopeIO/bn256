@@ -1,6 +1,12 @@
 include(CheckCXXSourceCompiles)
 
 check_cxx_source_compiles("
+#if defined(__has_feature)
+#  if __has_feature(undefined_behavior_sanitizer)
+#    error UBSAN and bitint don't work together yet, see https://github.com/llvm/llvm-project/issues/64100
+#  endif
+#endif
+
 int main() {
   using T=_ExtInt(512);
   return 0;
