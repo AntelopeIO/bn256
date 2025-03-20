@@ -1,10 +1,10 @@
 #pragma once
 
+#include <bit>
 #include <cstdint>
 #include <cstring>
-#if !(defined(__BYTE_ORDER__) && __BYTE_ORDER__ == 1234)
-#error This library only supports little endian architecture
-#endif
+
+static_assert(std::endian::native == std::endian::little, "This library only supports little endian architecture");
 
 #if defined(__cpp_lib_is_constant_evaluated)
 #   define BN256_IS_CONSTANT_EVALUATED std::is_constant_evaluated()
