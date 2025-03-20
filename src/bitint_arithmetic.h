@@ -3,16 +3,9 @@
 #include <bit>
 #include <cstdint>
 #include <cstring>
+#include <type_traits>
 
 static_assert(std::endian::native == std::endian::little, "This library only supports little endian architecture");
-
-#if defined(__cpp_lib_is_constant_evaluated)
-#   define BN256_IS_CONSTANT_EVALUATED std::is_constant_evaluated()
-#elif (defined(__clang__) && (__clang_major__ > 8)) || (defined(__GNUC__) && (__GNUC__ > 8))
-#   define BN256_IS_CONSTANT_EVALUATED __builtin_is_constant_evaluated()
-#else
-#   define BN256_IS_CONSTANT_EVALUATED true
-#endif
 
 #if defined(__amd64__)
 #   include <x86intrin.h>
@@ -22,11 +15,11 @@ static_assert(std::endian::native == std::endian::little, "This library only sup
 namespace bn256 {
 constexpr bool subborrow_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noexcept {
 #if defined(__amd64__)
-   if (!BN256_IS_CONSTANT_EVALUATED) {
+   if (!std::is_constant_evaluated()) {
       return _subborrow_u64(carry, a, b, (unsigned long long*)c);
    }
 #elif defined(__clang__)
-   if (!BN256_IS_CONSTANT_EVALUATED) {
+   if (!std::is_constant_evaluated()) {
       unsigned long long carryout=0;
       *c = __builtin_subcll(a, b, carry, &carryout);
       return carryout;
@@ -40,11 +33,11 @@ constexpr bool subborrow_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) no
 
 constexpr bool addcarry_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noexcept {
 #if defined(__amd64__)
-   if (!BN256_IS_CONSTANT_EVALUATED) {
+   if (!std::is_constant_evaluated()) {
       return _addcarry_u64(carry, a, b, (unsigned long long*)c);
    }
 #elif defined(__clang__)
-   if (!BN256_IS_CONSTANT_EVALUATED) {
+   if (!std::is_constant_evaluated()) {
       unsigned long long carryout=0;
       *c = __builtin_addcll(a, b, carry, &carryout);
       return carryout;
@@ -57,7 +50,7 @@ constexpr bool addcarry_u64(bool carry, uint64_t a, uint64_t b, uint64_t* c) noe
 
 constexpr uint64_t mulx_u64(uint64_t a, uint64_t b, uint64_t* hi) noexcept {
 #ifdef BN256_HAS_BMI2
-   if (!BN256_IS_CONSTANT_EVALUATED) {
+   if (!std::is_constant_evaluated()) {
       unsigned long long local_hi=0;
       auto r = _mulx_u64(a, b,&local_hi);
       memcpy(hi, &local_hi, sizeof(*hi));
@@ -103,7 +96,7 @@ constexpr bool addcarry_u512(bool carry, const uint64_t* a, const uint64_t* b, u
 [[gnu::always_inline]] [[gnu::hot]] constexpr void full_mul_u256(const uint64_t* a, const uint64_t* b,
                                                                  uint64_t* c) noexcept {
 #ifdef BN256_HAS_EXTINT
-   if (!BN256_IS_CONSTANT_EVALUATED) {
+   if (!std::is_constant_evaluated()) {
 #if __clang__ && __clang_major__ >= 14
       using extint_t = _BitInt(512);
 #else
@@ -188,7 +181,7 @@ constexpr bool addcarry_u512(bool carry, const uint64_t* a, const uint64_t* b, u
 [[gnu::always_inline]] [[gnu::hot]]
 constexpr void half_mul_u256(const uint64_t* a, const uint64_t* b, uint64_t* c) noexcept {
 #ifdef BN256_HAS_EXTINT
-   if (!BN256_IS_CONSTANT_EVALUATED) {
+   if (!std::is_constant_evaluated()) {
 #if __clang__ && __clang_major__ >= 14
       using extint_t = _BitInt(256);
 #else
