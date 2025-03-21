@@ -1,6 +1,7 @@
 #pragma once
 #include "array.h"
 #include "bitint_arithmetic.h"
+#include <type_traits>
 #include <tuple>
 #include <iomanip>
 #include <iostream>
@@ -72,7 +73,7 @@ struct int512_t {
    }
 
    friend constexpr bool operator==(const int512_t& a, const int512_t& b) {
-      if (!BN256_IS_CONSTANT_EVALUATED) {
+      if (!std::is_constant_evaluated()) {
          return memcmp(&a, &b, sizeof(a)) == 0;
       }
       for (auto i = 0U; i < a.limbs_.size(); ++i) {
