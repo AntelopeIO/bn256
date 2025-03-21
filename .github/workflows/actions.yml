@@ -23,7 +23,7 @@ jobs:
           - name: MacOS
             mode: Release
             os: macos
-            vm_image: macos-11
+            vm_image: macos-latest
     env:
       DEBIAN_FRONTEND: noninteractive
     steps:
