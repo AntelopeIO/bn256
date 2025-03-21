@@ -29,7 +29,6 @@ endif()
 
 if (BN256_ENABLE_BMI2)
         target_compile_options(bn256 PUBLIC -mbmi2)
-        target_compile_definitions(bn256 PRIVATE BN256_HAS_BMI2)
 endif()
 
 if(BN256_INSTALL_COMPONENT)
